@@ -11,6 +11,7 @@ const authRoutes = require('./routes/authRoutes');
 const taskRoutes = require('./routes/taskRoutes'); 
 const userRoutes = require('./routes/userRoutes'); 
 const notificationRoutes = require('./routes/notificationRoutes');
+const depositRoutes = require('./routes/depositRoutes');
 
 const app = express();
 connectDB();
@@ -32,6 +33,7 @@ app.use('/api/auth', authRoutes);
 app.use('/api/tasks', taskRoutes); 
 app.use('/api/users', userRoutes); 
 app.use('/api/notifications', notificationRoutes);
+app.use('/api/deposits', depositRoutes);
 
 // (*** แก้ไข: Route หน้าเว็บ ให้ใช้ตัวแปร htmlPath ***)
 app.get('/', (req, res) => {
