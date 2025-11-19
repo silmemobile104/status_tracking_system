@@ -4,133 +4,92 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login - ระบบติดตามงาน</title>
-    <!-- โหลด Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+Thai:wght@400;500;600;700&display=swap');
-        body {
-            font-family: 'Inter', 'Noto Sans Thai', sans-serif;
-            background-color: #f3f4f6;
-        }
+        body { font-family: 'Inter', 'Noto Sans Thai', sans-serif; background-color: #f3f4f6; }
     </style>
 </head>
 <body class="flex items-center justify-center min-h-screen">
 
     <div class="w-full max-w-md p-8 space-y-8 bg-white rounded-xl shadow-lg">
-        
-        <!-- Login Form -->
+        <div class="text-center">
+            <h1 class="text-3xl font-bold text-gray-900">เข้าสู่ระบบ</h1>
+            <p class="mt-2 text-gray-600">ระบบติดตามสถานะงาน</p>
+        </div>
+
         <form id="login-form" class="mt-8 space-y-6">
-            
-            <!-- Username Input -->
             <div>
-                <label for="username" class="block text-sm font-medium text-gray-700 mb-2">
-                    รหัสพนักงาน (Username)
-                </label>
-                <input id="username" name="username" type="text" required
-                       class="w-full bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-3.5"
-                       placeholder="เช่น executive01">
+                <label for="username" class="block text-sm font-medium text-gray-700 mb-2">รหัสพนักงาน (Username)</label>
+                <input id="username" name="username" type="text" required class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500" placeholder="กรอกรหัสพนักงาน">
+            </div>
+            <div>
+                <label for="password" class="block text-sm font-medium text-gray-700 mb-2">รหัสผ่าน</label>
+                <input id="password" name="password" type="password" required class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500" placeholder="••••••••">
             </div>
 
-            <!-- Password Input -->
-            <div>
-                <label for="password" class="block text-sm font-medium text-gray-700 mb-2">
-                    รหัสผ่าน (Password)
-                </label>
-                <input id="password" name="password" type="password" required
-                       class="w-full bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-3.5"
-                       placeholder="••••••••">
-            </div>
+            <div id="error-message" class="hidden p-3 text-sm text-red-600 bg-red-100 rounded-md"></div>
 
-            <!-- Error Message Box (ซ่อนไว้ก่อน) -->
-            <div id="error-message" class="hidden p-3 text-sm text-red-700 bg-red-100 rounded-lg" role="alert">
-                <!-- ข้อความ Error จะถูกเติมด้วย JavaScript -->
-            </div>
-
-            <!-- Submit Button -->
-            <div>
-                <button id="submit-button" type="submit"
-                        class="w-full flex justify-center py-3 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
-                    เข้าสู่ระบบ
-                </button>
-            </div>
+            <button type="submit" id="submit-btn" class="w-full px-4 py-2 text-white bg-indigo-600 rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 font-semibold transition-colors">
+                เข้าสู่ระบบ
+            </button>
         </form>
     </div>
 
-    <!-- 
-      *************************************************
-      * อัปเดต SCRIPT ที่นี่
-      *************************************************
-    -->
     <script>
         document.addEventListener('DOMContentLoaded', () => {
+            // เคลียร์ Token เก่าทิ้งทุกครั้งที่เข้าหน้า Login
+            localStorage.clear();
+
             const loginForm = document.getElementById('login-form');
             const errorMessageDiv = document.getElementById('error-message');
-            const submitButton = document.getElementById('submit-button');
+            const submitButton = document.getElementById('submit-btn');
 
-            // เพิ่ม: ตรวจสอบว่าเคย Login หรือยัง
-            // ถ้าใช่, ให้ไปหน้า dashboard เลย (ป้องกันการ login ซ้ำ)
-            if (localStorage.getItem('token')) {
-                window.location.href = 'index.html';
-                return; // หยุดการทำงานทันที
-            }
-
-            loginForm.addEventListener('submit', async (event) => {
-                // 1. หยุดการ Submit แบบดั้งเดิม (ที่หน้าจะรีเฟรช)
-                event.preventDefault();
-
-                // 2. ซ่อน Error เก่า และแสดงสถานะ Loading
-                errorMessageDiv.classList.add('hidden');
-                submitButton.disabled = true;
-                submitButton.textContent = 'กำลังตรวจสอบ...';
-
-                // 3. ดึงข้อมูลจาก Form
+            loginForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                
                 const username = document.getElementById('username').value;
                 const password = document.getElementById('password').value;
 
-                // 4. กำหนดเป้าหมาย API (Server ของเราที่รันอยู่)
-                const serverUrl = 'http://localhost:5000/api/auth/login';
+                // ปิดปุ่มกันกดซ้ำ
+                submitButton.disabled = true;
+                submitButton.textContent = 'กำลังตรวจสอบ...';
+                errorMessageDiv.classList.add('hidden');
 
                 try {
-                    // (*** แก้ไข: ตัด http://localhost:5000 ออก ***)
-                    // ใช้แค่ /api/... พอ
+                    // (*** จุดที่ต้องแก้ที่ 1: ใช้ Relative Path ***)
+                    // ใช้แค่ '/api/auth/login' ตัด http://localhost:5000 ออก
                     const response = await fetch('/api/auth/login', { 
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json'
-                        },
+                        method: 'POST', // ต้องเป็น POST เท่านั้น
+                        headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({ username, password })
                     });
 
                     const data = await response.json();
 
                     if (response.ok) {
+                        // บันทึก Token
                         localStorage.setItem('token', data.token);
                         localStorage.setItem('user', JSON.stringify(data.user));
 
-                        // (*** แก้ไข: เปลี่ยน path ให้ตรงกับที่เราตั้งใน server.js ***)
-                        window.location.href = '/dashboard'; // หรือ 'index.html' ก็ได้ แต่ /dashboard สวยกว่า
+                        // (*** จุดที่ต้องแก้ที่ 2: Redirect ไป dashboard ***)
+                        window.location.href = '/dashboard'; 
                     
                     } else {
-                        // --- ล้มเหลว (Server ตอบ 400, 401) ---
-                        // แสดงข้อความ Error ที่ Server ส่งกลับมา
-                        errorMessageDiv.textContent = data.message;
-                        errorMessageDiv.classList.remove('hidden');
-                        submitButton.disabled = false;
-                        submitButton.textContent = 'เข้าสู่ระบบ';
+                        throw new Error(data.message || 'เข้าสู่ระบบไม่สำเร็จ');
                     }
 
                 } catch (error) {
-                    // --- ล้มเหลว (เช่น Server ปิด, Network Error) ---
-                    console.error('Fetch Error:', error);
-                    errorMessageDiv.textContent = 'ไม่สามารถเชื่อมต่อเซิร์ฟเวอร์ได้ กรุณาตรวจสอบว่าเซิร์ฟเวอร์ (node server.js) ทำงานอยู่';
+                    console.error('Login Error:', error);
+                    errorMessageDiv.textContent = error.message || 'ไม่สามารถเชื่อมต่อ Server ได้';
                     errorMessageDiv.classList.remove('hidden');
+                    
+                    // คืนค่าปุ่ม
                     submitButton.disabled = false;
                     submitButton.textContent = 'เข้าสู่ระบบ';
                 }
             });
         });
-        
     </script>
-
 </body>
 </html>
