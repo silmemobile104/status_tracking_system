@@ -3,8 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ระบบติดตามงาน</title>
-    <link rel="icon" href="/image/icon_silme.png" type="image/png">
+    <title>SILMIN MOBILE</title>
+    <link href="https://cdn.jsdelivr.net/npm/tom-select@2.2.2/dist/css/tom-select.default.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/tom-select@2.2.2/dist/js/tom-select.complete.min.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
     <script type="module" src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.esm.js"></script>
     <script nomodule src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.js"></script>
@@ -192,7 +193,7 @@
                             <thead class="bg-gray-50">
                                 <tr>
                                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ชื่องาน</th>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ผู้รับผิดชอบ</th>
+                                    <th id="header-assignee" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ผู้รับผิดชอบ</th>
                                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">สถานะ</th>
                                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">วันครบกำหนด</th>
                                     <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">จัดการ</th>
@@ -208,34 +209,46 @@
                 </div>
 
                 <div id="deposit-view" class="hidden bg-white p-4 rounded-lg shadow overflow-x-auto mt-6">
-                    <div class="flex justify-between items-center mb-4">
+                    <div class="flex flex-wrap justify-between items-center mb-4 gap-2">
                         <h3 class="text-lg font-bold text-gray-800 flex items-center">
                             <ion-icon name="wallet" class="mr-2 text-amber-600"></ion-icon>
-                            รายการเงินค่ามัดจำหน้าร้าน
+                            <span id="deposit-header-title">รายการเงินค่ามัดจำหน้าร้าน</span>
                         </h3>
-                        <button onclick="openDepositModal()" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded shadow flex items-center">
-                            <ion-icon name="add-circle" class="mr-2"></ion-icon> เพิ่มรายการ
-                        </button>
+                    
+                        <div class="flex items-center space-x-2">
+                            <div id="filter-branch-container">
+                                <select id="deposit-filter-branch" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg p-2 focus:ring-amber-500 focus:border-amber-500">
+                                    <option value="all" selected>ดูทุกสาขา</option>   
+                                    <option value="นราธิวาส">นราธิวาส</option>
+                                    <option value="ยะลา">ยะลา</option>
+                                    <option value="ปัตตานี">ปัตตานี</option>
+                                </select>
+                            </div>
+                        
+                            <button onclick="openDepositModal()" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded shadow flex items-center">
+                                <ion-icon name="add-circle" class="mr-2"></ion-icon> เพิ่มรายการ
+                            </button>
+                        </div>
                     </div>
                 
                     <table class="w-full deposit-table border-collapse text-sm">
-                        <thead>
+                        <thead class="bg-gray-100">
                             <tr>
-                                <th rowspan="2" class="w-24">วันที่มัดจำ</th>
-                                <th rowspan="2">ชื่อ-สกุล (ลูกค้า)</th>
-                                <th rowspan="2">เบอร์โทร</th>
-                                <th rowspan="2" style="background-color: #fee2e2;">ยอดมัดจำ</th>
-                                <th rowspan="2">วันที่นัดรับเครื่อง</th>
-                                <th colspan="7" class="header-received">รับเครื่องแล้ว</th>
+                                <th rowspan="2" class="border p-2">วันที่มัดจำ</th>
+                                <th rowspan="2" class="border p-2">ลูกค้า</th>
+                                <th rowspan="2" class="border p-2">เบอร์โทร</th>
+                                <th rowspan="2" class="border p-2 bg-red-50 text-red-700">ยอดมัดจำ</th>
+                                <th rowspan="2" class="border p-2">นัดรับ</th>
+                                <th colspan="7" class="border p-2 bg-gray-200 text-center">ข้อมูลรับเครื่อง</th>
                             </tr>
                             <tr>
-                                <th class="header-received">เลขที่บิล</th>
-                                <th class="header-received">อิมี่</th>
-                                <th class="header-received">สินค้า</th>
-                                <th class="header-received" style="background-color: #fca5a5;">ราคาเครื่อง</th>
-                                <th class="header-received" style="background-color: #bfdbfe;">ชำระส่วนต่าง</th>
-                                <th class="header-received" style="background-color: #86efac;">สำเร็จ</th>
-                                <th class="header-received">ลงชื่อ</th>
+                                <th class="border p-2 text-xs">บิล</th>
+                                <th class="border p-2 text-xs">IMEI</th>
+                                <th class="border p-2 text-xs">สินค้า</th>
+                                <th class="border p-2 text-xs">ราคาเต็ม</th>
+                                <th class="border p-2 text-xs bg-blue-50">ค้างชำระ</th>
+                                <th class="border p-2 text-xs">สถานะ</th>
+                                <th class="border p-2 text-xs">ผู้ทำรายการ</th>
                             </tr>
                         </thead>
                         <tbody id="deposit-table-body" class="text-gray-700 bg-white">
@@ -645,6 +658,9 @@
                 selectElement.innerHTML = '';
                 selectElement.disabled = false;
                 selectElement.prepend(new Option('--- เลือกผู้รับผิดชอบ ---', '', true, true));
+                if (selectElement.tomselect) {
+                    selectElement.tomselect.destroy();
+                }
                 users.forEach(user => {
                     if (user && user._id) { 
                         const option = document.createElement('option');
@@ -678,7 +694,7 @@
                 
                 allDashboardTasks = tasks;      // เก็บงานทั้งหมดลง Cache
                 renderTaskTable(tasks);         // แสดงผลทั้งหมด (ปกติ)
-                clearTaskFilterHighlights();  // เคลียร์กรอบสีเหลือง (ถ้ามี)
+                filterTasksByStatus('todo');
 
             } catch (error) {
                 safeHide(document.getElementById('loading-tasks'));
@@ -715,61 +731,106 @@
 
         const renderTaskTable = (tasks) => {
             const taskTableBody = document.getElementById('task-table-body');
-            document.getElementById('task-count').textContent = `${tasks.length} งาน`;
-
+            
+            // อัปเดตจำนวนงาน (ถ้ามี element นี้)
+            const countElement = document.getElementById('task-count');
+            if(countElement) countElement.textContent = `${tasks.length} งาน`;
+        
             // 1. กรณีไม่มีงาน
             if (tasks.length === 0) {
                 taskTableBody.innerHTML = `<tr id="no-task-row" class="text-center"><td colspan="5" class="px-6 py-4 text-gray-500">ไม่มีงานที่ต้องแสดงในขณะนี้</td></tr>`;
                 return;
             }
-
+        
             taskTableBody.innerHTML = ''; 
-
+        
             // 2. วนลูปแสดงงาน
-            tasks.forEach(task => { 
+            tasks.forEach((task, index) => {
                 // ตรวจสอบงานเกินกำหนด
                 const isOverdue = new Date(task.dueDate) < new Date() && task.status !== 'completed';
                 const statusDisplay = isOverdue ? getStatusTag('overdue') : getStatusTag(task.status);
                 
-                // ดึงชื่อผู้รับผิดชอบ
-                const assignedUserName = task.assignedTo ? task.assignedTo.name : 'Unknown User';
-                // ดึงสังกัด (ถ้ามีสาขาให้แสดงสาขา ถ้าไม่มีให้แสดงแผนก)
-                const subText = task.assignedTo ? (task.assignedTo.branch || task.assignedTo.department) : 'N/A';
-
-                // --- LOGIC การแสดงผลฝ่ายขาย (ทีมสาขา) ---
-                let nameDisplayHtml = assignedUserName;
+                // --- LOGIC การเลือกแสดงชื่อ (ผู้รับผิดชอบ VS ผู้สั่งงาน) ---
+                let personName = 'Unknown User';
+                let personSubText = '-';
+                let personImageChar = '?';
+                let showBranchBadge = false; // ตัวแปรเช็คว่าจะโชว์ Badge สาขาไหม
+            
+                // ตรวจสอบว่าเป็นหน้า "งานของฉัน" หรือไม่ (ต้องมีตัวแปร currentView ในระบบ)
+                const isMyTasksView = (typeof currentView !== 'undefined' && currentView === 'mytasks');
+            
+                if (isMyTasksView) {
+                    // >> กรณีหน้างานของฉัน: แสดง "ผู้สั่งงาน" (Created By)
+                    if (task.createdBy) {
+                        personName = task.createdBy.name || 'ไม่ระบุชื่อ';
+                        personSubText = 'ผู้สั่งงาน'; // ข้อความระบุสถานะ
+                        personImageChar = personName.charAt(0);
+                    } else {
+                        personName = 'ไม่ระบุ';
+                        personSubText = 'ผู้สั่งงาน';
+                    }
+                    // ปกติผู้สั่งงานไม่ต้องโชว์ Badge สาขาก็ได้ (หรือถ้าต้องการก็เปิดได้)
+                    showBranchBadge = false; 
                 
-                // ถ้า Task นี้ถูกระบุว่าเป็นของสาขาใดสาขาหนึ่ง (สำหรับฝ่ายขาย)
-                // ให้เพิ่มป้าย Badge ชื่อสาขาต่อท้ายชื่อคน เพื่อให้รู้ว่าเป็นงานกองกลางของสาขานั้น
-                if (task.branch) {
+                } else {
+                    // >> กรณีหน้าอื่น (Dashboard): แสดง "ผู้รับผิดชอบ" (Assigned To)
+                    if (task.assignedTo) {
+                        personName = task.assignedTo.name || 'Unknown User';
+                        // ดึงสังกัด (ถ้ามีสาขาให้แสดงสาขา ถ้าไม่มีให้แสดงแผนก)
+                        personSubText = task.assignedTo.branch || task.assignedTo.department || 'N/A';
+                        personImageChar = personName.charAt(0);
+                    }
+                    // แสดง Badge สาขาเฉพาะเมื่อดูในมุมมองผู้รับผิดชอบ และงานนั้นมีระบุสาขา
+                    showBranchBadge = true;
+                }
+            
+                // --- LOGIC การแสดงชื่อและ Badge ---
+                let nameDisplayHtml = personName;
+                
+                // ถ้า Logic อนุญาตให้โชว์ Badge และ Task มีข้อมูล Branch
+                if (showBranchBadge && task.branch) {
                     nameDisplayHtml += ` <span class="ml-2 px-2 py-0.5 text-xs rounded bg-indigo-100 text-indigo-800 border border-indigo-200">สาขา${task.branch}</span>`;
                 }
-
+            
                 const row = document.createElement('tr');
                 row.className = 'hover:bg-gray-50 transition-colors duration-150';
-                
+                // คลิกที่แถวเพื่อดูรายละเอียด (ถ้าเผลอคลิกปุ่มจะไม่ซ้อนทับกัน เพราะปุ่มมี event แยก)
+                row.onclick = (e) => {
+                    // ป้องกันการเปิด Modal ซ้อนถ้าคลิกโดนปุ่ม "เพิ่มเติม" โดยตรง (Optional)
+                    if (!e.target.closest('button')) openDetailModal(task._id);
+                };
+            
                 row.innerHTML = `
-                    <td class="px-6 py-4 whitespace-nowrap">
-                        <div class="text-sm font-medium text-gray-900">${task.title}</div>
+                    <td class="px-6 py-4">
+                        <div class="flex items-center">
+                            <div class="ml-0">
+                                <div class="text-sm font-medium text-gray-900">
+                                    <span class="font-bold text-amber-600 mr-2">${index + 1}.</span>${task.title}
+                                </div>
+                            </div>
+                        </div>
                     </td>
                     <td class="px-6 py-4 whitespace-nowrap">
                         <div class="flex items-center">
-                            <img class="h-8 w-8 rounded-full object-cover shadow-sm" src="https://placehold.co/100x100/e0e7ff/4f46e5?text=${assignedUserName.charAt(0)}" alt="">
+                            <img class="h-8 w-8 rounded-full object-cover shadow-sm" 
+                                 src="https://placehold.co/100x100/e0e7ff/4f46e5?text=${encodeURIComponent(personImageChar)}" 
+                                 alt="">
                             <div class="ml-3">
                                 <div class="text-sm font-medium text-gray-900 flex items-center">
                                     ${nameDisplayHtml}
                                 </div>
-                                <div class="text-xs text-gray-500">${subText}</div>
+                                <div class="text-xs text-gray-500">${personSubText}</div>
                             </div>
                         </div>
                     </td>
                     <td class="px-6 py-4 whitespace-nowrap">${statusDisplay}</td>
                     <td class="px-6 py-4 whitespace-nowrap text-sm ${isOverdue ? 'text-red-500 font-bold' : 'text-gray-500'}">
                         ${formatDate(task.dueDate)}
+                        <div class="text-xs font-normal text-gray-400">${timeAgo(task.dueDate)}</div>
                     </td>
                     <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                         <button class="text-amber-600 hover:text-amber-800 bg-amber-50 hover:bg-amber-100 px-3 py-1 rounded-md transition-colors" onclick="openDetailModal('${task._id}')">
-                            ดู/ทำ
+                            เพิ่มเติม
                         </button>
                     </td>
                 `;
@@ -779,7 +840,7 @@
 
         const filterTasksByStatus = (status) => {
             // 1. ไฮไลท์การ์ดที่เลือก
-            const statCards = document.querySelectorAll('#stats-cards [data-status]');
+            const statCards = document.querySelectorAll('#stats-cards [data-status]');  
             statCards.forEach(card => {
                 if (card.getAttribute('data-status') === status) {
                     card.classList.add('ring-2', 'ring-amber-500', 'shadow-lg');
@@ -1059,27 +1120,60 @@
         // ------------------------------------------
         // --- (D) DEPOSIT FUNCTIONS ---
         // ------------------------------------------
+        // ในไฟล์ index.html
         async function fetchDeposits() {
             try {
                 const token = localStorage.getItem('token');
-                const selectedCompanyId = document.getElementById('company-select').value; // Filter by company
-                // หมายเหตุ: Backend ต้องรองรับ query param นี้ หรือกรองตาม User Token ก็ได้
-                // แต่เพื่อให้ชัวร์ เราส่ง companyId ไปด้วยก็ได้ หาก API รองรับ
-                const res = await fetch(`${SERVER_URL}/deposits?companyId=${selectedCompanyId}`, { headers: { 'Authorization': `Bearer ${token}` } });
+                const selectedCompanyId = document.getElementById('company-select').value;
+            
+                // --- ส่วนที่ 1: อัปเดตหัวข้อตาราง (Header Title) ---
+                // ส่วนนี้จะเปลี่ยนข้อความ "รายการเงินค่ามัดจำหน้าร้าน" เป็น "รายการเงินค่ามัดจำ - สาขา..."
+                const titleElem = document.getElementById('deposit-header-title');
+                const filterBranchElem = document.getElementById('deposit-filter-branch');
                 
-                // Fallback ถ้า API ไม่รองรับ query param ก็ fetch ปกติ
-                if(!res.ok && res.status === 404) {
-                     // retry without query param just in case
-                     // ... code omitted for brevity, assuming API works as per previous instructions ...
+                if (titleElem) {
+                    if (typeof currentUser !== 'undefined' && currentUser && currentUser.role === 'staff') {
+                        // กรณี Staff: ให้แสดงสาขาของ Staff คนนั้นเสมอ
+                        titleElem.textContent = `รายการเงินค่ามัดจำ - สาขา ${currentUser.branch}`;
+                    } else {
+                        // กรณี Admin/Manager: ให้แสดงตามที่เลือกใน Dropdown
+                        // ถ้าเลือก "ทั้งหมด" หรือยังไม่เลือก ให้แสดงคำว่า "ทั้งหมด"
+                        // ถ้าเลือกสาขาเจาะจง ให้ดึงข้อความ (Text) ของ option นั้นมาแสดง
+                        let branchName = 'ทั้งหมด';
+                        if (filterBranchElem && filterBranchElem.value !== 'all' && filterBranchElem.selectedIndex > -1) {
+                            branchName = filterBranchElem.options[filterBranchElem.selectedIndex].text;
+                        }
+                        titleElem.textContent = `รายการเงินค่ามัดจำ - ${branchName}`;
+                    }
                 }
-
+            
+                // --- ส่วนที่ 2: เตรียม URL และ Parameter ---
+                let url = `${SERVER_URL}/deposits?companyId=${selectedCompanyId}`;
+            
+                // ดึงค่าจาก Dropdown ตัวกรองสาขา เพื่อส่งไปที่ API
+                if (filterBranchElem) {
+                    const branchVal = filterBranchElem.value;
+                    if (branchVal && branchVal !== 'all') {
+                        url += `&branch=${encodeURIComponent(branchVal)}`;
+                    }
+                }
+            
+                // --- ส่วนที่ 3: ส่งคำสั่งไปที่ Server ---
+                // console.log('Fetching URL:', url); 
+                const res = await fetch(url, { headers: { 'Authorization': `Bearer ${token}` } });
+                
+                if (!res.ok) {
+                    throw new Error(`HTTP error! status: ${res.status}`);
+                }
+                
                 const deposits = await res.json();
-
+            
+                // --- ส่วนที่ 4: วาดตาราง ---
                 const tbody = document.getElementById('deposit-table-body');
                 tbody.innerHTML = '';
-
+            
                 if (deposits.length === 0) {
-                    tbody.innerHTML = `<tr><td colspan="12" class="text-center py-6 text-gray-500">ยังไม่มีรายการมัดจำ</td></tr>`;
+                    tbody.innerHTML = `<tr><td colspan="12" class="text-center py-6 text-gray-500">ไม่พบข้อมูลในสาขานี้</td></tr>`;
                     return;
                 }
             
@@ -1089,29 +1183,35 @@
                     const balance = price > 0 ? (price - deposit) : 0;
                 
                     const tr = document.createElement('tr');
-                    tr.className = "hover:bg-blue-50 transition-colors cursor-pointer";
+                    tr.className = "hover:bg-blue-50 transition-colors cursor-pointer border-b";
                     tr.onclick = () => openDepositModal(d);
-
+                
                     tr.innerHTML = `
-                        <td class="text-center text-gray-600">${formatDateShort(d.depositDate)}</td>
-                        <td class="font-medium text-gray-800">${d.customerName}</td>
-                        <td class="text-center text-gray-600">${d.phoneNumber}</td>
-                        <td class="text-right font-bold text-red-600 bg-red-50">${deposit.toLocaleString()}</td>
-                        <td class="text-center text-gray-600">${formatDateShort(d.pickupDueDate)}</td>
-
-                        <td class="text-center">${d.billNo || '-'}</td>
-                        <td class="text-center text-xs font-mono text-gray-500">${d.imei || '-'}</td>
-                        <td class="text-xs">${d.product || '-'}</td>
-                        <td class="text-right bg-red-100">${price ? price.toLocaleString() : '-'}</td>
-                        <td class="text-right font-bold bg-blue-100 text-blue-800">${price ? balance.toLocaleString() : '-'}</td>
-                        <td class="text-center bg-green-100">
-                            ${d.isSuccess ? '<ion-icon name="checkbox" class="text-green-600 text-xl"></ion-icon>' : '<span class="text-gray-300">-</span>'}
+                        <td class="text-center border p-2 text-gray-600">${formatDateShort(d.depositDate)}</td>
+                        <td class="font-medium border p-2 text-gray-800">${d.customerName}</td>
+                        <td class="text-center border p-2 text-gray-600">${d.phoneNumber}</td>
+                        <td class="text-right border p-2 font-bold text-red-600 bg-red-50">${deposit.toLocaleString()}</td>
+                        <td class="text-center border p-2 text-gray-600">${formatDateShort(d.pickupDueDate)}</td>
+                
+                        <td class="text-center border p-2 text-xs">${d.billNo || '-'}</td>
+                        <td class="text-center border p-2 text-xs font-mono text-gray-500">${d.imei || '-'}</td>
+                        <td class="text-xs border p-2">${d.product || '-'}</td>
+                        <td class="text-right border p-2 bg-red-50 text-xs">${price ? price.toLocaleString() : '-'}</td>
+                        <td class="text-right border p-2 font-bold bg-blue-50 text-blue-800">${price ? balance.toLocaleString() : '-'}</td>
+                        <td class="text-center border p-2 bg-green-50">
+                            ${d.isSuccess ? '<ion-icon name="checkmark-circle" class="text-green-600 text-xl"></ion-icon>' : '<span class="text-gray-300">-</span>'}
                         </td>
-                        <td class="text-center text-xs text-gray-500">${d.signName || ''}</td>
+                        <td class="text-center border p-2 text-xs text-gray-500">${d.signName || ''}</td>
                     `;
                     tbody.appendChild(tr);
                 });
-            } catch (e) { console.error(e); }
+            
+            } catch (e) {
+                console.error("Error fetching deposits:", e);
+                // อาจจะแสดง Error บนหน้าจอด้วยก็ได้ถ้าต้องการ
+                const tbody = document.getElementById('deposit-table-body');
+                if(tbody) tbody.innerHTML = `<tr><td colspan="12" class="text-center py-6 text-red-500">เกิดข้อผิดพลาดในการโหลดข้อมูล</td></tr>`;
+            }
         }
 
         function openDepositModal(data = null) {
@@ -1485,10 +1585,14 @@
 
             // Navigation Listeners (ใช้ updateNavActiveState ทั้งหมด)
             document.getElementById('nav-dashboard').addEventListener('click', (e) => {
+                const header = document.getElementById('header-assignee');
+                if(header) header.textContent = 'ผู้รับผิดชอบ';
                 e.preventDefault(); updateNavActiveState('dashboard');
                 fetchDashboardTasks(); fetchTaskStats(); 
             });
             document.getElementById('nav-mytasks').addEventListener('click', (e) => {
+                const header = document.getElementById('header-assignee');
+                if(header) header.textContent = 'ผู้มอบหมายงาน';
                 e.preventDefault(); updateNavActiveState('mytasks');
                 fetchMyTasks();
             });
@@ -1518,6 +1622,19 @@
             document.getElementById('user-company-input').addEventListener('change', () => {
                 loadManagersForDropdown();
             });
+
+            const branchFilterSelect = document.getElementById('deposit-filter-branch');
+            if (branchFilterSelect) {
+                branchFilterSelect.addEventListener('change', () => {
+                    fetchDeposits(); // เรียกฟังก์ชันโหลดข้อมูลใหม่
+                });
+
+                // (เสริม) ถ้าเป็น Staff ทั่วไป ซ่อนตัวกรองนี้ไปเลย (เพราะดูได้แค่สาขาตัวเองอยู่แล้ว)
+                if (currentUser && currentUser.role === 'staff') {
+                    const container = document.getElementById('filter-branch-container');
+                    if(container) container.style.display = 'none';
+                }
+            }
         });
 
         // Modal Control
