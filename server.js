@@ -27,7 +27,7 @@ const htmlPath = path.join(process.cwd(), 'HTML');
 
 // บอก Express ว่าไฟล์ static อยู่ที่ไหน
 app.use(express.static(htmlPath));
-
+app.use('/image', express.static(path.join(process.cwd(), 'image')));
 // API Routes
 app.use('/api/auth', authRoutes);
 app.use('/api/tasks', taskRoutes); 
