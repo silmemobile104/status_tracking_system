@@ -12,6 +12,7 @@
     <script nomodule src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.js"></script>
     
     <style type="text/tailwindcss">
+        /* ในส่วน <style type="text/tailwindcss"> */
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+Thai:wght@400;500;600;700&display=swap');
         body { font-family: 'Inter', 'Noto Sans Thai', sans-serif; }
         ::-webkit-scrollbar { width: 8px; }
@@ -20,7 +21,7 @@
         ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
         .modal { display: none; }
         .modal.active { display: flex; }
-
+        
         .form-input-theme {
             @apply w-full bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg block p-3;
             @apply focus:ring-amber-500 focus:border-amber-500;
@@ -31,7 +32,7 @@
         }
         /* สไตล์ตารางมัดจำ */
         .deposit-table th {
-            background-color: #e0f2fe; /* สีฟ้าอ่อนหัวตาราง */
+            background-color: #e0f2fe;
             border: 1px solid #94a3b8;
             text-align: center;
             padding: 8px;
@@ -44,18 +45,73 @@
             vertical-align: middle;
         }
         .header-received {
-            background-color: #fef3c7 !important; /* สีเหลืองอ่อน */
+            background-color: #fef3c7 !important;
+        }
+        
+        /* --- RESPONSIVE FIXES (สำคัญ) --- */
+        #sidebar {
+            /* 🔴 BASE (Mobile): Fixed position, ซ่อน, ใช้ transition */
+            position: fixed;
+            transform: translateX(-100%);
+            transition: transform 0.3s ease-in-out;
+            height: 100vh;
+            padding-top: 4rem; /* เว้นที่ให้ Mobile Header */
+            z-index: 50; 
+        }
+        /* เมื่อ Menu ถูกเปิด */
+        #sidebar.active {
+            transform: translateX(0);
+        }
+        
+        /* 🟢 DESKTOP FIX (md: และใหญ่กว่า) */
+        @media (min-width: 768px) {
+            #sidebar {
+                /* 🔴 เปลี่ยนกลับเป็น Relative/Static เพื่อให้ Layout ปกติ (Flexbox) */
+                position: static; 
+                transform: translateX(0);
+                padding-top: 0; /* ลบ padding มือถือออก */
+                box-shadow: none; 
+            }
+        }
+        /* 🔴 MAIN CONTENT PADDING ADJUSTMENTS */
+        #main-content {
+            /* ใช้ pt-20 เพื่อแก้ปัญหาปุ่มสั่งงานใหม่ถูกบัง (ชดเชยที่ h-16 + p-3) */
+            padding-top: 5rem; /* 🔴 5rem = 80px (pt-20) */
+            transition: margin-left 0.3s ease-in-out; 
+        }
+        @media (min-width: 768px) {
+            #main-content {
+                /* กลับเป็นค่า Padding ปกติบน Desktop */
+                padding-top: 1rem; 
+            }
         }
     </style>
 </head>
 <body class="bg-gray-100">
-    <div class="flex h-screen overflow-hidden">
 
-        <aside class="w-64 flex-shrink-0 bg-white shadow-lg overflow-y-auto">
+    <div id="mobile-header" class="md:hidden bg-white shadow p-3 flex justify-between items-center fixed top-0 left-0 w-full z-40">
+        <button id="menu-toggle" class="text-gray-700 p-2">
+            <ion-icon name="menu" class="text-2xl"></ion-icon>
+        </button>
+        <span class="text-lg font-bold text-amber-600">SILMIN MOBILE</span>
+        <div id="notification-bell-mobile" class="relative">
+             <button id="notification-bell-btn-mobile" class="relative text-gray-500 hover:text-amber-600 focus:outline-none">
+                <ion-icon name="notifications-outline" class="w-6 h-6"></ion-icon>
+                <span id="notification-dot-mobile" class="hidden absolute top-0 right-0 block h-2 w-2 rounded-full bg-red-500 ring-2 ring-white"></span>
+            </button>
+        </div>
+    </div>
+
+    <div id="sidebar-overlay" class="fixed inset-0 bg-black bg-opacity-50 z-30 hidden md:hidden"></div>
+    
+    <div id="app-wrapper" class="flex min-h-screen"> 
+        
+        <aside id="sidebar" class="w-64 bg-white shadow-lg flex-shrink-0 flex flex-col md:shadow-lg">
             <div class="flex flex-col h-full">
-                <div class="h-16 flex items-center justify-center border-b">
+                <div class="h-16 flex items-center justify-center border-b hidden md:flex">
                     <h1 class="text-xl font-bold text-gray-800">SILMIN MOBILE</h1>
                 </div>
+                
                 <div class="p-4 border-b">
                     <label for="company-select" class="block text-sm font-medium text-gray-500 mb-2">บริษัท</label>
                     <select id="company-select" class="form-select-theme p-2.5">
@@ -65,31 +121,25 @@
                 </div>
                 
                 <nav id="nav-menu" class="flex-1 py-4 px-2 space-y-2">
-                    <a href="#" id="nav-dashboard" class="flex items-center px-4 py-2 text-white bg-amber-500 rounded-lg font-medium">
-                        <ion-icon name="grid-outline" class="w-5 h-5 mr-3"></ion-icon>
-                        แดชบอร์ด
+                    <a href="#" onclick="updateNavActiveState('dashboard')" id="nav-dashboard" class="flex items-center px-4 py-2 text-white bg-amber-500 rounded-lg font-medium">
+                        <ion-icon name="grid-outline" class="w-5 h-5 mr-3"></ion-icon> แดชบอร์ด
                     </a>
-                    <a href="#" id="nav-mytasks" class="flex items-center px-4 py-2 text-gray-600 hover:bg-gray-100 rounded-lg">
-                        <ion-icon name="document-text-outline" class="w-5 h-5 mr-3"></ion-icon>
-                        งานของฉัน
+                    <a href="#" onclick="updateNavActiveState('mytasks')" id="nav-mytasks" class="flex items-center px-4 py-2 text-gray-600 hover:bg-gray-100 rounded-lg">
+                        <ion-icon name="document-text-outline" class="w-5 h-5 mr-3"></ion-icon> งานของฉัน
                     </a>
-                    <a href="#" id="nav-Storefront_deposit" class="flex items-center px-4 py-2 text-gray-600 hover:bg-gray-100 rounded-lg">
-                        <ion-icon name="cash-outline" class="w-5 h-5 mr-3"></ion-icon>
-                        เงินค่ามัดจำหน้าร้าน
+                    <a href="#" onclick="updateNavActiveState('deposit')" id="nav-Storefront_deposit" class="flex items-center px-4 py-2 text-gray-600 hover:bg-gray-100 rounded-lg">
+                        <ion-icon name="cash-outline" class="w-5 h-5 mr-3"></ion-icon> เงินค่ามัดจำหน้าร้าน
                     </a>
-                    <a href="#" id="nav-admin" class="flex items-center px-4 py-2 text-gray-600 hover:bg-gray-100 rounded-lg">
-                        <ion-icon name="person-add-outline" class="w-5 h-5 mr-3"></ion-icon>
-                        จัดการผู้ใช้
+                    <a href="#" onclick="updateNavActiveState('admin')" id="nav-admin" class="flex items-center px-4 py-2 text-gray-600 hover:bg-gray-100 rounded-lg">
+                        <ion-icon name="person-add-outline" class="w-5 h-5 mr-3"></ion-icon> จัดการผู้ใช้
                     </a>
                     <a href="#" id="nav-settings" class="flex items-center px-4 py-2 text-gray-600 hover:bg-gray-100 rounded-lg">
-                        <ion-icon name="settings-outline" class="w-5 h-5 mr-3"></ion-icon>
-                        ตั้งค่า
+                        <ion-icon name="settings-outline" class="w-5 h-5 mr-3"></ion-icon> ตั้งค่า
                     </a>
                 </nav>
-
+                
                 <div class="p-4 border-t mt-auto">
                     <div id="user-profile-widget" class="flex items-center justify-between">
-                        
                         <div class="flex items-center">
                             <img class="h-10 w-10 rounded-full object-cover" src="https://placehold.co/100x100/e2e8f0/718096?text=U" alt="User Avatar">
                             <div class="ml-3">
@@ -97,24 +147,21 @@
                                 <p id="user-role" class="text-xs text-gray-500">...</p>
                             </div>
                         </div>
-
-                        <div class="relative">
+                        <div class="relative hidden md:block">
                             <button id="notification-bell" class="relative text-gray-500 hover:text-amber-600 focus:outline-none">
                                 <ion-icon name="notifications-outline" class="w-6 h-6"></ion-icon>
                                 <span id="notification-dot" class="hidden absolute top-0 right-0 block h-2 w-2 rounded-full bg-red-500 ring-2 ring-white"></span>
                             </button>
                         </div>
-
                     </div>
                     <button id="logout-button" class="w-full mt-3 text-left flex items-center px-4 py-2 text-sm text-gray-600 hover:bg-gray-100 rounded-lg">
-                        <ion-icon name="log-out-outline" class="w-5 h-5 mr-3 text-red-500"></ion-icon>
-                        ออกจากระบบ
+                        <ion-icon name="log-out-outline" class="w-5 h-5 mr-3 text-red-500"></ion-icon> ออกจากระบบ
                     </button>
                 </div>
             </div>
         </aside>
 
-        <main class="flex-1 overflow-y-auto">
+        <main id="main-content" class="flex-1 p-4 pt-20 md:pt-4 overflow-y-auto">
             
             <div class="container mx-auto px-6 py-8">
                 
@@ -1636,6 +1683,28 @@
                     const container = document.getElementById('filter-branch-container');
                     if(container) container.style.display = 'none';
                 }
+            }
+            const sidebar = document.getElementById('sidebar');
+            const menuToggle = document.getElementById('menu-toggle');
+            const overlay = document.getElementById('sidebar-overlay');
+
+            if (menuToggle && sidebar && overlay) {
+                const toggleMenu = () => {
+                    sidebar.classList.toggle('active');
+                    overlay.classList.toggle('hidden');
+                };
+                menuToggle.addEventListener('click', toggleMenu);
+                overlay.addEventListener('click', toggleMenu);
+            
+                // ปิดเมนูอัตโนมัติเมื่อกดลิงก์
+                document.querySelectorAll('#nav-menu a').forEach(link => {
+                    link.addEventListener('click', () => {
+                        // เช็คว่าอยู่ในโหมดมือถือ (จอเล็กกว่า 768px)
+                        if (window.innerWidth < 768) { 
+                            toggleMenu(); 
+                        }
+                    });
+                });
             }
         });
 
