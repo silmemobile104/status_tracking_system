@@ -1135,7 +1135,8 @@
                 if (titleElem) {
                     if (typeof currentUser !== 'undefined' && currentUser && currentUser.role === 'staff') {
                         // กรณี Staff: ให้แสดงสาขาของ Staff คนนั้นเสมอ
-                        titleElem.textContent = `รายการเงินค่ามัดจำ - สาขา ${currentUser.branch}`;
+                        const branchName = currentUser.branch || 'ทั้งหมด'; // ถ้าเป็นค่าว่าง/null/undefined ให้ใช้คำว่า 'ทั้งหมด' แทน
+                        titleElem.textContent = `รายการเงินค่ามัดจำ - สาขา ${branchName}`;
                     } else {
                         // กรณี Admin/Manager: ให้แสดงตามที่เลือกใน Dropdown
                         // ถ้าเลือก "ทั้งหมด" หรือยังไม่เลือก ให้แสดงคำว่า "ทั้งหมด"
