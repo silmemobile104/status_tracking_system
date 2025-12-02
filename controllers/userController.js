@@ -2,6 +2,7 @@
 // (เวอร์ชันแก้ไข - รวบที่ซ้ำซ้อนและแก้บั๊กตัวแปร)
 
 const User = require('../models/user'); // <-- 1. ใช้ตัวพิมพ์ใหญ่ 'User'
+const bcrypt = require('bcryptjs'); // Import bcrypt for password hashing
 
 // @desc    ดึงรายชื่อ User ทั้งหมด (เพื่อใช้ใน Dropdown มอบหมายงาน)
 // @route   GET /api/users
@@ -14,24 +15,24 @@ exports.getUsersForAssignment = async (req, res) => {
         // 1. กำหนดว่าจะกรองบริษัทไหน
         let filterCompanyId;
         if (userRole === 'staff') {
-             filterCompanyId = req.user.companyId;
+            filterCompanyId = req.user.companyId;
         } else {
             // (Manager, HR, Exec)
             filterCompanyId = companyId || req.user.companyId;
         }
 
         // 2. สร้างเงื่อนไขการค้นหา
-        let query = { 
+        let query = {
             companyId: filterCompanyId,
         };
 
         // 3. Logic การกรอง Role (ตาม Requirement ล่าสุด)
         if (userRole === 'staff') {
-             query.role = '---no-one---'; 
-        
+            query.role = '---no-one---';
+
         } else if (userRole === 'manager' || userRole === 'hr' || userRole === 'executive') {
             // เห็นทุกคน (ยกเว้นผู้บริหาร) เพื่อสั่งงานได้
-            query.role = { $ne: 'executive' }; 
+            query.role = { $ne: 'executive' };
         }
 
         // 4. ค้นหา User (*** แก้ไข: ใช้ 'User.find' ***)
@@ -56,8 +57,8 @@ exports.getUsersForAssignment = async (req, res) => {
 exports.adminGetAllUsers = async (req, res) => {
     try {
         const users = await User.find({})
-            .populate('reportsTo', 'name username') 
-            .select('-password') 
+            .populate('reportsTo', 'name username')
+            .select('-password')
             .sort({ name: 1 });
 
         res.status(200).json(users);
@@ -73,7 +74,7 @@ exports.adminGetAllUsers = async (req, res) => {
 exports.adminUpdateUser = async (req, res) => {
     try {
         const userId = req.params.id;
-        const { name, role, department, branch, reportsTo } = req.body;
+        const { name, role, department, branch, reportsTo, password } = req.body; // Extract password
 
         const user = await User.findById(userId);
 
@@ -84,8 +85,14 @@ exports.adminUpdateUser = async (req, res) => {
         user.name = name || user.name;
         user.role = role || user.role;
         user.department = department || user.department;
-        user.branch = branch; 
-        user.reportsTo = reportsTo || null; 
+        user.branch = branch;
+        user.reportsTo = reportsTo || null;
+
+        // Check if password is provided and not empty
+        if (password && password.trim() !== '') {
+            const salt = await bcrypt.genSalt(10);
+            user.password = await bcrypt.hash(password, salt);
+        }
 
         const updatedUser = await user.save();
         console.log(`[Admin] User ${req.user.username} แก้ไขข้อมูล ${updatedUser.username}`);
@@ -116,13 +123,13 @@ exports.adminDeleteUser = async (req, res) => {
         if (!user) {
             return res.status(404).json({ message: 'ไม่พบผู้ใช้นี้' });
         }
-        
+
         if (user._id.toString() === req.user.id) {
             return res.status(400).json({ message: 'คุณไม่สามารถลบตัวเองได้' });
         }
 
-        await user.deleteOne(); 
-        
+        await user.deleteOne();
+
         console.log(`[Admin] User ${req.user.username} ลบ User ${user.username}`);
         res.status(200).json({ message: 'ลบผู้ใช้สำเร็จ' });
 

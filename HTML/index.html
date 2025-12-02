@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="th">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -10,7 +11,7 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script type="module" src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.esm.js"></script>
     <script nomodule src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.js"></script>
-    
+
     <style type="text/tailwindcss">
         /* ในส่วน <style type="text/tailwindcss"> */
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+Thai:wght@400;500;600;700&display=swap');
@@ -87,31 +88,36 @@
         }
     </style>
 </head>
+
 <body class="bg-gray-100">
 
-    <div id="mobile-header" class="md:hidden bg-white shadow p-3 flex justify-between items-center fixed top-0 left-0 w-full z-40">
+    <div id="mobile-header"
+        class="md:hidden bg-white shadow p-3 flex justify-between items-center fixed top-0 left-0 w-full z-40">
         <button id="menu-toggle" class="text-gray-700 p-2">
             <ion-icon name="menu" class="text-2xl"></ion-icon>
         </button>
         <span class="text-lg font-bold text-amber-600">SILMIN MOBILE</span>
         <div id="notification-bell-mobile" class="relative">
-             <button id="notification-bell-btn-mobile" class="relative text-gray-500 hover:text-amber-600 focus:outline-none">
-                <ion-icon name="notifications-outline" class="w-6 h-6"></ion-icon>
-                <span id="notification-dot-mobile" class="hidden absolute top-0 right-0 block h-2 w-2 rounded-full bg-red-500 ring-2 ring-white"></span>
+            <button id="notification-bell-btn-mobile"
+                class="relative bg-white p-2 rounded-full text-gray-400 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                <span class="sr-only">View notifications</span>
+                <ion-icon name="notifications-outline" class="text-2xl"></ion-icon>
+                <span id="notification-dot-mobile"
+                    class="hidden absolute top-1 right-1 block h-2.5 w-2.5 rounded-full ring-2 ring-white bg-red-500 transform translate-x-1/4 -translate-y-1/4"></span>
             </button>
         </div>
     </div>
 
     <div id="sidebar-overlay" class="fixed inset-0 bg-black bg-opacity-50 z-30 hidden md:hidden"></div>
-    
-    <div id="app-wrapper" class="flex min-h-screen"> 
-        
+
+    <div id="app-wrapper" class="flex min-h-screen">
+
         <aside id="sidebar" class="w-64 bg-white shadow-lg flex-shrink-0 flex flex-col md:shadow-lg">
             <div class="flex flex-col h-full">
                 <div class="h-16 flex items-center justify-center border-b hidden md:flex">
                     <h1 class="text-xl font-bold text-gray-800">SILMIN MOBILE</h1>
                 </div>
-                
+
                 <div class="p-4 border-b">
                     <label for="company-select" class="block text-sm font-medium text-gray-500 mb-2">บริษัท</label>
                     <select id="company-select" class="form-select-theme p-2.5">
@@ -119,42 +125,51 @@
                         <option value="company_2_id">เอสจี พลัส 2023 จำกัด</option>
                     </select>
                 </div>
-                
+
                 <nav id="nav-menu" class="flex-1 py-4 px-2 space-y-2">
-                    <a href="#" onclick="updateNavActiveState('dashboard')" id="nav-dashboard" class="flex items-center px-4 py-2 text-white bg-amber-500 rounded-lg font-medium">
+                    <a href="#" onclick="updateNavActiveState('dashboard')" id="nav-dashboard"
+                        class="flex items-center px-4 py-2 text-white bg-amber-500 rounded-lg font-medium">
                         <ion-icon name="grid-outline" class="w-5 h-5 mr-3"></ion-icon> แดชบอร์ด
                     </a>
-                    <a href="#" onclick="updateNavActiveState('mytasks')" id="nav-mytasks" class="flex items-center px-4 py-2 text-gray-600 hover:bg-gray-100 rounded-lg">
+                    <a href="#" onclick="updateNavActiveState('mytasks')" id="nav-mytasks"
+                        class="flex items-center px-4 py-2 text-gray-600 hover:bg-gray-100 rounded-lg">
                         <ion-icon name="document-text-outline" class="w-5 h-5 mr-3"></ion-icon> งานของฉัน
                     </a>
-                    <a href="#" onclick="updateNavActiveState('deposit')" id="nav-Storefront_deposit" class="flex items-center px-4 py-2 text-gray-600 hover:bg-gray-100 rounded-lg">
+                    <a href="#" onclick="updateNavActiveState('deposit')" id="nav-Storefront_deposit"
+                        class="flex items-center px-4 py-2 text-gray-600 hover:bg-gray-100 rounded-lg">
                         <ion-icon name="cash-outline" class="w-5 h-5 mr-3"></ion-icon> เงินค่ามัดจำหน้าร้าน
                     </a>
-                    <a href="#" onclick="updateNavActiveState('admin')" id="nav-admin" class="flex items-center px-4 py-2 text-gray-600 hover:bg-gray-100 rounded-lg">
+                    <a href="#" onclick="updateNavActiveState('admin')" id="nav-admin"
+                        class="flex items-center px-4 py-2 text-gray-600 hover:bg-gray-100 rounded-lg">
                         <ion-icon name="person-add-outline" class="w-5 h-5 mr-3"></ion-icon> จัดการผู้ใช้
                     </a>
-                    <a href="#" id="nav-settings" class="flex items-center px-4 py-2 text-gray-600 hover:bg-gray-100 rounded-lg">
+                    <a href="#" id="nav-settings"
+                        class="flex items-center px-4 py-2 text-gray-600 hover:bg-gray-100 rounded-lg">
                         <ion-icon name="settings-outline" class="w-5 h-5 mr-3"></ion-icon> ตั้งค่า
                     </a>
                 </nav>
-                
+
                 <div class="p-4 border-t mt-auto">
                     <div id="user-profile-widget" class="flex items-center justify-between">
                         <div class="flex items-center">
-                            <img class="h-10 w-10 rounded-full object-cover" src="https://placehold.co/100x100/e2e8f0/718096?text=U" alt="User Avatar">
+                            <img class="h-10 w-10 rounded-full object-cover"
+                                src="https://placehold.co/100x100/e2e8f0/718096?text=U" alt="User Avatar">
                             <div class="ml-3">
                                 <p id="user-name" class="text-sm font-medium text-gray-800">กำลังโหลด...</p>
                                 <p id="user-role" class="text-xs text-gray-500">...</p>
                             </div>
                         </div>
                         <div class="relative hidden md:block">
-                            <button id="notification-bell" class="relative text-gray-500 hover:text-amber-600 focus:outline-none">
+                            <button id="notification-bell"
+                                class="relative text-gray-500 hover:text-amber-600 focus:outline-none">
                                 <ion-icon name="notifications-outline" class="w-6 h-6"></ion-icon>
-                                <span id="notification-dot" class="hidden absolute top-0 right-0 block h-2 w-2 rounded-full bg-red-500 ring-2 ring-white"></span>
+                                <span id="notification-dot"
+                                    class="hidden absolute top-0 right-0 block h-2 w-2 rounded-full bg-red-500 ring-2 ring-white"></span>
                             </button>
                         </div>
                     </div>
-                    <button id="logout-button" class="w-full mt-3 text-left flex items-center px-4 py-2 text-sm text-gray-600 hover:bg-gray-100 rounded-lg">
+                    <button id="logout-button"
+                        class="w-full mt-3 text-left flex items-center px-4 py-2 text-sm text-gray-600 hover:bg-gray-100 rounded-lg">
                         <ion-icon name="log-out-outline" class="w-5 h-5 mr-3 text-red-500"></ion-icon> ออกจากระบบ
                     </button>
                 </div>
@@ -162,17 +177,19 @@
         </aside>
 
         <main id="main-content" class="flex-1 p-4 pt-20 md:pt-4 overflow-y-auto">
-            
+
             <div class="container mx-auto px-6 py-8">
-                
+
                 <div class="flex justify-between items-center mb-6">
                     <h2 id="main-header" class="text-3xl font-bold text-gray-800">แดชบอร์ด</h2>
                     <div id="main-header-buttons">
-                        <button id="newTaskButton" class="bg-amber-500 hover:bg-amber-600 text-white font-bold py-2 px-4 rounded-lg flex items-center">
+                        <button id="newTaskButton"
+                            class="bg-amber-500 hover:bg-amber-600 text-white font-bold py-2 px-4 rounded-lg flex items-center">
                             <ion-icon name="add-outline" class="w-5 h-5 mr-2"></ion-icon>
                             สั่งงานใหม่
                         </button>
-                        <button id="newUserButton" class="bg-amber-600 hover:bg-amber-700 text-white font-bold py-2 px-4 rounded-lg flex items-center hidden">
+                        <button id="newUserButton"
+                            class="bg-amber-600 hover:bg-amber-700 text-white font-bold py-2 px-4 rounded-lg flex items-center hidden">
                             <ion-icon name="person-add-outline" class="w-5 h-5 mr-2"></ion-icon>
                             เพิ่มผู้ใช้ใหม่
                         </button>
@@ -180,45 +197,54 @@
                 </div>
 
                 <div id="stats-cards" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
-                    </div>
-                
+                </div>
+
                 <div id="mytasks-filters" class="hidden mb-6">
                     <h3 class="text-lg font-semibold text-gray-700 mb-3">แยกตามสถานะงาน</h3>
                     <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-                        <button onclick="filterMyTasks('todo')" id="btn-filter-todo" class="p-3 bg-white rounded-lg shadow hover:shadow-md transition-all border-l-4 border-gray-400 flex items-center justify-between group focus:ring-2 focus:ring-gray-300">
+                        <button onclick="filterMyTasks('todo')" id="btn-filter-todo"
+                            class="p-3 bg-white rounded-lg shadow hover:shadow-md transition-all border-l-4 border-gray-400 flex items-center justify-between group focus:ring-2 focus:ring-gray-300">
                             <div class="flex items-center">
                                 <ion-icon name="clipboard-outline" class="text-gray-500 mr-2"></ion-icon>
                                 <span class="text-sm font-semibold text-gray-700">รอทำ</span>
                             </div>
-                            <span id="mytask-count-todo" class="bg-gray-100 text-gray-600 py-0.5 px-2 rounded-full text-xs font-bold">0</span>
+                            <span id="mytask-count-todo"
+                                class="bg-gray-100 text-gray-600 py-0.5 px-2 rounded-full text-xs font-bold">0</span>
                         </button>
 
-                        <button onclick="filterMyTasks('in-progress')" id="btn-filter-inprogress" class="p-3 bg-white rounded-lg shadow hover:shadow-md transition-all border-l-4 border-yellow-400 flex items-center justify-between group focus:ring-2 focus:ring-yellow-300">
+                        <button onclick="filterMyTasks('in-progress')" id="btn-filter-inprogress"
+                            class="p-3 bg-white rounded-lg shadow hover:shadow-md transition-all border-l-4 border-yellow-400 flex items-center justify-between group focus:ring-2 focus:ring-yellow-300">
                             <div class="flex items-center">
                                 <ion-icon name="construct-outline" class="text-yellow-600 mr-2"></ion-icon>
                                 <span class="text-sm font-semibold text-yellow-700">กำลังทำ</span>
                             </div>
-                            <span id="mytask-count-inprogress" class="bg-yellow-100 text-yellow-600 py-0.5 px-2 rounded-full text-xs font-bold">0</span>
+                            <span id="mytask-count-inprogress"
+                                class="bg-yellow-100 text-yellow-600 py-0.5 px-2 rounded-full text-xs font-bold">0</span>
                         </button>
 
-                        <button onclick="filterMyTasks('for-review')" id="btn-filter-review" class="p-3 bg-white rounded-lg shadow hover:shadow-md transition-all border-l-4 border-amber-400 flex items-center justify-between group focus:ring-2 focus:ring-amber-300">
+                        <button onclick="filterMyTasks('for-review')" id="btn-filter-review"
+                            class="p-3 bg-white rounded-lg shadow hover:shadow-md transition-all border-l-4 border-amber-400 flex items-center justify-between group focus:ring-2 focus:ring-amber-300">
                             <div class="flex items-center">
                                 <ion-icon name="search-outline" class="text-amber-600 mr-2"></ion-icon>
                                 <span class="text-sm font-semibold text-amber-700">รอตรวจสอบ</span>
                             </div>
-                            <span id="mytask-count-review" class="bg-amber-100 text-amber-600 py-0.5 px-2 rounded-full text-xs font-bold">0</span>
+                            <span id="mytask-count-review"
+                                class="bg-amber-100 text-amber-600 py-0.5 px-2 rounded-full text-xs font-bold">0</span>
                         </button>
 
-                        <button onclick="filterMyTasks('completed')" id="btn-filter-completed" class="p-3 bg-white rounded-lg shadow hover:shadow-md transition-all border-l-4 border-green-400 flex items-center justify-between group focus:ring-2 focus:ring-green-300">
+                        <button onclick="filterMyTasks('completed')" id="btn-filter-completed"
+                            class="p-3 bg-white rounded-lg shadow hover:shadow-md transition-all border-l-4 border-green-400 flex items-center justify-between group focus:ring-2 focus:ring-green-300">
                             <div class="flex items-center">
                                 <ion-icon name="checkmark-circle-outline" class="text-green-600 mr-2"></ion-icon>
                                 <span class="text-sm font-semibold text-green-700">เสร็จสิ้น</span>
                             </div>
-                            <span id="mytask-count-completed" class="bg-green-100 text-green-600 py-0.5 px-2 rounded-full text-xs font-bold">0</span>
+                            <span id="mytask-count-completed"
+                                class="bg-green-100 text-green-600 py-0.5 px-2 rounded-full text-xs font-bold">0</span>
                         </button>
                     </div>
                     <div class="mt-2 flex justify-end">
-                        <button onclick="filterMyTasks('all')" class="text-xs text-gray-500 hover:text-amber-600 underline flex items-center">
+                        <button onclick="filterMyTasks('all')"
+                            class="text-xs text-gray-500 hover:text-amber-600 underline flex items-center">
                             <ion-icon name="refresh-outline" class="mr-1"></ion-icon> แสดงทั้งหมด
                         </button>
                     </div>
@@ -229,7 +255,8 @@
                         <div class="animate-spin rounded-full h-10 w-10 border-b-2 border-amber-500 mx-auto mb-4"></div>
                         <p class="text-gray-500">กำลังดึงข้อมูลงาน...</p>
                     </div>
-                    <div id="task-error-message" class="hidden p-4 m-4 text-sm text-red-700 bg-red-100 rounded-lg" role="alert">
+                    <div id="task-error-message" class="hidden p-4 m-4 text-sm text-red-700 bg-red-100 rounded-lg"
+                        role="alert">
                         <span class="font-medium">เกิดข้อผิดพลาด:</span> <span id="task-error-text"></span>
                     </div>
                     <div class="p-4 border-b flex justify-between items-center">
@@ -240,11 +267,21 @@
                         <table class="w-full min-w-lg">
                             <thead class="bg-gray-50">
                                 <tr>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ชื่องาน</th>
-                                    <th id="header-assignee" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ผู้รับผิดชอบ</th>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">สถานะ</th>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">วันครบกำหนด</th>
-                                    <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">จัดการ</th>
+                                    <th
+                                        class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        ชื่องาน</th>
+                                    <th id="header-assignee"
+                                        class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        ผู้รับผิดชอบ</th>
+                                    <th
+                                        class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        สถานะ</th>
+                                    <th
+                                        class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        วันครบกำหนด</th>
+                                    <th
+                                        class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        จัดการ</th>
                                 </tr>
                             </thead>
                             <tbody id="task-table-body" class="bg-white divide-y divide-gray-200">
@@ -262,23 +299,25 @@
                             <ion-icon name="wallet" class="mr-2 text-amber-600"></ion-icon>
                             <span id="deposit-header-title">รายการเงินค่ามัดจำหน้าร้าน</span>
                         </h3>
-                    
+
                         <div class="flex items-center space-x-2">
                             <div id="filter-branch-container">
-                                <select id="deposit-filter-branch" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg p-2 focus:ring-amber-500 focus:border-amber-500">
-                                    <option value="all" selected>ดูทุกสาขา</option>   
+                                <select id="deposit-filter-branch"
+                                    class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg p-2 focus:ring-amber-500 focus:border-amber-500">
+                                    <option value="all" selected>ดูทุกสาขา</option>
                                     <option value="นราธิวาส">นราธิวาส</option>
                                     <option value="ยะลา">ยะลา</option>
                                     <option value="ปัตตานี">ปัตตานี</option>
                                 </select>
                             </div>
-                        
-                            <button onclick="openDepositModal()" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded shadow flex items-center">
+
+                            <button onclick="openDepositModal()"
+                                class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded shadow flex items-center">
                                 <ion-icon name="add-circle" class="mr-2"></ion-icon> เพิ่มรายการ
                             </button>
                         </div>
                     </div>
-                
+
                     <table class="w-full deposit-table border-collapse text-sm">
                         <thead class="bg-gray-100">
                             <tr>
@@ -300,7 +339,7 @@
                             </tr>
                         </thead>
                         <tbody id="deposit-table-body" class="text-gray-700 bg-white">
-                            </tbody>
+                        </tbody>
                     </table>
                 </div>
 
@@ -317,12 +356,24 @@
                         <table class="w-full min-w-lg">
                             <thead class="bg-gray-50">
                                 <tr>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ชื่อ-สกุล</th>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Username</th>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ตำแหน่ง</th>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">แผนก / สาขา</th>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">หัวหน้า</th>
-                                    <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">จัดการ</th>
+                                    <th
+                                        class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        ชื่อ-สกุล</th>
+                                    <th
+                                        class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        Username</th>
+                                    <th
+                                        class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        ตำแหน่ง</th>
+                                    <th
+                                        class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        แผนก / สาขา</th>
+                                    <th
+                                        class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        หัวหน้า</th>
+                                    <th
+                                        class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        จัดการ</th>
                                 </tr>
                             </thead>
                             <tbody id="user-table-body" class="bg-white divide-y divide-gray-200">
@@ -333,20 +384,24 @@
                         </table>
                     </div>
                 </div>
-            </div> </main>
+            </div>
+        </main>
     </div>
 
-    <div id="newTaskModal" class="modal fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full items-center justify-center">
+    <div id="newTaskModal"
+        class="modal fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full items-center justify-center">
         <div class="relative mx-auto p-8 border w-full max-w-2xl shadow-lg rounded-lg bg-white">
             <h3 class="text-2xl font-semibold mb-6 text-gray-800">สั่งงานใหม่</h3>
             <form id="new-task-form">
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div>
                         <label for="taskTitle" class="block text-sm font-medium text-gray-700 mb-2">ชื่องาน</label>
-                        <input type="text" id="taskTitle" name="title" required class="form-input-theme" placeholder="เช่น สรุปยอดขายประจำสัปดาห์">
+                        <input type="text" id="taskTitle" name="title" required class="form-input-theme"
+                            placeholder="เช่น สรุปยอดขายประจำสัปดาห์">
                     </div>
                     <div>
-                        <label for="taskAssignTo" class="block text-sm font-medium text-gray-700 mb-2">มอบหมายให้</label>
+                        <label for="taskAssignTo"
+                            class="block text-sm font-medium text-gray-700 mb-2">มอบหมายให้</label>
                         <select id="taskAssignTo" name="assignedTo" required class="form-select-theme">
                             <option value="" disabled selected>--- กำลังโหลดรายชื่อพนักงาน ---</option>
                         </select>
@@ -354,7 +409,8 @@
                 </div>
                 <div class="mt-6">
                     <label for="taskDesc" class="block text-sm font-medium text-gray-700 mb-2">รายละเอียดงาน</label>
-                    <textarea id="taskDesc" name="description" rows="4" class="form-input-theme" placeholder="รายละเอียด..."></textarea>
+                    <textarea id="taskDesc" name="description" rows="4" class="form-input-theme"
+                        placeholder="รายละเอียด..."></textarea>
                 </div>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
                     <div>
@@ -372,10 +428,14 @@
                 </div>
                 <div id="new-task-error" class="hidden mt-4 p-3 text-sm text-red-700 bg-red-100 rounded-lg"></div>
                 <div class="mt-8 flex justify-end space-x-3">
-                    <button type="button" class="bg-gray-200 hover:bg-gray-300 text-gray-800 font-bold py-2 px-6 rounded-lg" onclick="closeModal('newTaskModal')">ยกเลิก</button>
-                    <button type="submit" id="submit-task-btn" class="bg-amber-500 hover:bg-amber-600 text-white font-bold py-2 px-6 rounded-lg">
+                    <button type="button"
+                        class="bg-gray-200 hover:bg-gray-300 text-gray-800 font-bold py-2 px-6 rounded-lg"
+                        onclick="closeModal('newTaskModal')">ยกเลิก</button>
+                    <button type="submit" id="submit-task-btn"
+                        class="bg-amber-500 hover:bg-amber-600 text-white font-bold py-2 px-6 rounded-lg">
                         <span id="submit-task-text">สร้างงาน</span>
-                        <div id="submit-task-spinner" class="hidden ml-2 animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                        <div id="submit-task-spinner"
+                            class="hidden ml-2 animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
                     </button>
                 </div>
             </form>
@@ -386,64 +446,92 @@
         <div class="bg-white rounded-lg shadow-xl w-full max-w-3xl mx-4 overflow-hidden">
             <div class="bg-amber-600 p-4 flex justify-between items-center text-white">
                 <h3 class="text-lg font-bold">บันทึกรายการมัดจำ</h3>
-                <button onclick="closeModal('depositModal')" class="hover:text-gray-200"><ion-icon name="close" class="text-2xl"></ion-icon></button>
+                <button onclick="closeModal('depositModal')" class="hover:text-gray-200"><ion-icon name="close"
+                        class="text-2xl"></ion-icon></button>
             </div>
             <div class="p-6 max-h-[80vh] overflow-y-auto">
                 <form id="deposit-form" class="space-y-4">
                     <input type="hidden" id="dep-id">
 
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4 border-b pb-4">
-                        <div class="col-span-2 font-bold text-gray-700 flex items-center"><ion-icon name="document-text" class="mr-2"></ion-icon> ข้อมูลการมัดจำ</div>
-                        <div><label class="block text-xs text-gray-500">วันที่มัดจำ</label><input type="date" id="dep-date" class="w-full border p-2 rounded"></div>
-                        <div><label class="block text-xs text-gray-500">วันที่นัดรับ</label><input type="date" id="dep-pickup" class="w-full border p-2 rounded"></div>
-                        <div><label class="block text-xs text-gray-500">ชื่อลูกค้า</label><input type="text" id="dep-name" class="w-full border p-2 rounded" required></div>
-                        <div><label class="block text-xs text-gray-500">เบอร์โทร</label><input type="text" id="dep-phone" class="w-full border p-2 rounded" required></div>
-                        <div class="col-span-2"><label class="block text-xs text-gray-500">ยอดมัดจำ (บาท)</label><input type="number" id="dep-amount" class="w-full border p-2 rounded bg-red-50 text-red-600 font-bold" required></div>
+                        <div class="col-span-2 font-bold text-gray-700 flex items-center"><ion-icon name="document-text"
+                                class="mr-2"></ion-icon> ข้อมูลการมัดจำ</div>
+                        <div><label class="block text-xs text-gray-500">วันที่มัดจำ</label><input type="date"
+                                id="dep-date" class="w-full border p-2 rounded"></div>
+                        <div><label class="block text-xs text-gray-500">วันที่นัดรับ</label><input type="date"
+                                id="dep-pickup" class="w-full border p-2 rounded"></div>
+                        <div><label class="block text-xs text-gray-500">ชื่อลูกค้า</label><input type="text"
+                                id="dep-name" class="w-full border p-2 rounded" required></div>
+                        <div><label class="block text-xs text-gray-500">เบอร์โทร</label><input type="text"
+                                id="dep-phone" class="w-full border p-2 rounded" required></div>
+                        <div class="col-span-2"><label class="block text-xs text-gray-500">ยอดมัดจำ (บาท)</label><input
+                                type="number" id="dep-amount"
+                                class="w-full border p-2 rounded bg-red-50 text-red-600 font-bold" required></div>
                     </div>
 
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2">
-                        <div class="col-span-2 font-bold text-gray-700 flex items-center bg-yellow-50 p-2 rounded"><ion-icon name="gift" class="mr-2"></ion-icon> ส่วนรับเครื่อง (กรอกเมื่อมารับของ)</div>
-                        <div><label class="block text-xs text-gray-500">สินค้า (รุ่น/สี/ความจุ)</label><input type="text" id="dep-product" class="w-full border p-2 rounded"></div>
-                        <div><label class="block text-xs text-gray-500">ราคาเครื่องเต็ม (บาท)</label><input type="number" id="dep-price" class="w-full border p-2 rounded"></div>
-                        <div><label class="block text-xs text-gray-500">เลขที่บิล</label><input type="text" id="dep-bill" class="w-full border p-2 rounded"></div>
-                        <div><label class="block text-xs text-gray-500">IMEI</label><input type="text" id="dep-imei" class="w-full border p-2 rounded"></div>
+                        <div class="col-span-2 font-bold text-gray-700 flex items-center bg-yellow-50 p-2 rounded">
+                            <ion-icon name="gift" class="mr-2"></ion-icon> ส่วนรับเครื่อง (กรอกเมื่อมารับของ)
+                        </div>
+                        <div><label class="block text-xs text-gray-500">สินค้า (รุ่น/สี/ความจุ)</label><input
+                                type="text" id="dep-product" class="w-full border p-2 rounded"></div>
+                        <div><label class="block text-xs text-gray-500">ราคาเครื่องเต็ม (บาท)</label><input
+                                type="number" id="dep-price" class="w-full border p-2 rounded"></div>
+                        <div><label class="block text-xs text-gray-500">เลขที่บิล</label><input type="text"
+                                id="dep-bill" class="w-full border p-2 rounded"></div>
+                        <div><label class="block text-xs text-gray-500">IMEI</label><input type="text" id="dep-imei"
+                                class="w-full border p-2 rounded"></div>
 
-                        <div class="col-span-2 flex items-center mt-2 p-3 bg-green-50 rounded border border-green-200 cursor-pointer" onclick="document.getElementById('dep-success').click()">
+                        <div class="col-span-2 flex items-center mt-2 p-3 bg-green-50 rounded border border-green-200 cursor-pointer"
+                            onclick="document.getElementById('dep-success').click()">
                             <input type="checkbox" id="dep-success" class="w-5 h-5 text-green-600 rounded mr-3">
-                            <label for="dep-success" class="font-bold text-green-800 cursor-pointer">ทำรายการสำเร็จ (รับเครื่องแล้ว)</label>
+                            <label for="dep-success" class="font-bold text-green-800 cursor-pointer">ทำรายการสำเร็จ
+                                (รับเครื่องแล้ว)</label>
                         </div>
                     </div>
 
                     <div class="flex justify-end space-x-3 pt-4 border-t">
-                        <button type="button" onclick="closeModal('depositModal')" class="bg-gray-200 px-4 py-2 rounded text-gray-700">ยกเลิก</button>
-                        <button type="submit" class="bg-amber-600 hover:bg-amber-700 text-white px-6 py-2 rounded font-bold shadow">บันทึกข้อมูล</button>
+                        <button type="button" onclick="closeModal('depositModal')"
+                            class="bg-gray-200 px-4 py-2 rounded text-gray-700">ยกเลิก</button>
+                        <button type="submit"
+                            class="bg-amber-600 hover:bg-amber-700 text-white px-6 py-2 rounded font-bold shadow">บันทึกข้อมูล</button>
                     </div>
                 </form>
             </div>
         </div>
     </div>
-    
-    <div id="taskDetailModal" class="modal fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full items-center justify-center">
+
+    <div id="taskDetailModal"
+        class="modal fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full items-center justify-center">
         <div class="relative mx-auto p-8 border w-full max-w-2xl shadow-lg rounded-lg bg-white">
             <form id="update-task-form">
                 <input type="hidden" id="detail-task-id" name="taskId">
                 <div class="flex justify-between items-center mb-4">
                     <h3 class="text-2xl font-semibold text-gray-800" id="detail-task-title">กำลังโหลด...</h3>
-                    <button type="button" class="text-gray-400 hover:text-gray-600" onclick="closeModal('taskDetailModal')"><ion-icon name="close-outline" class="w-7 h-7"></ion-icon></button>
+                    <button type="button" class="text-gray-400 hover:text-gray-600"
+                        onclick="closeModal('taskDetailModal')"><ion-icon name="close-outline"
+                            class="w-7 h-7"></ion-icon></button>
                 </div>
                 <div class="space-y-4 mb-6">
-                    <p class="text-sm text-gray-700"><strong>รายละเอียด:</strong><br><span id="detail-task-desc" class="text-gray-600 whitespace-pre-wrap">...</span></p>
+                    <p class="text-sm text-gray-700"><strong>รายละเอียด:</strong><br><span id="detail-task-desc"
+                            class="text-gray-600 whitespace-pre-wrap">...</span></p>
                     <div class="grid grid-cols-2 gap-4 text-sm">
-                        <div><strong>ผู้สั่งงาน:</strong> <span id="detail-task-creator" class="text-gray-600">...</span></div>
-                        <div><strong>กำหนดส่ง:</strong> <span id="detail-task-dueDate" class="text-gray-600">...</span></div>
+                        <div><strong>ผู้สั่งงาน:</strong> <span id="detail-task-creator"
+                                class="text-gray-600">...</span></div>
+                        <div><strong>กำหนดส่ง:</strong> <span id="detail-task-dueDate" class="text-gray-600">...</span>
+                        </div>
                     </div>
                 </div>
                 <div class="mt-6 border-t pt-6">
                     <h4 class="text-md font-semibold text-gray-700 mb-3">ประวัติการอัปเดต</h4>
-                    <div id="detail-task-comments-list" class="space-y-3 max-h-40 overflow-y-auto bg-gray-50 p-3 rounded-lg"><p class="text-sm text-gray-500">ไม่มีประวัติการอัปเดต</p></div>
+                    <div id="detail-task-comments-list"
+                        class="space-y-3 max-h-40 overflow-y-auto bg-gray-50 p-3 rounded-lg">
+                        <p class="text-sm text-gray-500">ไม่มีประวัติการอัปเดต</p>
+                    </div>
                 </div>
                 <div class="mt-6 border-t pt-6">
-                    <label for="detail-task-status" class="block text-sm font-medium text-gray-700 mb-2">อัปเดตสถานะงาน</label>
+                    <label for="detail-task-status"
+                        class="block text-sm font-medium text-gray-700 mb-2">อัปเดตสถานะงาน</label>
                     <select id="detail-task-status" name="status" class="form-select-theme">
                         <option value="todo">มอบหมายแล้ว (To Do)</option>
                         <option value="in-progress">กำลังดำเนินการ (In Progress)</option>
@@ -451,51 +539,68 @@
                         <option value="completed">สำเร็จแล้ว (Completed)</option>
                     </select>
                     <div class="mt-4">
-                        <label for="detail-task-comment" class="block text-sm font-medium text-gray-700 mb-2">เพิ่มคำอธิบาย (สำหรับสถานะ 'กำลังดำเนินการ' หรือ 'สำเร็จแล้ว')</label>
-                        <textarea id="detail-task-comment" name="commentText" rows="3" class="form-input-theme" placeholder="เช่น อัปเดตความคืบหน้า หรือแนบ Link ผลงาน..."></textarea>
+                        <label for="detail-task-comment"
+                            class="block text-sm font-medium text-gray-700 mb-2">เพิ่มคำอธิบาย (สำหรับสถานะ
+                            'กำลังดำเนินการ' หรือ 'สำเร็จแล้ว')</label>
+                        <textarea id="detail-task-comment" name="commentText" rows="3" class="form-input-theme"
+                            placeholder="เช่น อัปเดตความคืบหน้า หรือแนบ Link ผลงาน..."></textarea>
                     </div>
                 </div>
                 <div id="update-task-error" class="hidden mt-4 p-3 text-sm text-red-700 bg-red-100 rounded-lg"></div>
                 <div class="mt-8 flex justify-between items-center">
-                    <button type="button" id="delete-task-btn" class="bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded-lg inline-flex items-center" style="display: none;"><ion-icon name="trash-outline" class="w-5 h-5 mr-2"></ion-icon>ลบงานนี้</button>
+                    <button type="button" id="delete-task-btn"
+                        class="bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded-lg inline-flex items-center"
+                        style="display: none;"><ion-icon name="trash-outline"
+                            class="w-5 h-5 mr-2"></ion-icon>ลบงานนี้</button>
                     <div class="space-x-3">
-                        <button type="button" class="bg-gray-200 hover:bg-gray-300 text-gray-800 font-bold py-2 px-6 rounded-lg" onclick="closeModal('taskDetailModal')">ปิด</button>
-                        <button type="submit" id="save-task-details-btn" class="bg-amber-500 hover:bg-amber-600 text-white font-bold py-2 px-6 rounded-lg">บันทึกการเปลี่ยนแปลง</button>
+                        <button type="button"
+                            class="bg-gray-200 hover:bg-gray-300 text-gray-800 font-bold py-2 px-6 rounded-lg"
+                            onclick="closeModal('taskDetailModal')">ปิด</button>
+                        <button type="submit" id="save-task-details-btn"
+                            class="bg-amber-500 hover:bg-amber-600 text-white font-bold py-2 px-6 rounded-lg">บันทึกการเปลี่ยนแปลง</button>
                     </div>
                 </div>
             </form>
         </div>
     </div>
 
-    <div id="confirmModal" class="modal fixed inset-0 bg-gray-600 bg-opacity-75 overflow-y-auto h-full w-full items-center justify-center">
+    <div id="confirmModal"
+        class="modal fixed inset-0 bg-gray-600 bg-opacity-75 overflow-y-auto h-full w-full items-center justify-center">
         <div class="relative mx-auto p-6 border w-full max-w-md shadow-lg rounded-lg bg-white">
             <div class="flex items-start">
-                <div class="mr-4 flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-full bg-red-100"><ion-icon name="warning-outline" class="h-6 w-6 text-red-600"></ion-icon></div>
+                <div class="mr-4 flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-full bg-red-100">
+                    <ion-icon name="warning-outline" class="h-6 w-6 text-red-600"></ion-icon>
+                </div>
                 <div class="mt-0">
                     <h3 class="text-xl font-semibold text-gray-900">ยืนยันการลบ</h3>
                     <div class="mt-2">
-                        <p class="text-sm text-gray-600" id="confirm-message">คุณแน่ใจหรือไม่ว่าต้องการลบงานนี้? การกระทำนี้ไม่สามารถย้อนกลับได้</p>
+                        <p class="text-sm text-gray-600" id="confirm-message">คุณแน่ใจหรือไม่ว่าต้องการลบงานนี้?
+                            การกระทำนี้ไม่สามารถย้อนกลับได้</p>
                         <p id="confirm-error-message" class="text-xs text-red-600 mt-2"></p>
                     </div>
                 </div>
             </div>
             <div class="mt-6 flex justify-end space-x-3">
-                <button type="button" class="bg-gray-200 hover:bg-gray-300 text-gray-800 font-bold py-2 px-6 rounded-lg" onclick="closeModal('confirmModal')">ยกเลิก</button>
-                <button type="button" id="confirm-delete-button" data-task-id="" class="bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-6 rounded-lg">ตกลง</button>
+                <button type="button" class="bg-gray-200 hover:bg-gray-300 text-gray-800 font-bold py-2 px-6 rounded-lg"
+                    onclick="closeModal('confirmModal')">ยกเลิก</button>
+                <button type="button" id="confirm-delete-button" data-task-id=""
+                    class="bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-6 rounded-lg">ตกลง</button>
             </div>
         </div>
     </div>
 
 
-    <div id="userModal" class="modal fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full items-center justify-center">
+    <div id="userModal"
+        class="modal fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full items-center justify-center">
         <div class="relative mx-auto p-8 border w-full max-w-2xl shadow-lg rounded-lg bg-white">
             <h3 class="text-2xl font-semibold mb-6 text-gray-800" id="user-modal-title">เพิ่มผู้ใช้ใหม่</h3>
             <form id="user-form">
                 <input type="hidden" id="user-id" name="userId">
                 <input type="hidden" id="form-mode" name="mode" value="create">
-                
+
                 <div class="mb-6">
-                    <label for="user-company-input" class="block text-sm font-medium text-gray-700 mb-2">บริษัท (Company)</label>
+                    <label for="user-company-input" class="block text-sm font-medium text-gray-700 mb-2">บริษัท
+                        (Company)</label>
                     <select id="user-company-input" name="companyId" required class="form-select-theme">
                         <option value="company_1_id">ซิลมีน โมบาย จำกัด</option>
                         <option value="company_2_id">เอสจี พลัส 2023 จำกัด</option>
@@ -503,11 +608,13 @@
                 </div>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div>
-                        <label for="user-name-input" class="block text-sm font-medium text-gray-700 mb-2">ชื่อ-สกุล</label>
+                        <label for="user-name-input"
+                            class="block text-sm font-medium text-gray-700 mb-2">ชื่อ-สกุล</label>
                         <input type="text" id="user-name-input" name="name" required class="form-input-theme">
                     </div>
                     <div>
-                        <label for="user-role-input" class="block text-sm font-medium text-gray-700 mb-2">ตำแหน่ง (Role)</label>
+                        <label for="user-role-input" class="block text-sm font-medium text-gray-700 mb-2">ตำแหน่ง
+                            (Role)</label>
                         <select id="user-role-input" name="role" required class="form-select-theme">
                             <option value="staff">พนักงาน (Staff)</option>
                             <option value="manager">ผู้จัดการ (Manager)</option>
@@ -518,55 +625,68 @@
                 </div>
                 <div id="auth-section" class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
                     <div>
-                        <label for="user-username-input" class="block text-sm font-medium text-gray-700 mb-2">Username (รหัสพนักงาน)</label>
+                        <label for="user-username-input" class="block text-sm font-medium text-gray-700 mb-2">Username
+                            (รหัสพนักงาน)</label>
                         <input type="text" id="user-username-input" name="username" required class="form-input-theme">
                     </div>
                     <div>
-                        <label for="user-password-input" class="block text-sm font-medium text-gray-700 mb-2">Password (สำหรับการสร้างใหม่)</label>
-                        <input type="password" id="user-password-input" name="password" class="form-input-theme" placeholder="เว้นว่างไว้หากไม่ต้องการเปลี่ยน">
+                        <label for="user-password-input" class="block text-sm font-medium text-gray-700 mb-2">Password
+                            (สำหรับการสร้างใหม่)</label>
+                        <input type="password" id="user-password-input" name="password" class="form-input-theme"
+                            placeholder="เว้นว่างไว้หากไม่ต้องการเปลี่ยน">
                     </div>
                 </div>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
                     <div>
-                        <label for="user-department-input" class="block text-sm font-medium text-gray-700 mb-2">แผนก</label>
-                        <input type="text" id="user-department-input" name="department" required class="form-input-theme">
+                        <label for="user-department-input"
+                            class="block text-sm font-medium text-gray-700 mb-2">แผนก</label>
+                        <input type="text" id="user-department-input" name="department" required
+                            class="form-input-theme">
                     </div>
                     <div>
-                        <label for="user-branch-input" class="block text-sm font-medium text-gray-700 mb-2">สาขา (ถ้ามี)</label>
+                        <label for="user-branch-input" class="block text-sm font-medium text-gray-700 mb-2">สาขา
+                            (ถ้ามี)</label>
                         <input type="text" id="user-branch-input" name="branch" class="form-input-theme">
                     </div>
                 </div>
                 <div class="mt-6">
-                    <label for="user-reportsTo-input" class="block text-sm font-medium text-gray-700 mb-2">หัวหน้างาน (Reports To)</label>
+                    <label for="user-reportsTo-input" class="block text-sm font-medium text-gray-700 mb-2">หัวหน้างาน
+                        (Reports To)</label>
                     <select id="user-reportsTo-input" name="reportsTo" class="form-select-theme">
                         <option value="">--- ไม่มีหัวหน้า ---</option>
                     </select>
                 </div>
                 <div id="user-form-error" class="hidden mt-4 p-3 text-sm text-red-700 bg-red-100 rounded-lg"></div>
                 <div class="mt-8 flex justify-end space-x-3">
-                    <button type="button" class="bg-gray-200 hover:bg-gray-300 text-gray-800 font-bold py-2 px-6 rounded-lg" onclick="closeModal('userModal')">ยกเลิก</button>
-                    <button type="submit" id="submit-user-btn" class="bg-amber-500 hover:bg-amber-600 text-white font-bold py-2 px-6 rounded-lg">บันทึก</button>
+                    <button type="button"
+                        class="bg-gray-200 hover:bg-gray-300 text-gray-800 font-bold py-2 px-6 rounded-lg"
+                        onclick="closeModal('userModal')">ยกเลิก</button>
+                    <button type="submit" id="submit-user-btn"
+                        class="bg-amber-500 hover:bg-amber-600 text-white font-bold py-2 px-6 rounded-lg">บันทึก</button>
                 </div>
             </form>
         </div>
     </div>
-    
-    <div id="notificationModal" class="modal fixed inset-0 bg-gray-600 bg-opacity-75 overflow-y-auto h-full w-full items-center justify-center z-50">
+
+    <div id="notificationModal"
+        class="modal fixed inset-0 bg-gray-600 bg-opacity-75 overflow-y-auto h-full w-full items-center justify-center z-50">
         <div class="relative mx-auto p-8 border w-full max-w-2xl shadow-lg rounded-lg bg-white">
-            
+
             <div class="flex justify-between items-center mb-6">
                 <h3 class="text-2xl font-semibold text-gray-800">การแจ้งเตือน</h3>
-                <button type="button" class="text-gray-400 hover:text-gray-600" onclick="closeModal('notificationModal')">
+                <button type="button" class="text-gray-400 hover:text-gray-600"
+                    onclick="closeModal('notificationModal')">
                     <ion-icon name="close-outline" class="w-7 h-7"></ion-icon>
                 </button>
             </div>
-            
+
             <div id="notification-list" class="max-h-96 overflow-y-auto -mr-4 pr-4">
                 <p class="text-center text-gray-500 p-4">ไม่มีการแจ้งเตือนใหม่</p>
             </div>
 
             <div class="mt-8 flex justify-end space-x-3">
-                <button type="button" class="bg-amber-500 hover:bg-amber-600 text-white font-bold py-2 px-6 rounded-lg" onclick="closeModal('notificationModal')">
+                <button type="button" class="bg-amber-500 hover:bg-amber-600 text-white font-bold py-2 px-6 rounded-lg"
+                    onclick="closeModal('notificationModal')">
                     ปิด
                 </button>
             </div>
@@ -574,11 +694,11 @@
     </div>
     <script>
         const SERVER_URL = '/api';
-        let currentUser = null; 
-        let currentView = 'dashboard'; 
-        let notificationPollInterval = null; 
-        let allDashboardTasks = []; 
-        let allMyTasks = []; 
+        let currentUser = null;
+        let currentView = 'dashboard';
+        let notificationPollInterval = null;
+        let allDashboardTasks = [];
+        let allMyTasks = [];
 
         // --- Helper Functions ---
         const getRoleName = (role) => {
@@ -629,37 +749,82 @@
         const initializeAuth = () => {
             const token = localStorage.getItem('token');
             const userString = localStorage.getItem('user');
-            if (!token || !userString) { window.location.href = 'login.html'; return; }
+
+            if (!token || !userString) {
+                window.location.href = 'login.html';
+                return;
+            }
+
             currentUser = JSON.parse(userString);
+
+            // แสดงชื่อและตำแหน่ง
             document.getElementById('user-name').textContent = currentUser.name;
             document.getElementById('user-role').textContent = getRoleName(currentUser.role);
+
+            // --- ส่วนที่แก้ไข: ควบคุมการแสดงเมนู "เงินค่ามัดจำหน้าร้าน" ---
+            const depositNav = document.getElementById('nav-Storefront_deposit');
+            if (depositNav) {
+                // 1. ดึงชื่อแผนก (เผื่อเช็คคำว่า "ขาย")
+                const userDept = (currentUser.department || '').trim();
+                const isSalesTeam = userDept.includes('ขาย') || userDept.includes('Sales');
+
+                // 2. เงื่อนไขใหม่: แสดงถ้าเป็น...
+                // - ทีมขาย (มีคำว่า "ขาย" ในแผนก)
+                // - หรือเป็น Admin
+                // - หรือเป็น ผู้บริหาร (executive)
+                // - หรือเป็น ผู้จัดการ (manager)
+                // - หรือเป็น HR (hr)
+                if (isSalesTeam ||
+                    currentUser.role === 'admin' ||
+                    currentUser.role === 'executive' ||
+                    currentUser.role === 'manager' ||
+                    currentUser.role === 'hr') {
+
+                    depositNav.style.display = 'flex'; // แสดงเมนู
+                } else {
+                    depositNav.style.display = 'none'; // ซ่อนเมนู
+                }
+            }
+            // -------------------------------------------------------
+
+            // Logic เดิมของการจัดการ Role (Staff, Manager, Executive)
             if (currentUser.role === 'staff') {
                 safeHide(document.getElementById('nav-dashboard'));
                 safeHide(document.getElementById('nav-admin'));
-                safeHide(document.getElementById('nav-settings')); 
-                if (document.getElementById('company-select')) { document.getElementById('company-select').parentElement.style.display = 'none'; }
-                updateNavActiveState('mytasks'); 
-                fetchMyTasks(); 
+                safeHide(document.getElementById('nav-settings'));
+
+                if (document.getElementById('company-select')) {
+                    document.getElementById('company-select').parentElement.style.display = 'none';
+                }
+
+                updateNavActiveState('mytasks');
+                fetchMyTasks();
+
             } else if (currentUser.role === 'executive') {
                 safeHide(document.getElementById('nav-mytasks'));
-                updateNavActiveState('dashboard'); 
-                fetchDashboardTasks(); fetchTaskStats(); fetchAllUsers(); 
+                updateNavActiveState('dashboard');
+                fetchDashboardTasks();
+                fetchTaskStats();
+                fetchAllUsers();
+
             } else if (currentUser.role === 'manager' || currentUser.role === 'hr') {
-                updateNavActiveState('dashboard'); 
-                fetchDashboardTasks(); fetchTaskStats(); fetchAllUsers();
+                updateNavActiveState('dashboard');
+                fetchDashboardTasks();
+                fetchTaskStats();
+                fetchAllUsers();
             }
+
             document.getElementById('logout-button').addEventListener('click', () => {
-                localStorage.removeItem('token'); localStorage.removeItem('user');
-                clearInterval(notificationPollInterval); 
+                localStorage.removeItem('token');
+                localStorage.removeItem('user');
+                clearInterval(notificationPollInterval);
                 window.location.href = 'login.html';
             });
 
-            // (*** 3. (ใหม่) เริ่มดึงการแจ้งเตือน ***)
             fetchNotifications();
-            // ดึงการแจ้งเตือนใหม่ทุกๆ 1 นาที
-            notificationPollInterval = setInterval(fetchNotifications, 60000); 
+            notificationPollInterval = setInterval(fetchNotifications, 60000);
         };
-        
+
         // ------------------------------------------
         // --- (A) TASK FUNCTIONS ---
         // ------------------------------------------
@@ -672,7 +837,7 @@
                 const response = await fetch(`${SERVER_URL}/tasks/stats?companyId=${selectedCompanyId}`, { headers: { 'Authorization': `Bearer ${token}` } });
                 if (!response.ok) { statsDiv.innerHTML = `<div class="text-sm text-red-500">โหลดสถิติไม่สำเร็จ</div>`; return; }
                 const stats = await response.json();
-                
+
                 statsDiv.innerHTML = `
                     <div onclick="filterTasksByStatus('todo')" data-status="todo" class="p-5 bg-white rounded-lg shadow-md cursor-pointer hover:shadow-xl transition-shadow">
                         <div class="flex items-center"><div class="p-3 rounded-full bg-gray-100 text-gray-600"><ion-icon name="clipboard-outline" class="w-6 h-6"></ion-icon></div><div class="ml-4"><p class="text-sm font-medium text-gray-500">สั่งแล้ว</p><p class="text-2xl font-bold text-gray-900">${stats.todo || 0}</p></div></div>
@@ -702,7 +867,7 @@
             try {
                 const response = await fetch(`${SERVER_URL}/users?companyId=${selectedCompanyId}`, { headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' } });
                 if (!response.ok) { selectElement.innerHTML = '<option value="" disabled selected>--- โหลดรายชื่อไม่สำเร็จ ---</option>'; return; }
-                const users = await response.json(); 
+                const users = await response.json();
                 selectElement.innerHTML = '';
                 selectElement.disabled = false;
                 selectElement.prepend(new Option('--- เลือกผู้รับผิดชอบ ---', '', true, true));
@@ -710,9 +875,9 @@
                     selectElement.tomselect.destroy();
                 }
                 users.forEach(user => {
-                    if (user && user._id) { 
+                    if (user && user._id) {
                         const option = document.createElement('option');
-                        option.value = user._id; 
+                        option.value = user._id;
                         option.textContent = `${user.name} (${user.branch || user.department})`;
                         selectElement.appendChild(option);
                     }
@@ -727,7 +892,7 @@
             safeHide(document.getElementById('task-error-message'));
             const token = localStorage.getItem('token');
             const taskTableBody = document.getElementById('task-table-body');
-            taskTableBody.innerHTML = ''; 
+            taskTableBody.innerHTML = '';
             const selectedCompanyId = document.getElementById('company-select').value;
             try {
                 const response = await fetch(`${SERVER_URL}/tasks?view=dashboard&companyId=${selectedCompanyId}`, { headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' } });
@@ -739,7 +904,7 @@
                     return;
                 }
                 const tasks = await response.json();
-                
+
                 allDashboardTasks = tasks;      // เก็บงานทั้งหมดลง Cache
                 renderTaskTable(tasks);         // แสดงผลทั้งหมด (ปกติ)
                 filterTasksByStatus('todo');
@@ -750,13 +915,13 @@
                 safeShow(document.getElementById('task-error-message'));
             }
         };
-        
+
         const fetchMyTasks = async () => {
             safeShow(document.getElementById('loading-tasks'));
             safeHide(document.getElementById('task-error-message'));
             const token = localStorage.getItem('token');
             const taskTableBody = document.getElementById('task-table-body');
-            taskTableBody.innerHTML = ''; 
+            taskTableBody.innerHTML = '';
             try {
                 const response = await fetch(`${SERVER_URL}/tasks?view=mytasks`, { headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' } });
                 safeHide(document.getElementById('loading-tasks'));
@@ -779,34 +944,34 @@
 
         const renderTaskTable = (tasks) => {
             const taskTableBody = document.getElementById('task-table-body');
-            
+
             // อัปเดตจำนวนงาน (ถ้ามี element นี้)
             const countElement = document.getElementById('task-count');
-            if(countElement) countElement.textContent = `${tasks.length} งาน`;
-        
+            if (countElement) countElement.textContent = `${tasks.length} งาน`;
+
             // 1. กรณีไม่มีงาน
             if (tasks.length === 0) {
                 taskTableBody.innerHTML = `<tr id="no-task-row" class="text-center"><td colspan="5" class="px-6 py-4 text-gray-500">ไม่มีงานที่ต้องแสดงในขณะนี้</td></tr>`;
                 return;
             }
-        
-            taskTableBody.innerHTML = ''; 
-        
+
+            taskTableBody.innerHTML = '';
+
             // 2. วนลูปแสดงงาน
             tasks.forEach((task, index) => {
                 // ตรวจสอบงานเกินกำหนด
                 const isOverdue = new Date(task.dueDate) < new Date() && task.status !== 'completed';
                 const statusDisplay = isOverdue ? getStatusTag('overdue') : getStatusTag(task.status);
-                
+
                 // --- LOGIC การเลือกแสดงชื่อ (ผู้รับผิดชอบ VS ผู้สั่งงาน) ---
                 let personName = 'Unknown User';
                 let personSubText = '-';
                 let personImageChar = '?';
                 let showBranchBadge = false; // ตัวแปรเช็คว่าจะโชว์ Badge สาขาไหม
-            
+
                 // ตรวจสอบว่าเป็นหน้า "งานของฉัน" หรือไม่ (ต้องมีตัวแปร currentView ในระบบ)
                 const isMyTasksView = (typeof currentView !== 'undefined' && currentView === 'mytasks');
-            
+
                 if (isMyTasksView) {
                     // >> กรณีหน้างานของฉัน: แสดง "ผู้สั่งงาน" (Created By)
                     if (task.createdBy) {
@@ -818,8 +983,8 @@
                         personSubText = 'ผู้สั่งงาน';
                     }
                     // ปกติผู้สั่งงานไม่ต้องโชว์ Badge สาขาก็ได้ (หรือถ้าต้องการก็เปิดได้)
-                    showBranchBadge = false; 
-                
+                    showBranchBadge = false;
+
                 } else {
                     // >> กรณีหน้าอื่น (Dashboard): แสดง "ผู้รับผิดชอบ" (Assigned To)
                     if (task.assignedTo) {
@@ -831,15 +996,15 @@
                     // แสดง Badge สาขาเฉพาะเมื่อดูในมุมมองผู้รับผิดชอบ และงานนั้นมีระบุสาขา
                     showBranchBadge = true;
                 }
-            
+
                 // --- LOGIC การแสดงชื่อและ Badge ---
                 let nameDisplayHtml = personName;
-                
+
                 // ถ้า Logic อนุญาตให้โชว์ Badge และ Task มีข้อมูล Branch
                 if (showBranchBadge && task.branch) {
                     nameDisplayHtml += ` <span class="ml-2 px-2 py-0.5 text-xs rounded bg-indigo-100 text-indigo-800 border border-indigo-200">สาขา${task.branch}</span>`;
                 }
-            
+
                 const row = document.createElement('tr');
                 row.className = 'hover:bg-gray-50 transition-colors duration-150';
                 // คลิกที่แถวเพื่อดูรายละเอียด (ถ้าเผลอคลิกปุ่มจะไม่ซ้อนทับกัน เพราะปุ่มมี event แยก)
@@ -847,7 +1012,7 @@
                     // ป้องกันการเปิด Modal ซ้อนถ้าคลิกโดนปุ่ม "เพิ่มเติม" โดยตรง (Optional)
                     if (!e.target.closest('button')) openDetailModal(task._id);
                 };
-            
+
                 row.innerHTML = `
                     <td class="px-6 py-4">
                         <div class="flex items-center">
@@ -888,7 +1053,7 @@
 
         const filterTasksByStatus = (status) => {
             // 1. ไฮไลท์การ์ดที่เลือก
-            const statCards = document.querySelectorAll('#stats-cards [data-status]');  
+            const statCards = document.querySelectorAll('#stats-cards [data-status]');
             statCards.forEach(card => {
                 if (card.getAttribute('data-status') === status) {
                     card.classList.add('ring-2', 'ring-amber-500', 'shadow-lg');
@@ -899,7 +1064,7 @@
 
             // 2. กรองงานจาก Cache
             const filteredTasks = allDashboardTasks.filter(task => task.status === status);
-            
+
             // 3. วาดตารางใหม่
             renderTaskTable(filteredTasks);
         };
@@ -911,7 +1076,7 @@
             });
         };
 
-        const handleNewTaskSubmit = async (event) => { 
+        const handleNewTaskSubmit = async (event) => {
             event.preventDefault();
             const token = localStorage.getItem('token');
             const form = event.target;
@@ -919,7 +1084,7 @@
             const submitButton = document.getElementById('submit-task-btn');
             const errorBox = document.getElementById('new-task-error');
             if (!data.assignedTo || data.assignedTo === "") {
-                errorBox.textContent = 'กรุณาเลือกผู้รับผิดชอบงาน'; safeShow(errorBox); return; 
+                errorBox.textContent = 'กรุณาเลือกผู้รับผิดชอบงาน'; safeShow(errorBox); return;
             }
             const postData = { ...data, companyId: document.getElementById('company-select').value, dueDate: data.dueDate ? new Date(data.dueDate).toISOString() : null };
             submitButton.disabled = true; submitButton.querySelector('#submit-task-text').textContent = 'กำลังสร้าง...'; safeShow(submitButton.querySelector('#submit-task-spinner'));
@@ -929,16 +1094,16 @@
                     method: 'POST', headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' }, body: JSON.stringify(postData)
                 });
                 if (!response.ok) { const err = await response.json(); throw new Error(err.message); }
-                closeModal('newTaskModal'); form.reset(); fetchDashboardTasks(); fetchTaskStats(); 
-                fetchNotifications(); 
+                closeModal('newTaskModal'); form.reset(); fetchDashboardTasks(); fetchTaskStats();
+                fetchNotifications();
             } catch (error) {
                 errorBox.textContent = `สร้างงานไม่สำเร็จ: ${error.message}`; safeShow(errorBox);
             } finally {
                 submitButton.disabled = false; submitButton.querySelector('#submit-task-text').textContent = 'สร้างงาน'; safeHide(submitButton.querySelector('#submit-task-spinner'));
             }
         };
-        
-        const openDetailModal = async (taskId) => { 
+
+        const openDetailModal = async (taskId) => {
             openModal('taskDetailModal');
             const token = localStorage.getItem('token');
             const errorBox = document.getElementById('update-task-error');
@@ -975,7 +1140,7 @@
                 document.getElementById('detail-task-creator').textContent = task.createdBy ? task.createdBy.name : 'N/A';
                 document.getElementById('detail-task-dueDate').textContent = formatDate(task.dueDate);
                 const commentsList = document.getElementById('detail-task-comments-list');
-                commentsList.innerHTML = ''; 
+                commentsList.innerHTML = '';
                 if (task.comments && task.comments.length > 0) {
                     task.comments.slice().reverse().forEach(comment => {
                         const commentEl = document.createElement('div');
@@ -999,14 +1164,14 @@
             } finally {
                 document.getElementById('save-task-details-btn').disabled = false;
             }
-        }; 
-        
-        const handleUpdateTaskSubmit = async (event) => { 
+        };
+
+        const handleUpdateTaskSubmit = async (event) => {
             event.preventDefault();
             const token = localStorage.getItem('token');
             const status = document.getElementById('detail-task-status').value;
             const taskId = document.getElementById('detail-task-id').value;
-            const commentText = document.getElementById('detail-task-comment').value; 
+            const commentText = document.getElementById('detail-task-comment').value;
             const errorBox = document.getElementById('update-task-error');
             const submitButton = document.getElementById('save-task-details-btn');
             submitButton.disabled = true; submitButton.textContent = 'กำลังบันทึก...';
@@ -1020,7 +1185,7 @@
                 closeModal('taskDetailModal');
                 if (currentView === 'dashboard') { fetchDashboardTasks(); fetchTaskStats(); }
                 else { fetchMyTasks(); }
-                fetchNotifications(); 
+                fetchNotifications();
             } catch (error) {
                 errorBox.textContent = `อัปเดตไม่สำเร็จ: ${error.message}`; safeShow(errorBox);
             } finally {
@@ -1049,7 +1214,7 @@
                 deleteButton.disabled = false; deleteButton.textContent = 'ตกลง';
             }
         };
-        
+
         // ------------------------------------------
         // --- (B) USER FUNCTIONS ---
         // ------------------------------------------
@@ -1098,24 +1263,90 @@
         const fetchNotifications = async () => {
             const token = localStorage.getItem('token');
             if (!token) return;
-        
+
             try {
+                // 1. ดึงข้อมูลจาก Server
                 const response = await fetch(`${SERVER_URL}/notifications`, {
                     headers: { 'Authorization': `Bearer ${token}` }
                 });
+
                 if (!response.ok) return;
-            
+
                 const data = await response.json();
-                const notificationsList = data.notifications; 
-                const unreadCount = data.unreadCount;        
-            
-                updateNotificationUI(notificationsList, unreadCount);
-            
+
+                // จัดการโครงสร้างข้อมูล (รองรับทั้งแบบส่งมาเป็น Array โดยตรง หรือส่งมาเป็น Object)
+                const notifications = Array.isArray(data) ? data : (data.notifications || []);
+
+                // คำนวณจำนวนที่ยังไม่อ่าน
+                const unreadCount = typeof data.unreadCount === 'number'
+                    ? data.unreadCount
+                    : notifications.filter(n => !n.isRead).length;
+
+                // --- ส่วนที่ 1: จัดการจุดแดง (Red Dot) ---
+
+                // ฟังก์ชันช่วยเปิด/ปิดจุด (ใช้ได้ทั้ง Desktop และ Mobile)
+                const toggleDot = (elementId, show) => {
+                    const el = document.getElementById(elementId);
+                    if (el) {
+                        if (show) el.classList.remove('hidden');
+                        else el.classList.add('hidden');
+                    }
+                };
+
+                // อัปเดตจุดแดงทั้ง 2 จุดพร้อมกัน
+                const hasUnread = unreadCount > 0;
+                toggleDot('notification-dot', hasUnread);          // สำหรับ Desktop
+                toggleDot('notification-dot-mobile', hasUnread);   // สำหรับ Mobile (ที่คุณเพิ่งเพิ่ม)
+
+                // --- ส่วนที่ 2: แสดงรายการแจ้งเตือนใน Dropdown ---
+                const listContainer = document.getElementById('notification-list');
+                if (listContainer) {
+                    listContainer.innerHTML = ''; // ล้างรายการเก่า
+
+                    if (notifications.length === 0) {
+                        // กรณีไม่มีการแจ้งเตือน
+                        listContainer.innerHTML = `
+                            <div class="px-4 py-6 text-sm text-gray-500 text-center flex flex-col items-center">
+                                <ion-icon name="notifications-off-outline" class="text-2xl mb-2 text-gray-300"></ion-icon>
+                                ไม่มีการแจ้งเตือนใหม่
+                            </div>`;
+                    } else {
+                        // วนลูปสร้างรายการ
+                        notifications.forEach(notif => {
+                            const item = document.createElement('div');
+                            // ถ้ายังไม่อ่าน ให้พื้นหลังเป็นสีฟ้าอ่อน (bg-blue-50)
+                            item.className = `px-4 py-3 border-b hover:bg-gray-50 transition-colors cursor-pointer ${!notif.isRead ? 'bg-blue-50' : ''}`;
+
+                            // ใส่เนื้อหา HTML
+                            item.innerHTML = `
+                                <div class="flex justify-between items-start">
+                                    <div>
+                                        <p class="text-sm font-medium text-gray-900">${notif.title || 'การแจ้งเตือน'}</p>
+                                        <p class="text-xs text-gray-500 mt-1">${notif.message || '-'}</p>
+                                        <p class="text-[10px] text-gray-400 mt-2">
+                                            ${new Date(notif.createdAt).toLocaleString('th-TH')}
+                                        </p>
+                                    </div>
+                                    ${!notif.isRead ? '<span class="h-2 w-2 bg-blue-600 rounded-full mt-1 flex-shrink-0"></span>' : ''}
+                                </div>
+                            `;
+
+                            // เพิ่ม Event คลิก (เช่น กดแล้วไปหน้างาน หรือทำเครื่องหมายว่าอ่านแล้ว)
+                            item.onclick = () => {
+                                // ตรงนี้ใส่ Logic เพิ่มเติมได้ เช่น markAsRead(notif._id)
+                                console.log('Clicked notification:', notif._id);
+                            };
+
+                            listContainer.appendChild(item);
+                        });
+                    }
+                }
+
             } catch (error) {
                 console.warn('Could not fetch notifications:', error.message);
             }
         };
-        
+
         const updateNotificationUI = (notifications, unreadCount) => {
             const dot = document.getElementById('notification-dot');
             const list = document.getElementById('notification-list');
@@ -1125,14 +1356,14 @@
             } else {
                 safeHide(dot);
             }
-        
+
             if (notifications && notifications.length > 0) {
-                list.innerHTML = ''; 
+                list.innerHTML = '';
                 notifications.forEach(noti => {
                     const taskTitle = noti.task ? noti.task.title : 'งานนี้ถูกลบแล้ว';
                     const taskAction = noti.task ? `onclick="openDetailModal('${noti.task._id}'); closeModal('notificationModal');"` : '';
 
-                    const item = document.createElement('div'); 
+                    const item = document.createElement('div');
                     item.className = `block p-3 border-b hover:bg-gray-50 cursor-pointer ${noti.isRead ? 'bg-white' : 'bg-blue-50'}`;
 
                     item.innerHTML = `
@@ -1153,7 +1384,7 @@
         const markNotificationsAsRead = async () => {
             const token = localStorage.getItem('token');
             const dot = document.getElementById('notification-dot');
-            safeHide(dot); 
+            safeHide(dot);
 
             try {
                 await fetch(`${SERVER_URL}/notifications/read`, {
@@ -1164,7 +1395,7 @@
                 console.warn('Could not mark notifications as read:', error.message);
             }
         };
-        
+
         // ------------------------------------------
         // --- (D) DEPOSIT FUNCTIONS ---
         // ------------------------------------------
@@ -1173,12 +1404,12 @@
             try {
                 const token = localStorage.getItem('token');
                 const selectedCompanyId = document.getElementById('company-select').value;
-            
+
                 // --- ส่วนที่ 1: อัปเดตหัวข้อตาราง (Header Title) ---
                 // ส่วนนี้จะเปลี่ยนข้อความ "รายการเงินค่ามัดจำหน้าร้าน" เป็น "รายการเงินค่ามัดจำ - สาขา..."
                 const titleElem = document.getElementById('deposit-header-title');
                 const filterBranchElem = document.getElementById('deposit-filter-branch');
-                
+
                 if (titleElem) {
                     if (typeof currentUser !== 'undefined' && currentUser && currentUser.role === 'staff') {
                         // กรณี Staff: ให้แสดงสาขาของ Staff คนนั้นเสมอ
@@ -1195,10 +1426,10 @@
                         titleElem.textContent = `รายการเงินค่ามัดจำ - ${branchName}`;
                     }
                 }
-            
+
                 // --- ส่วนที่ 2: เตรียม URL และ Parameter ---
                 let url = `${SERVER_URL}/deposits?companyId=${selectedCompanyId}`;
-            
+
                 // ดึงค่าจาก Dropdown ตัวกรองสาขา เพื่อส่งไปที่ API
                 if (filterBranchElem) {
                     const branchVal = filterBranchElem.value;
@@ -1206,35 +1437,35 @@
                         url += `&branch=${encodeURIComponent(branchVal)}`;
                     }
                 }
-            
+
                 // --- ส่วนที่ 3: ส่งคำสั่งไปที่ Server ---
                 // console.log('Fetching URL:', url); 
                 const res = await fetch(url, { headers: { 'Authorization': `Bearer ${token}` } });
-                
+
                 if (!res.ok) {
                     throw new Error(`HTTP error! status: ${res.status}`);
                 }
-                
+
                 const deposits = await res.json();
-            
+
                 // --- ส่วนที่ 4: วาดตาราง ---
                 const tbody = document.getElementById('deposit-table-body');
                 tbody.innerHTML = '';
-            
+
                 if (deposits.length === 0) {
                     tbody.innerHTML = `<tr><td colspan="12" class="text-center py-6 text-gray-500">ไม่พบข้อมูลในสาขานี้</td></tr>`;
                     return;
                 }
-            
+
                 deposits.forEach(d => {
                     const price = d.price || 0;
                     const deposit = d.depositAmount || 0;
                     const balance = price > 0 ? (price - deposit) : 0;
-                
+
                     const tr = document.createElement('tr');
                     tr.className = "hover:bg-blue-50 transition-colors cursor-pointer border-b";
                     tr.onclick = () => openDepositModal(d);
-                
+
                     tr.innerHTML = `
                         <td class="text-center border p-2 text-gray-600">${formatDateShort(d.depositDate)}</td>
                         <td class="font-medium border p-2 text-gray-800">${d.customerName}</td>
@@ -1254,12 +1485,12 @@
                     `;
                     tbody.appendChild(tr);
                 });
-            
+
             } catch (e) {
                 console.error("Error fetching deposits:", e);
                 // อาจจะแสดง Error บนหน้าจอด้วยก็ได้ถ้าต้องการ
                 const tbody = document.getElementById('deposit-table-body');
-                if(tbody) tbody.innerHTML = `<tr><td colspan="12" class="text-center py-6 text-red-500">เกิดข้อผิดพลาดในการโหลดข้อมูล</td></tr>`;
+                if (tbody) tbody.innerHTML = `<tr><td colspan="12" class="text-center py-6 text-red-500">เกิดข้อผิดพลาดในการโหลดข้อมูล</td></tr>`;
             }
         }
 
@@ -1303,7 +1534,7 @@
                 imei: document.getElementById('dep-imei').value,
                 isSuccess: document.getElementById('dep-success').checked
             };
-        
+
             try {
                 const res = await fetch(`${SERVER_URL}/deposits`, {
                     method: 'POST',
@@ -1312,7 +1543,7 @@
                 });
                 if (res.ok) {
                     closeModal('depositModal');
-                    fetchDeposits(); 
+                    fetchDeposits();
                 } else {
                     alert('บันทึกไม่สำเร็จ โปรดลองใหม่');
                 }
@@ -1335,7 +1566,7 @@
             const select = document.getElementById('user-reportsTo-input');
             select.innerHTML = '<option value="">--- กำลังโหลด... ---</option>';
             try {
-                const selectedCompanyId = document.getElementById('user-company-input').value; 
+                const selectedCompanyId = document.getElementById('user-company-input').value;
                 const response = await fetch(`${SERVER_URL}/users?companyId=${selectedCompanyId}`, {
                     headers: { 'Authorization': `Bearer ${token}` }
                 });
@@ -1362,14 +1593,14 @@
             document.getElementById('user-password-input').placeholder = "ต้องกรอก";
             document.getElementById('user-password-input').required = true;
             safeShow(document.getElementById('auth-section'));
-            
-            const currentCompany = document.getElementById('company-select').value; 
+
+            const currentCompany = document.getElementById('company-select').value;
             const userCompanySelect = document.getElementById('user-company-input');
-            userCompanySelect.value = currentCompany; 
-            userCompanySelect.disabled = false; 
+            userCompanySelect.value = currentCompany;
+            userCompanySelect.disabled = false;
 
             safeHide(document.getElementById('user-reportsTo-input').parentElement);
-            
+
             openModal('userModal');
         };
 
@@ -1380,7 +1611,7 @@
                 if (!response.ok) throw new Error('ไม่สามารถดึงข้อมูลผู้ใช้ได้');
                 const users = await response.json();
                 const user = users.find(u => u._id === id);
-                
+
                 if (user) {
                     document.getElementById('user-form').reset();
                     document.getElementById('user-modal-title').textContent = 'แก้ไขผู้ใช้';
@@ -1392,8 +1623,8 @@
                     document.getElementById('user-username-input').required = false;
                     document.getElementById('user-password-input').placeholder = "เว้นว่างไว้หากไม่ต้องการเปลี่ยน";
                     document.getElementById('user-password-input').required = false;
-                    safeShow(document.getElementById('auth-section')); 
-                    
+                    safeShow(document.getElementById('auth-section'));
+
                     document.getElementById('user-name-input').value = user.name;
                     document.getElementById('user-role-input').value = user.role;
                     document.getElementById('user-username-input').value = user.username;
@@ -1401,13 +1632,13 @@
                     document.getElementById('user-branch-input').value = user.branch || '';
 
                     const userCompanySelect = document.getElementById('user-company-input');
-                    userCompanySelect.value = user.companyId; 
-                    userCompanySelect.disabled = true; 
-                    
+                    userCompanySelect.value = user.companyId;
+                    userCompanySelect.disabled = true;
+
                     const reportsToDiv = document.getElementById('user-reportsTo-input').parentElement;
                     safeShow(reportsToDiv);
-                    
-                    await loadManagersForDropdown(); 
+
+                    await loadManagersForDropdown();
 
                     document.getElementById('user-reportsTo-input').value = user.reportsTo ? user.reportsTo._id : '';
                 } else {
@@ -1424,7 +1655,7 @@
             const token = localStorage.getItem('token');
             const form = event.target;
             const formData = new FormData(form);
-            const data = Object.fromEntries(formData.entries()); 
+            const data = Object.fromEntries(formData.entries());
             const mode = data.mode;
             const userId = data.userId;
             const submitButton = document.getElementById('submit-user-btn');
@@ -1447,9 +1678,9 @@
                     department: data.department,
                     branch: data.branch || null,
                     reportsTo: data.reportsTo || null,
-                    companyId: data.companyId 
+                    companyId: data.companyId
                 };
-            } else { 
+            } else {
                 url = `${SERVER_URL}/users/admin/${userId}`;
                 method = 'PUT';
                 body = {
@@ -1475,7 +1706,7 @@
                 }
                 closeModal('userModal');
                 fetchAllUsersForTable();
-                fetchAllUsers(); 
+                fetchAllUsers();
             } catch (error) {
                 errorBox.textContent = `บันทึกไม่สำเร็จ: ${error.message}`;
                 safeShow(errorBox);
@@ -1500,7 +1731,7 @@
                     throw new Error(err.message);
                 }
                 fetchAllUsersForTable();
-                fetchAllUsers(); 
+                fetchAllUsers();
             } catch (error) {
                 alert(`ลบไม่สำเร็จ: ${error.message}`);
             }
@@ -1513,34 +1744,34 @@
             const taskView = document.getElementById('task-view-content');
             const adminView = document.getElementById('admin-view-content');
             const depositView = document.getElementById('deposit-view'); // เพิ่ม Deposit View
-            
+
             const mainHeader = document.getElementById('main-header');
             const newTaskBtn = document.getElementById('newTaskButton');
             const newUserBtn = document.getElementById('newUserButton');
-            
+
             const navDashboard = document.getElementById('nav-dashboard');
             const navMyTasks = document.getElementById('nav-mytasks');
             const navAdmin = document.getElementById('nav-admin');
             const navDeposit = document.getElementById('nav-Storefront_deposit'); // เพิ่ม Deposit Nav
-            
+
             const companySelectDiv = document.getElementById('company-select').parentElement;
-            
+
             // Reset Nav Styles
             [navDashboard, navMyTasks, navAdmin, navDeposit].forEach(el => {
                 el.classList.remove('bg-amber-500', 'text-white');
                 el.classList.add('text-gray-600', 'hover:bg-gray-100');
             });
-            
+
             // Hide All Views
-            safeHide(statsCards); 
-            safeHide(taskView); 
+            safeHide(statsCards);
+            safeHide(taskView);
             safeHide(adminView);
             safeHide(depositView); // Hide Deposit View
-            
+
             // Hide Buttons & Filters
             safeHide(newTaskBtn); safeHide(newUserBtn);
             safeHide(myTasksFilters);
-            
+
             currentView = activeView;
 
             if (activeView === 'dashboard') {
@@ -1550,15 +1781,15 @@
                 navDashboard.classList.add('bg-amber-500', 'text-white');
                 navDashboard.classList.remove('text-gray-600', 'hover:bg-gray-100');
                 if (companySelectDiv) companySelectDiv.style.display = 'block';
-            } 
+            }
             else if (activeView === 'mytasks') {
                 safeShow(taskView);
-                safeShow(myTasksFilters); 
+                safeShow(myTasksFilters);
                 mainHeader.textContent = "งานของฉัน";
                 navMyTasks.classList.add('bg-amber-500', 'text-white');
                 navMyTasks.classList.remove('text-gray-600', 'hover:bg-gray-100');
                 if (companySelectDiv) companySelectDiv.style.display = 'none';
-            } 
+            }
             else if (activeView === 'admin') {
                 safeShow(adminView); safeShow(newUserBtn);
                 mainHeader.textContent = "จัดการผู้ใช้";
@@ -1576,7 +1807,7 @@
             }
 
             if (currentUser && currentUser.role === 'staff') {
-                 if(document.getElementById('company-select')) document.getElementById('company-select').disabled = true;
+                if (document.getElementById('company-select')) document.getElementById('company-select').disabled = true;
             }
         };
 
@@ -1603,7 +1834,7 @@
                 else if (status === 'in-progress') btnId = 'inprogress';
                 else if (status === 'for-review') btnId = 'review';
                 else if (status === 'completed') btnId = 'completed';
-                
+
                 if (btnId) {
                     document.getElementById(`btn-filter-${btnId}`).classList.add('ring-2', 'ring-offset-1', 'ring-gray-400');
                 }
@@ -1614,16 +1845,16 @@
         // --- INIT & LISTENERS ---
         document.addEventListener('DOMContentLoaded', () => {
             initializeAuth();
-            
+
             // Forms
             document.getElementById('new-task-form').addEventListener('submit', handleNewTaskSubmit);
             document.getElementById('update-task-form').addEventListener('submit', handleUpdateTaskSubmit);
             document.getElementById('user-form').addEventListener('submit', handleUserFormSubmit);
-            
+
             // Buttons
-            document.getElementById('confirm-delete-button').addEventListener('click', executeDelete); 
+            document.getElementById('confirm-delete-button').addEventListener('click', executeDelete);
             document.getElementById('newTaskButton').addEventListener('click', () => {
-                fetchAllUsers(); 
+                fetchAllUsers();
                 openModal('newTaskModal');
             });
             document.getElementById('newUserButton').addEventListener('click', openNewUserModal);
@@ -1631,28 +1862,35 @@
                 openModal('notificationModal');
                 markNotificationsAsRead();
             });
-
-            // Navigation Listeners (ใช้ updateNavActiveState ทั้งหมด)
+            const mobileBell = document.getElementById('notification-bell-btn-mobile');
+            if (mobileBell) {
+                mobileBell.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    const mobileDot = document.getElementById('notification-dot-mobile');
+                    if (mobileDot) mobileDot.classList.add('hidden');
+                    openModal('notificationModal');
+                });
+            }
             document.getElementById('nav-dashboard').addEventListener('click', (e) => {
                 const header = document.getElementById('header-assignee');
-                if(header) header.textContent = 'ผู้รับผิดชอบ';
+                if (header) header.textContent = 'ผู้รับผิดชอบ';
                 e.preventDefault(); updateNavActiveState('dashboard');
-                fetchDashboardTasks(); fetchTaskStats(); 
+                fetchDashboardTasks(); fetchTaskStats();
             });
             document.getElementById('nav-mytasks').addEventListener('click', (e) => {
                 const header = document.getElementById('header-assignee');
-                if(header) header.textContent = 'ผู้มอบหมายงาน';
+                if (header) header.textContent = 'ผู้มอบหมายงาน';
                 e.preventDefault(); updateNavActiveState('mytasks');
                 fetchMyTasks();
             });
             document.getElementById('nav-admin').addEventListener('click', (e) => {
                 e.preventDefault(); updateNavActiveState('admin');
-                fetchAllUsersForTable(); 
+                fetchAllUsersForTable();
             });
-            
+
             // (*** เพิ่ม Listener สำหรับเมนู Deposit ***)
             document.getElementById('nav-Storefront_deposit').addEventListener('click', (e) => {
-                e.preventDefault(); 
+                e.preventDefault();
                 updateNavActiveState('deposit'); // เรียกใช้ฟังก์ชันกลาง
                 fetchDeposits(); // โหลดข้อมูล
             });
@@ -1660,14 +1898,14 @@
             // Company Change Listener
             document.getElementById('company-select').addEventListener('change', () => {
                 if (currentView === 'dashboard') {
-                    fetchNotifications(); fetchDashboardTasks(); fetchTaskStats(); fetchAllUsers();      
+                    fetchNotifications(); fetchDashboardTasks(); fetchTaskStats(); fetchAllUsers();
                 } else if (currentView === 'admin') {
                     fetchAllUsersForTable();
                 } else if (currentView === 'deposit') { // (*** เพิ่ม ***)
                     fetchDeposits(); // รีเฟรชตารางมัดจำเมื่อเปลี่ยนบริษัท
                 }
             });
-            
+
             document.getElementById('user-company-input').addEventListener('change', () => {
                 loadManagersForDropdown();
             });
@@ -1681,7 +1919,7 @@
                 // (เสริม) ถ้าเป็น Staff ทั่วไป ซ่อนตัวกรองนี้ไปเลย (เพราะดูได้แค่สาขาตัวเองอยู่แล้ว)
                 if (currentUser && currentUser.role === 'staff') {
                     const container = document.getElementById('filter-branch-container');
-                    if(container) container.style.display = 'none';
+                    if (container) container.style.display = 'none';
                 }
             }
             const sidebar = document.getElementById('sidebar');
@@ -1695,13 +1933,13 @@
                 };
                 menuToggle.addEventListener('click', toggleMenu);
                 overlay.addEventListener('click', toggleMenu);
-            
+
                 // ปิดเมนูอัตโนมัติเมื่อกดลิงก์
                 document.querySelectorAll('#nav-menu a').forEach(link => {
                     link.addEventListener('click', () => {
                         // เช็คว่าอยู่ในโหมดมือถือ (จอเล็กกว่า 768px)
-                        if (window.innerWidth < 768) { 
-                            toggleMenu(); 
+                        if (window.innerWidth < 768) {
+                            toggleMenu();
                         }
                     });
                 });
@@ -1710,9 +1948,9 @@
 
         // Modal Control
         function openModal(modalId) { document.getElementById(modalId).classList.add('active'); }
-        function closeModal(modalId) { 
+        function closeModal(modalId) {
             document.getElementById(modalId).classList.remove('active');
-        } 
+        }
 
         window.addEventListener('click', (event) => {
             if (event.target.classList.contains('modal')) {
@@ -1721,4 +1959,5 @@
         });
     </script>
 </body>
+
 </html>
