@@ -15,7 +15,7 @@ exports.createNotification = async (recipientIds, message, taskId, actorId) => {
     try {
         // 1. กรอง ID ของ "ผู้กระทำ" ออก (ไม่แจ้งเตือนตัวเอง)
         const finalRecipients = recipientIds.filter(id => id.toString() !== actorId.toString());
-        
+
         // 2. กันซ้ำ
         const uniqueRecipients = [...new Set(finalRecipients)];
 
@@ -44,12 +44,12 @@ exports.createNotification = async (recipientIds, message, taskId, actorId) => {
 exports.getNotifications = async (req, res) => {
     try {
         // (*** 1. (แก้ไข) ดึง "ประวัติ" 50 อันล่าสุด (ทั้งอ่านแล้วและยังไม่อ่าน) ***)
-        const notifications = await Notification.find({ 
-            user: req.user.id, 
+        const notifications = await Notification.find({
+            user: req.user.id,
         })
-        .sort({ createdAt: -1 }) // เอาอันใหม่สุดขึ้นก่อน
-        .limit(50) // (ใหม่) จำกัดแค่ 50 รายการล่าสุด
-        .populate('task', 'title'); // ดึง "ชื่องาน" มาแสดง
+            .sort({ createdAt: -1 }) // เอาอันใหม่สุดขึ้นก่อน
+            .limit(50) // (ใหม่) จำกัดแค่ 50 รายการล่าสุด
+            .populate('task', 'title'); // ดึง "ชื่องาน" มาแสดง
 
         // (*** 2. (ใหม่) นับ "จำนวนที่ยังไม่อ่าน" (สำหรับจุดแดง) ***)
         const unreadCount = await Notification.countDocuments({
@@ -76,11 +76,48 @@ exports.markAllAsRead = async (req, res) => {
             { user: req.user.id, isRead: false },
             { $set: { isRead: true } }
         );
-        
+
         console.log(`[Notify] User ${req.user.username} อ่านการแจ้งเตือนทั้งหมดแล้ว`);
         res.status(200).json({ message: 'มาร์คว่าอ่านทั้งหมดแล้ว' });
     } catch (error) {
         console.error('Mark as Read Error:', error.message);
+        res.status(500).json({ message: 'Server Error' });
+    }
+};
+
+/**
+     * @desc    (API) ลบการแจ้งเตือน (รายตัว)
+     * @route   DELETE /api/notifications/:id
+     */
+exports.deleteNotification = async (req, res) => {
+    try {
+        const notificationId = req.params.id;
+
+        // ตรวจสอบว่าเป็นเจ้าของหรือไม่
+        const notification = await Notification.findOne({ _id: notificationId, user: req.user.id });
+        if (!notification) {
+            return res.status(404).json({ message: 'ไม่พบการแจ้งเตือน' });
+        }
+
+        await Notification.deleteOne({ _id: notificationId });
+        res.status(200).json({ message: 'ลบการแจ้งเตือนสำเร็จ' });
+
+    } catch (error) {
+        console.error('Delete Notification Error:', error.message);
+        res.status(500).json({ message: 'Server Error' });
+    }
+};
+
+/**
+ * @desc    (API) ลบการแจ้งเตือนทั้งหมด
+ * @route   DELETE /api/notifications
+ */
+exports.deleteAllNotifications = async (req, res) => {
+    try {
+        await Notification.deleteMany({ user: req.user.id });
+        res.status(200).json({ message: 'ลบการแจ้งเตือนทั้งหมดสำเร็จ' });
+    } catch (error) {
+        console.error('Delete All Notifications Error:', error.message);
         res.status(500).json({ message: 'Server Error' });
     }
 };

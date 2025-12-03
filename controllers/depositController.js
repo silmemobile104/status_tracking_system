@@ -6,7 +6,7 @@ exports.getDeposits = async (req, res) => {
     try {
         const userRole = req.user.role;
         // 1. รับค่าที่ส่งมาจากหน้าเว็บ (Query Parameters)
-        const { branch, companyId } = req.query; 
+        const { branch, companyId } = req.query;
 
         // 2. กำหนด Company ID ที่จะค้นหา
         let filterCompanyId;
@@ -56,9 +56,9 @@ exports.getDeposits = async (req, res) => {
 // @desc    บันทึก หรือ แก้ไข ข้อมูล
 exports.saveDeposit = async (req, res) => {
     try {
-        const { 
+        const {
             id, depositDate, customerName, phoneNumber, depositAmount, pickupDueDate,
-            billNo, imei, product, price, isSuccess 
+            billNo, imei, product, price, isSuccess
         } = req.body;
 
         if (id) {
@@ -71,13 +71,13 @@ exports.saveDeposit = async (req, res) => {
             deposit.phoneNumber = phoneNumber;
             deposit.depositAmount = depositAmount;
             deposit.pickupDueDate = pickupDueDate;
-            
+
             deposit.billNo = billNo;
             deposit.imei = imei;
             deposit.product = product;
             deposit.price = price;
             deposit.isSuccess = isSuccess;
-            
+
             if (isSuccess && !deposit.signName) deposit.signName = req.user.name;
 
             await deposit.save();
@@ -89,8 +89,8 @@ exports.saveDeposit = async (req, res) => {
                 // บันทึกสาขาลงไปตาม User ที่สร้าง (สำคัญมากสำหรับการกรอง)
                 branch: req.user.branch || req.user.department,
                 depositDate, customerName, phoneNumber, depositAmount, pickupDueDate,
-                billNo, imei, product, price, isSuccess, 
-                signName: '' 
+                billNo, imei, product, price, isSuccess,
+                signName: ''
             });
             await newDeposit.save();
             return res.status(201).json(newDeposit);
@@ -107,6 +107,21 @@ exports.deleteDeposit = async (req, res) => {
         await Deposit.findByIdAndDelete(req.params.id);
         res.status(200).json({ message: 'Deleted' });
     } catch (error) {
+        res.status(500).json({ message: 'Server Error' });
+    }
+};
+
+// @desc    ดึงรายชื่อสินค้าที่มีอยู่ (Unique)
+exports.getDepositProducts = async (req, res) => {
+    try {
+        const companyId = req.user.companyId;
+        const products = await Deposit.distinct('product', {
+            companyId: companyId,
+            product: { $ne: null, $ne: "" }
+        });
+        res.status(200).json(products);
+    } catch (error) {
+        console.error('Get Products Error:', error);
         res.status(500).json({ message: 'Server Error' });
     }
 };

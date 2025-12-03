@@ -137,6 +137,31 @@
         @media (min-width: 768px) {
             #main-content { padding-top: 0; }
         }
+        /* Tom Select Customization */
+        .ts-control {
+            border-radius: 0.75rem !important; /* rounded-xl */
+            border-color: #e2e8f0 !important; /* slate-200 */
+            padding: 0.75rem !important; /* p-3 */
+            box-shadow: none !important;
+            min-height: 46px; /* Match standard input height */
+        }
+        .ts-control.focus {
+            border-color: #facc15 !important; /* yellow-400 */
+            box-shadow: 0 0 0 2px rgba(250, 204, 21, 0.5) !important; /* ring-yellow-400/50 */
+        }
+        .ts-dropdown {
+            border-radius: 0.75rem !important;
+            border-color: #e2e8f0 !important;
+            margin-top: 4px !important;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05) !important;
+        }
+        .ts-dropdown .option {
+            padding: 0.5rem 1rem !important;
+        }
+        .ts-dropdown .active {
+            background-color: #fef9c3 !important; /* yellow-100 */
+            color: #854d0e !important; /* yellow-800 */
+        }
     </style>
 </head>
 
@@ -174,11 +199,7 @@
             <div class="flex flex-col h-full">
                 <!-- Logo -->
                 <div class="h-20 flex items-center px-8 border-b border-slate-100 hidden md:flex">
-                    <img 
-                        src="/image/icon_silme.png" 
-                        alt="SILME Icon"
-                        class="w-8 h-8 mr-3 rounded-lg shadow-lg"
-                    />
+                    <img src="/image/icon_silme.png" alt="SILME Icon" class="w-8 h-8 mr-3 rounded-lg shadow-lg" />
                     <h1 class="text-xl font-bold text-slate-800 tracking-tight font-display">SILMIN MOBILE</h1>
                 </div>
 
@@ -267,6 +288,10 @@
                         <p class="text-slate-500 mt-1">System</p>
                     </div>
                     <div id="main-header-buttons" class="flex gap-3">
+                        <button id="showAllTasksBtn"
+                            class="bg-white hover:bg-slate-50 text-slate-600 border border-slate-200 font-semibold py-2.5 px-5 rounded-xl shadow-sm flex items-center transition-all transform hover:-translate-y-0.5">
+                            <ion-icon name="list-outline" class="w-5 h-5 mr-2"></ion-icon> แสดงงานทั้งหมด
+                        </button>
                         <button id="newTaskButton"
                             class="bg-yellow-500 hover:bg-yellow-600 text-white font-semibold py-2.5 px-5 rounded-xl shadow-lg shadow-yellow-500/30 flex items-center transition-all transform hover:-translate-y-0.5">
                             <ion-icon name="add-circle-outline" class="w-5 h-5 mr-2"></ion-icon> สั่งงานใหม่
@@ -467,11 +492,22 @@
                         </div>
                         <p class="text-slate-500">กำลังดึงข้อมูลผู้ใช้...</p>
                     </div>
-                    <div class="p-6 border-b border-slate-100 flex justify-between items-center bg-slate-50/50">
-                        <h3 class="text-lg font-bold text-slate-800">รายชื่อผู้ใช้ในระบบ</h3>
-                        <span id="user-count"
-                            class="text-xs font-semibold text-slate-500 bg-white border border-slate-200 px-3 py-1 rounded-full shadow-sm">0
-                            คน</span>
+                    <div
+                        class="p-6 border-b border-slate-100 flex flex-col sm:flex-row justify-between items-center bg-slate-50/50 gap-4">
+                        <div class="flex items-center gap-4">
+                            <h3 class="text-lg font-bold text-slate-800">รายชื่อผู้ใช้ในระบบ</h3>
+                            <span id="user-count"
+                                class="text-xs font-semibold text-slate-500 bg-white border border-slate-200 px-3 py-1 rounded-full shadow-sm">0
+                                คน</span>
+                        </div>
+                        <div class="relative w-full sm:w-64">
+                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                <ion-icon name="search-outline" class="text-slate-400"></ion-icon>
+                            </div>
+                            <input type="text" id="user-search-input"
+                                class="block w-full pl-10 pr-3 py-2 border border-slate-200 rounded-xl leading-5 bg-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:border-yellow-400 sm:text-sm transition-shadow"
+                                placeholder="ค้นหาชื่อ หรือ Username...">
+                        </div>
                     </div>
                     <div class="overflow-x-auto">
                         <table class="w-full min-w-lg">
@@ -629,7 +665,8 @@
                             (กรอกเมื่อมารับของ)
                         </div>
                         <div><label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">สินค้า
-                                (รุ่น/สี/ความจุ)</label><input type="text" id="dep-product" class="form-input-theme">
+                                (รุ่น/สี/ความจุ)</label><select id="dep-product" class="form-select-theme"
+                                placeholder="เลือกหรือพิมพ์เพิ่ม..."></select>
                         </div>
                         <div><label
                                 class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">ราคาเครื่องเต็ม
@@ -873,7 +910,13 @@
     <div id="notificationModal" class="modal fixed inset-0 z-50 items-center justify-center p-4">
         <div class="modal-content relative w-full max-w-lg bg-white rounded-2xl shadow-2xl overflow-hidden">
             <div class="px-6 py-4 border-b border-slate-100 bg-slate-50/50 flex justify-between items-center">
-                <h3 class="text-lg font-bold text-slate-800">การแจ้งเตือน</h3>
+                <div class="flex items-center gap-3">
+                    <h3 class="text-lg font-bold text-slate-800">การแจ้งเตือน</h3>
+                    <button onclick="deleteAllNotifications()"
+                        class="text-xs text-red-500 hover:text-red-700 font-medium bg-red-50 px-2 py-1 rounded-lg transition-colors">
+                        ลบทั้งหมด
+                    </button>
+                </div>
                 <button onclick="closeModal('notificationModal')"
                     class="text-slate-400 hover:text-slate-600 transition-colors">
                     <ion-icon name="close" class="text-2xl"></ion-icon>
@@ -1133,7 +1176,7 @@
                 const tasks = await response.json();
                 allMyTasks = tasks;     // 1. เก็บข้อมูลทั้งหมดไว้ในตัวแปรกลาง
                 updateMyTaskCounts();   // 2. อัปเดตตัวเลขบนปุ่ม
-                renderTaskTable(tasks); // 3. แสดงผลทั้งหมดก่อน
+                filterMyTasks('todo'); // 3. Default แสดง Todo
             } catch (error) {
                 safeHide(document.getElementById('loading-tasks'));
                 document.getElementById('task-error-text').textContent = 'เกิดข้อผิดพลาดในการเชื่อมต่อ Server';
@@ -1437,6 +1480,8 @@
                 users.forEach(user => {
                     const row = document.createElement('tr');
                     row.className = 'hover:bg-slate-50';
+                    row.setAttribute('data-name', (user.name || '').toLowerCase());
+                    row.setAttribute('data-username', (user.username || '').toLowerCase());
                     row.innerHTML = `
                         <td class="px-6 py-4 whitespace-nowrap"><div class="text-sm font-medium text-gray-900">${user.name}</div></td>
                         <td class="px-6 py-4 whitespace-nowrap"><div class="text-sm text-gray-500">${user.username}</div></td>
@@ -1459,6 +1504,32 @@
         // ------------------------------------------
         // --- (C) NOTIFICATION FUNCTIONS ---
         // ------------------------------------------
+        const filterUsersByName = (query) => {
+            const rows = document.querySelectorAll('#user-table-body tr:not(#no-user-row)');
+            const lowerQuery = query.toLowerCase();
+
+            rows.forEach(row => {
+                const name = row.getAttribute('data-name') || '';
+                const username = row.getAttribute('data-username') || '';
+
+                if (name.includes(lowerQuery) || username.includes(lowerQuery)) {
+                    row.style.display = '';
+                } else {
+                    row.style.display = 'none';
+                }
+            });
+        };
+
+        // Add listener for search input
+        document.addEventListener('DOMContentLoaded', () => {
+            const searchInput = document.getElementById('user-search-input');
+            if (searchInput) {
+                searchInput.addEventListener('input', (e) => {
+                    filterUsersByName(e.target.value);
+                });
+            }
+        });
+
         const fetchNotifications = async () => {
             const token = localStorage.getItem('token');
             if (!token) return;
@@ -1563,10 +1634,10 @@
                     const taskAction = noti.task ? `onclick="openDetailModal('${noti.task._id}'); closeModal('notificationModal');"` : '';
 
                     const item = document.createElement('div');
-                    item.className = `block p-3 border-b hover:bg-gray-50 cursor-pointer ${noti.isRead ? 'bg-white' : 'bg-blue-50'}`;
+                    item.className = `flex justify-between items-start p-3 border-b hover:bg-gray-50 cursor-pointer ${noti.isRead ? 'bg-white' : 'bg-blue-50'}`;
 
                     item.innerHTML = `
-                        <div ${taskAction}>
+                        <div ${taskAction} class="flex-1">
                             <p class="text-sm text-gray-800 font-medium">${noti.message}</p>
                             <p class="text-xs text-gray-500 mt-1">
                                 <span class="font-semibold text-amber-600">${taskTitle}</span> • ${timeAgo(noti.createdAt)}
@@ -1596,6 +1667,48 @@
         };
 
         // ------------------------------------------
+        const deleteNotification = async (id) => {
+            const token = localStorage.getItem('token');
+            if (!confirm('คุณต้องการลบการแจ้งเตือนนี้หรือไม่?')) return;
+
+            try {
+                const response = await fetch(`${SERVER_URL}/notifications/${id}`, {
+                    method: 'DELETE',
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+
+                if (response.ok) {
+                    fetchNotifications();
+                } else {
+                    alert('ลบการแจ้งเตือนไม่สำเร็จ');
+                }
+            } catch (error) {
+                console.error('Delete Notification Error:', error);
+                alert('เกิดข้อผิดพลาดในการลบการแจ้งเตือน');
+            }
+        };
+
+        const deleteAllNotifications = async () => {
+            const token = localStorage.getItem('token');
+            if (!confirm('คุณต้องการลบการแจ้งเตือนทั้งหมดหรือไม่?')) return;
+
+            try {
+                const response = await fetch(`${SERVER_URL}/notifications`, {
+                    method: 'DELETE',
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+
+                if (response.ok) {
+                    fetchNotifications();
+                } else {
+                    alert('ลบการแจ้งเตือนทั้งหมดไม่สำเร็จ');
+                }
+            } catch (error) {
+                console.error('Delete All Notifications Error:', error);
+                alert('เกิดข้อผิดพลาดในการลบการแจ้งเตือนทั้งหมด');
+            }
+        };
+
         // --- (D) DEPOSIT FUNCTIONS ---
         // ------------------------------------------
         // ในไฟล์ index.html
@@ -1693,8 +1806,42 @@
             }
         }
 
-        function openDepositModal(data = null) {
+        let productTomSelect = null;
+
+        async function fetchProducts() {
+            try {
+                const token = localStorage.getItem('token');
+                const res = await fetch(`${SERVER_URL}/deposits/products`, { headers: { 'Authorization': `Bearer ${token}` } });
+                if (!res.ok) return [];
+                return await res.json();
+            } catch (e) {
+                console.error("Error fetching products:", e);
+                return [];
+            }
+        }
+
+        async function openDepositModal(data = null) {
             openModal('depositModal');
+
+            // Initialize Tom Select if not already done
+            if (!productTomSelect) {
+                productTomSelect = new TomSelect('#dep-product', {
+                    create: true,
+                    sortField: { field: "text", direction: "asc" },
+                    placeholder: "เลือกหรือพิมพ์เพิ่ม...",
+                    valueField: 'text',
+                    labelField: 'text',
+                    searchField: 'text',
+                    options: [],
+                    maxOptions: null
+                });
+            }
+
+            // Load products
+            productTomSelect.clear();
+            productTomSelect.clearOptions();
+            const products = await fetchProducts();
+            products.forEach(p => productTomSelect.addOption({ text: p }));
             document.getElementById('deposit-form').reset();
             document.getElementById('dep-id').value = '';
 
@@ -1706,7 +1853,11 @@
                 document.getElementById('dep-phone').value = data.phoneNumber;
                 document.getElementById('dep-amount').value = data.depositAmount;
 
-                document.getElementById('dep-product').value = data.product || '';
+                // Set product value
+                if (data.product) {
+                    productTomSelect.addOption({ text: data.product }); // Ensure option exists
+                    productTomSelect.setValue(data.product);
+                }
                 document.getElementById('dep-price').value = data.price || '';
                 document.getElementById('dep-bill').value = data.billNo || '';
                 document.getElementById('dep-imei').value = data.imei || '';
@@ -1947,6 +2098,7 @@
             const mainHeader = document.getElementById('main-header');
             const newTaskBtn = document.getElementById('newTaskButton');
             const newUserBtn = document.getElementById('newUserButton');
+            const showAllTasksBtn = document.getElementById('showAllTasksBtn');
 
             const navDashboard = document.getElementById('nav-dashboard');
             const navMyTasks = document.getElementById('nav-mytasks');
@@ -1969,6 +2121,7 @@
 
             // Hide Buttons & Filters
             safeHide(newTaskBtn); safeHide(newUserBtn);
+            safeHide(showAllTasksBtn);
             safeHide(myTasksFilters);
 
             currentView = activeView;
@@ -1976,6 +2129,7 @@
             if (activeView === 'dashboard') {
                 safeShow(statsCards); safeShow(taskView);
                 if (currentUser.role !== 'staff') safeShow(newTaskBtn);
+                safeShow(showAllTasksBtn);
                 mainHeader.textContent = "แดชบอร์ด";
                 navDashboard.classList.add('bg-amber-500', 'text-white');
                 navDashboard.classList.remove('text-gray-600', 'hover:bg-gray-100');
@@ -2055,6 +2209,17 @@
             document.getElementById('newTaskButton').addEventListener('click', () => {
                 fetchAllUsers();
                 openModal('newTaskModal');
+            });
+            // (*** เพิ่ม Listener ปุ่มแสดงงานทั้งหมด ***)
+            document.getElementById('showAllTasksBtn').addEventListener('click', () => {
+                // 1. ลบ Highlight จากการ์ดสถิติ
+                document.querySelectorAll('#stats-cards [data-status]').forEach(card => {
+                    card.classList.remove('ring-2', 'ring-amber-500', 'shadow-lg');
+                });
+                // 2. แสดงงานทั้งหมดจาก Cache
+                if (typeof allDashboardTasks !== 'undefined') {
+                    renderTaskTable(allDashboardTasks);
+                }
             });
             document.getElementById('newUserButton').addEventListener('click', openNewUserModal);
             document.getElementById('notification-bell').addEventListener('click', () => {

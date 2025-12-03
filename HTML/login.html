@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="th">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -8,9 +9,14 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+Thai:wght@400;500;600;700&display=swap');
-        body { font-family: 'Inter', 'Noto Sans Thai', sans-serif; background-color: #f3f4f6; }
+
+        body {
+            font-family: 'Inter', 'Noto Sans Thai', sans-serif;
+            background-color: #f3f4f6;
+        }
     </style>
 </head>
+
 <body class="flex items-center justify-center min-h-screen">
 
     <div class="w-full max-w-md p-8 space-y-8 bg-white rounded-xl shadow-lg">
@@ -21,17 +27,23 @@
 
         <form id="login-form" class="mt-8 space-y-6">
             <div>
-                <label for="username" class="block text-sm font-medium text-gray-700 mb-2">รหัสพนักงาน (Username)</label>
-                <input id="username" name="username" type="text" required class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500" placeholder="กรอกรหัสพนักงาน">
+                <label for="username" class="block text-sm font-medium text-gray-700 mb-2">รหัสพนักงาน
+                    (Username)</label>
+                <input id="username" name="username" type="text" required
+                    class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                    placeholder="กรอกรหัสพนักงาน">
             </div>
             <div>
                 <label for="password" class="block text-sm font-medium text-gray-700 mb-2">รหัสผ่าน</label>
-                <input id="password" name="password" type="password" required class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500" placeholder="••••••••">
+                <input id="password" name="password" type="password" required
+                    class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                    placeholder="••••••••">
             </div>
 
             <div id="error-message" class="hidden p-3 text-sm text-red-600 bg-red-100 rounded-md"></div>
 
-            <button type="submit" id="submit-btn" class="w-full px-4 py-2 text-white bg-indigo-600 rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 font-semibold transition-colors">
+            <button type="submit" id="submit-btn"
+                class="w-full px-4 py-2 text-white bg-indigo-600 rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 font-semibold transition-colors">
                 เข้าสู่ระบบ
             </button>
         </form>
@@ -48,7 +60,7 @@
 
             loginForm.addEventListener('submit', async (e) => {
                 e.preventDefault();
-                
+
                 const username = document.getElementById('username').value;
                 const password = document.getElementById('password').value;
 
@@ -60,7 +72,7 @@
                 try {
                     // (*** จุดที่ต้องแก้ที่ 1: ใช้ Relative Path ***)
                     // ใช้แค่ '/api/auth/login' ตัด http://localhost:5000 ออก
-                    const response = await fetch('/api/auth/login', { 
+                    const response = await fetch('/api/auth/login', {
                         method: 'POST', // ต้องเป็น POST เท่านั้น
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({ username, password })
@@ -74,8 +86,8 @@
                         localStorage.setItem('user', JSON.stringify(data.user));
 
                         // (*** จุดที่ต้องแก้ที่ 2: Redirect ไป dashboard ***)
-                        window.location.href = '/dashboard'; 
-                    
+                        window.location.href = '/dashboard';
+
                     } else {
                         throw new Error(data.message || 'เข้าสู่ระบบไม่สำเร็จ');
                     }
@@ -84,7 +96,7 @@
                     console.error('Login Error:', error);
                     errorMessageDiv.textContent = error.message || 'ไม่สามารถเชื่อมต่อ Server ได้';
                     errorMessageDiv.classList.remove('hidden');
-                    
+
                     // คืนค่าปุ่ม
                     submitButton.disabled = false;
                     submitButton.textContent = 'เข้าสู่ระบบ';
@@ -93,4 +105,5 @@
         });
     </script>
 </body>
+
 </html>
