@@ -239,12 +239,6 @@
                             class="w-5 h-5 mr-3 text-slate-400 group-hover:text-yellow-500 transition-colors"></ion-icon>
                         <span class="font-medium">จัดการผู้ใช้</span>
                     </a>
-                    <a href="#" id="nav-settings"
-                        class="flex items-center px-4 py-3 text-slate-600 hover:bg-slate-50 hover:text-slate-900 rounded-xl transition-all group">
-                        <ion-icon name="settings-outline"
-                            class="w-5 h-5 mr-3 text-slate-400 group-hover:text-yellow-500 transition-colors"></ion-icon>
-                        <span class="font-medium">ตั้งค่า</span>
-                    </a>
                 </nav>
 
                 <!-- User Profile -->
@@ -443,9 +437,24 @@
                             <div id="filter-branch-container">
                                 <select id="deposit-filter-branch" class="form-select-theme py-2 pl-3 pr-8 text-sm">
                                     <option value="all" selected>ดูทุกสาขา</option>
-                                    <option value="นราธิวาส">นราธิวาส</option>
                                     <option value="ยะลา">ยะลา</option>
+                                    <option value="นราธิวาส">นราธิวาส</option>
+                                    <option value="หาดใหญ่">หาดใหญ่</option>
+                                    <option value="หาดใหญ่2">หาดใหญ่2</option>
                                     <option value="ปัตตานี">ปัตตานี</option>
+                                    <option value="โคลีเซียม">โคลีเซียม</option>
+                                    <option value="สุราษฎร์ธานี">สุราษฎร์ธานี</option>
+                                    <option value="ปากแมว">ปากแมว</option>
+                                    <option value="ภูเก็ต">ภูเก็ต</option>
+                                    <option value="นครศรีธรรมราช">นครศรีธรรมราช</option>
+                                    <option value="กระบี่">กระบี่</option>
+                                    <option value="กะทู้">กะทู้</option>
+                                    <option value="ตรัง">ตรัง</option>
+                                    <option value="คุรุ">คุรุ</option>
+                                    <option value="ชุมพร">ชุมพร</option>
+                                    <option value="สตูล">สตูล</option>
+                                    <option value="พัทลุง">พัทลุง</option>
+                                    <option value="สงขลา">สงขลา</option>
                                 </select>
                             </div>
 
@@ -1033,7 +1042,6 @@
             if (currentUser.role === 'staff') {
                 safeHide(document.getElementById('nav-dashboard'));
                 safeHide(document.getElementById('nav-admin'));
-                safeHide(document.getElementById('nav-settings'));
 
                 if (document.getElementById('company-select')) {
                     document.getElementById('company-select').parentElement.style.display = 'none';
@@ -2148,7 +2156,7 @@
                 mainHeader.textContent = "จัดการผู้ใช้";
                 navAdmin.classList.add('bg-amber-500', 'text-white');
                 navAdmin.classList.remove('text-gray-600', 'hover:bg-gray-100');
-                if (companySelectDiv) companySelectDiv.style.display = 'block';
+                if (companySelectDiv) companySelectDiv.style.display = 'none';
             }
             else if (activeView === 'deposit') { // (*** ใหม่ ***)
                 safeShow(depositView);
@@ -2156,7 +2164,7 @@
                 navDeposit.classList.add('bg-amber-500', 'text-white');
                 navDeposit.classList.remove('text-gray-600', 'hover:bg-gray-100');
                 // ปกติหน้าร้านก็ควรเลือกบริษัทได้
-                if (companySelectDiv) companySelectDiv.style.display = 'block';
+                if (companySelectDiv) companySelectDiv.style.display = 'none';
             }
 
             if (currentUser && currentUser.role === 'staff') {
