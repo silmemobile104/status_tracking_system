@@ -1047,6 +1047,10 @@
                     document.getElementById('company-select').parentElement.style.display = 'none';
                 }
 
+                // Change Header Text for Staff
+                const header = document.getElementById('header-assignee');
+                if (header) header.textContent = 'ผู้มอบหมายงาน';
+
                 updateNavActiveState('mytasks');
                 fetchMyTasks();
 
