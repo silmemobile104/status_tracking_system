@@ -980,22 +980,6 @@
         const safeHide = (el) => { if (el) el.classList.add('hidden'); };
         const safeShow = (el) => { if (el) el.classList.remove('hidden'); };
 
-        // (*** 2. (ใหม่) เพิ่ม Helper สำหรับเวลา ***)
-        const timeAgo = (date) => {
-            const seconds = Math.floor((new Date() - new Date(date)) / 1000);
-            let interval = seconds / 31536000;
-            if (interval > 1) return Math.floor(interval) + " ปีก่อน";
-            interval = seconds / 2592000;
-            if (interval > 1) return Math.floor(interval) + " เดือนก่อน";
-            interval = seconds / 86400;
-            if (interval > 1) return Math.floor(interval) + " วันก่อน";
-            interval = seconds / 3600;
-            if (interval > 1) return Math.floor(interval) + " ชั่วโมงก่อน";
-            interval = seconds / 60;
-            if (interval > 1) return Math.floor(interval) + " นาทีก่อน";
-            return "เมื่อสักครู่";
-        };
-
         // --- Core Functions ---
         const initializeAuth = () => {
             const token = localStorage.getItem('token');
@@ -1286,14 +1270,12 @@
                                 <div class="text-sm font-medium text-gray-900 flex items-center">
                                     ${nameDisplayHtml}
                                 </div>
-                                <div class="text-xs text-gray-500">${personSubText}</div>
                             </div>
                         </div>
                     </td>
                     <td class="px-6 py-4 whitespace-nowrap">${statusDisplay}</td>
                     <td class="px-6 py-4 whitespace-nowrap text-sm ${isOverdue ? 'text-red-500 font-bold' : 'text-gray-500'}">
                         ${formatDate(task.dueDate)}
-                        <div class="text-xs font-normal text-gray-400">${timeAgo(task.dueDate)}</div>
                     </td>
                     <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                         <button class="text-amber-600 hover:text-amber-800 bg-amber-50 hover:bg-amber-100 px-3 py-1 rounded-md transition-colors" onclick="openDetailModal('${task._id}')">
@@ -1651,9 +1633,6 @@
                     item.innerHTML = `
                         <div ${taskAction} class="flex-1">
                             <p class="text-sm text-gray-800 font-medium">${noti.message}</p>
-                            <p class="text-xs text-gray-500 mt-1">
-                                <span class="font-semibold text-amber-600">${taskTitle}</span> • ${timeAgo(noti.createdAt)}
-                            </p>
                         </div>
                     `;
                     list.appendChild(item);
