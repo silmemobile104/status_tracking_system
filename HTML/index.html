@@ -3151,9 +3151,11 @@
             const purchasingView = document.getElementById('purchasing-view');
             const navImport = document.getElementById('nav-import');      // [New]
             const importView = document.getElementById('import-view');    // [New]
+            const navStockImport = document.getElementById('nav-stock-import'); // [Stock Import]
+            const stockImportView = document.getElementById('stock-import-view'); // [Stock Import]
 
             // Reset Nav Styles
-            [navDashboard, navMyTasks, navAdmin, navDeposit, navPurchasing, navImport].forEach(el => {
+            [navDashboard, navMyTasks, navAdmin, navDeposit, navPurchasing, navImport, navStockImport].forEach(el => {
                 if (el) {
                     el.classList.remove('bg-amber-500', 'text-white');
                     el.classList.add('text-slate-600', 'hover:bg-slate-50');
@@ -3167,6 +3169,7 @@
             safeHide(depositView); // Hide Deposit View
             safeHide(purchasingView);
             safeHide(importView);     // [New]
+            safeHide(stockImportView); // [Stock Import]
 
             // Hide Buttons & Filters
             safeHide(newTaskBtn); safeHide(newUserBtn);
@@ -3209,10 +3212,18 @@
             }
             else if (activeView === 'purchasing') { // [เพิ่ม]
                 safeShow(purchasingView);
-                mainHeader.textContent = "จัดซื้อ";
+                mainHeader.textContent = "ติดตามการสั่งซื้อ";
                 navPurchasing.classList.add('bg-amber-500', 'text-white');
                 navPurchasing.classList.remove('text-slate-600', 'hover:bg-slate-50');
                 if (companySelectDiv) companySelectDiv.style.display = 'none';
+
+                // Default to Pending
+                if (typeof filterPurchasingByStatus === 'function') {
+                    filterPurchasingByStatus('pending');
+                }
+                if (typeof fetchPurchasingOrders === 'function') {
+                    fetchPurchasingOrders();
+                }
             }
             else if (activeView === 'import') { // [New]
                 safeShow(importView);

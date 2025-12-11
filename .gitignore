@@ -1,2 +1,16 @@
-node_modules
+# Dependencies
+/node_modules
+
+# Files created by the application (DO NOT COMMIT)
+/uploads
+
+# Utility/Setup/Debug Scripts
+create_admin_script.js
+fix_password.js
+inspect_imports.js
+debug_data.js
+debug_data_v2.js
+debug_server.js
+
+# Environment variables
 .env
