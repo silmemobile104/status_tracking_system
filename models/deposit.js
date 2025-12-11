@@ -4,7 +4,7 @@ const Schema = mongoose.Schema;
 
 const DepositSchema = new Schema({
     companyId: { type: String, required: true },
-    branch: { type: String, default: '' }, // เก็บสาขา
+    branch: { type: String, default: '' },
     
     // --- ฝั่งซ้าย: ข้อมูลมัดจำ ---
     depositDate: { type: Date, default: Date.now },
@@ -16,12 +16,21 @@ const DepositSchema = new Schema({
     // --- ฝั่งขวา: รับเครื่องแล้ว ---
     billNo: { type: String, default: '' },
     imei: { type: String, default: '' },
-    product: { type: String, default: '' }, // สินค้า
-    price: { type: Number, default: 0 },    // ราคาเครื่อง
-    // *ส่วนต่าง (Balance) จะคำนวณเอาหน้าบ้าน (Price - Deposit)*
+    product: { type: String, default: '' },
+    price: { type: Number, default: 0 },
     
-    isSuccess: { type: Boolean, default: false }, // สถานะสำเร็จ
-    signName: { type: String, default: '' },      // ลงชื่อพนักงาน
+    isSuccess: { type: Boolean, default: false },
+    signName: { type: String, default: '' },
+
+    // === [NEW] ส่วนเพิ่มสำหรับฝ่ายจัดซื้อ ===
+    orderStatus: { 
+        type: String, 
+        enum: ['pending', 'ordered', 'arrived', 'canceled'], 
+        default: 'pending' 
+        // pending=รอดำเนินการ, ordered=สั่งของแล้ว, arrived=ของมาถึงแล้ว, canceled=ยกเลิก
+    },
+    orderNote: { type: String, default: '' }, // หมายเหตุจากจัดซื้อ เช่น เลขพัสดุ
+    // ===================================
     
     createdAt: { type: Date, default: Date.now }
 });

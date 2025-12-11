@@ -41,5 +41,14 @@ exports.protect = async (req, res, next) => {
     }
 };
 
-// (ในอนาคต) เราสามารถสร้าง Middleware เพิ่ม
-// เช่น exports.isManager = (req, res, next) => { ... }
+// Middleware ตรวจสอบ Role
+exports.checkRole = (roles) => {
+    return (req, res, next) => {
+        if (!roles.includes(req.user.role)) {
+            return res.status(403).json({
+                message: `User role ${req.user.role} is not authorized to access this route`
+            });
+        }
+        next();
+    };
+};

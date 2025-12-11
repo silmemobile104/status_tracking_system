@@ -162,6 +162,13 @@
             background-color: #fef9c3 !important; /* yellow-100 */
             color: #854d0e !important; /* yellow-800 */
         }
+        .animate-fade-in {
+            animation: fadeIn 0.3s ease-out forwards;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
     </style>
 </head>
 
@@ -232,6 +239,24 @@
                         <ion-icon name="wallet-outline"
                             class="w-5 h-5 mr-3 text-slate-400 group-hover:text-yellow-500 transition-colors"></ion-icon>
                         <span class="font-medium">เงินค่ามัดจำหน้าร้าน</span>
+                    </a>
+                    <a href="#" onclick="updateNavActiveState('purchasing')" id="nav-purchasing"
+                        class="flex items-center px-4 py-3 text-slate-600 hover:bg-slate-50 hover:text-slate-900 rounded-xl transition-all group">
+                        <ion-icon name="cart-outline"
+                            class="w-5 h-5 mr-3 text-slate-400 group-hover:text-yellow-500 transition-colors"></ion-icon>
+                        <span class="font-medium">ติดตามการสั่งซื้อ</span>
+                    </a>
+                    <a href="#" onclick="updateNavActiveState('import')" id="nav-import"
+                        class="hidden flex items-center px-4 py-3 text-slate-600 hover:bg-slate-50 hover:text-slate-900 rounded-xl transition-all group">
+                        <ion-icon name="cloud-upload-outline"
+                            class="w-5 h-5 mr-3 text-slate-400 group-hover:text-yellow-500 transition-colors"></ion-icon>
+                        <span class="font-medium">แจ้งนำเข้า</span>
+                    </a>
+                    <a href="#" onclick="updateNavActiveState('stock-import')" id="nav-stock-import"
+                        class="flex items-center px-4 py-3 text-slate-600 hover:bg-slate-50 hover:text-slate-900 rounded-xl transition-all group hidden">
+                        <ion-icon name="cube-outline"
+                            class="w-5 h-5 mr-3 text-slate-400 group-hover:text-yellow-500 transition-colors"></ion-icon>
+                        <span class="font-medium">จัดการรายการนำเข้า</span>
                     </a>
                     <a href="#" onclick="updateNavActiveState('admin')" id="nav-admin"
                         class="flex items-center px-4 py-3 text-slate-600 hover:bg-slate-50 hover:text-slate-900 rounded-xl transition-all group">
@@ -474,13 +499,14 @@
                                     <th rowspan="2">เบอร์โทร</th>
                                     <th rowspan="2" class="bg-red-50 text-red-700 border-red-100">ยอดมัดจำ</th>
                                     <th rowspan="2">นัดรับ</th>
-                                    <th colspan="7" class="bg-slate-100 text-slate-600 border-b border-slate-200">
+                                    <th colspan="8" class="bg-slate-100 text-slate-600 border-b border-slate-200">
                                         ข้อมูลรับเครื่อง</th>
                                 </tr>
                                 <tr>
                                     <th>บิล</th>
                                     <th>IMEI</th>
                                     <th>สินค้า</th>
+                                    <th>สถานะจัดซื้อ</th>
                                     <th>ราคาเต็ม</th>
                                     <th class="bg-blue-50 text-blue-700">ค้างชำระ</th>
                                     <th>สถานะ</th>
@@ -490,6 +516,307 @@
                             <tbody id="deposit-table-body" class="text-slate-600 bg-white">
                             </tbody>
                         </table>
+                    </div>
+                </div>
+                <div id="purchasing-view" class="hidden space-y-6 mt-6">
+                    <!-- Header Section -->
+                    <div
+                        class="bg-white rounded-2xl p-6 shadow-sm border border-slate-100 flex flex-col md:flex-row justify-between items-center gap-4">
+                        <div class="flex items-center gap-4">
+                            <div
+                                class="p-3 bg-gradient-to-br from-yellow-400 to-orange-600 text-white rounded-xl shadow-lg shadow-blue-500/30">
+                                <ion-icon name="cart" class="text-2xl"></ion-icon>
+                            </div>
+                            <div>
+                                <h3 class="text-xl font-bold text-slate-800">ติดตามการสั่งซื้อ</h3>
+                                <p class="text-sm text-slate-500">จัดการและติดตามสถานะสินค้าสำหรับหน้าร้าน</p>
+                            </div>
+                        </div>
+
+                        <div class="flex items-center gap-3 w-full md:w-auto">
+                            <!-- Search Input (New) -->
+                            <div class="relative w-full md:w-64">
+                                <input type="text" id="purchasing-search-input" onkeyup="handlePurchasingSearch()"
+                                    class="form-input-theme pl-10 text-sm shadow-sm border-slate-200 focus:border-blue-400 focus:ring-blue-400/50 placeholder-slate-400"
+                                    placeholder="ค้นหาลูกค้า, เบอร์โทร, สินค้า...">
+                            </div>
+
+                            <div class="relative group w-full md:w-48">
+                                <select id="purchasing-filter-branch" onchange="fetchPurchasingOrders()"
+                                    class="form-select-theme pl-10 text-sm shadow-sm border-slate-200 hover:border-blue-400 transition-colors cursor-pointer appearance-none">
+                                    <option value="all" selected>ทุกสาขา</option>
+                                    <option value="ยะลา">ยะลา</option>
+                                    <option value="นราธิวาส">นราธิวาส</option>
+                                    <option value="หาดใหญ่">หาดใหญ่</option>
+                                    <option value="หาดใหญ่2">หาดใหญ่2</option>
+                                    <option value="ปัตตานี">ปัตตานี</option>
+                                    <option value="โคลีเซียม">โคลีเซียม</option>
+                                    <option value="สุราษฎร์ธานี">สุราษฎร์ธานี</option>
+                                    <option value="ปากแมว">ปากแมว</option>
+                                    <option value="ภูเก็ต">ภูเก็ต</option>
+                                    <option value="นครศรีธรรมราช">นครศรีธรรมราช</option>
+                                    <option value="กระบี่">กระบี่</option>
+                                    <option value="กะทู้">กะทู้</option>
+                                    <option value="ตรัง">ตรัง</option>
+                                    <option value="คุรุ">คุรุ</option>
+                                    <option value="ชุมพร">ชุมพร</option>
+                                    <option value="สตูล">สตูล</option>
+                                    <option value="พัทลุง">พัทลุง</option>
+                                    <option value="สงขลา">สงขลา</option>
+                                </select>
+                            </div>
+                            <button onclick="fetchPurchasingOrders()"
+                                class="p-2.5 bg-white border border-slate-200 rounded-xl text-slate-500 hover:text-blue-600 hover:border-blue-300 hover:bg-blue-50 transition-all shadow-sm active:scale-95">
+                                <ion-icon name="refresh" class="text-xl"></ion-icon>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Statistics Summary (Optional Enhancement) -->
+                    <!-- Statistics Summary (Clickable Filters) -->
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                        <div onclick="filterPurchasingByStatus('pending')" id="card-filter-pending"
+                            class="bg-white p-4 rounded-2xl shadow-sm border border-slate-100 flex items-center justify-between cursor-pointer hover:shadow-md transition-all active:scale-95 group">
+                            <div>
+                                <p
+                                    class="text-xs font-semibold text-slate-400 uppercase group-hover:text-yellow-600 transition-colors">
+                                    รอดำเนินการ</p>
+                                <p id="count-pending" class="text-xl font-bold text-yellow-600">0</p>
+                            </div>
+                            <div
+                                class="p-2 bg-yellow-50 text-yellow-600 rounded-lg group-hover:bg-yellow-100 transition-colors">
+                                <ion-icon name="time"></ion-icon>
+                            </div>
+                        </div>
+                        <div onclick="filterPurchasingByStatus('ordered')" id="card-filter-ordered"
+                            class="bg-white p-4 rounded-2xl shadow-sm border border-slate-100 flex items-center justify-between cursor-pointer hover:shadow-md transition-all active:scale-95 group">
+                            <div>
+                                <p
+                                    class="text-xs font-semibold text-slate-400 uppercase group-hover:text-blue-600 transition-colors">
+                                    สั่งของแล้ว</p>
+                                <p id="count-ordered" class="text-xl font-bold text-blue-600">0</p>
+                            </div>
+                            <div
+                                class="p-2 bg-blue-50 text-blue-600 rounded-lg group-hover:bg-blue-100 transition-colors">
+                                <ion-icon name="cart"></ion-icon>
+                            </div>
+                        </div>
+                        <div onclick="filterPurchasingByStatus('arrived')" id="card-filter-arrived"
+                            class="bg-white p-4 rounded-2xl shadow-sm border border-slate-100 flex items-center justify-between cursor-pointer hover:shadow-md transition-all active:scale-95 group">
+                            <div>
+                                <p
+                                    class="text-xs font-semibold text-slate-400 uppercase group-hover:text-green-600 transition-colors">
+                                    ของมาถึงแล้ว</p>
+                                <p id="count-arrived" class="text-xl font-bold text-green-600">0</p>
+                            </div>
+                            <div
+                                class="p-2 bg-green-50 text-green-600 rounded-lg group-hover:bg-green-100 transition-colors">
+                                <ion-icon name="cube"></ion-icon>
+                            </div>
+                        </div>
+                        <div onclick="filterPurchasingByStatus('canceled')" id="card-filter-canceled"
+                            class="bg-white p-4 rounded-2xl shadow-sm border border-slate-100 flex items-center justify-between cursor-pointer hover:shadow-md transition-all active:scale-95 group">
+                            <div>
+                                <p
+                                    class="text-xs font-semibold text-slate-400 uppercase group-hover:text-red-600 transition-colors">
+                                    ยกเลิก/คืนเงิน</p>
+                                <p id="count-canceled" class="text-xl font-bold text-red-600">0</p>
+                            </div>
+                            <div class="p-2 bg-red-50 text-red-600 rounded-lg group-hover:bg-red-100 transition-colors">
+                                <ion-icon name="alert-circle"></ion-icon>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Clear Filter Button (Hidden by default) -->
+                    <div id="active-filter-indicator"
+                        class="hidden flex items-center justify-between bg-blue-50 text-blue-700 px-4 py-2 rounded-xl border border-blue-100">
+                        <span class="text-sm font-semibold flex items-center"><ion-icon name="funnel"
+                                class="mr-2"></ion-icon> กำลังแสดง: <span id="filter-name-display"
+                                class="ml-1">...</span></span>
+                        <button onclick="clearPurchasingFilter()"
+                            class="text-xs bg-white border border-blue-200 px-2 py-1 rounded-lg hover:bg-blue-100 transition-colors">ล้างตัวกรอง</button>
+                    </div>
+
+                    <!-- Cards Container -->
+                    <div id="purchasing-list-container" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+                        <!-- Cards will be injected here via JS -->
+                    </div>
+
+                    <!-- Empty State (Hidden by default) -->
+                    <div id="purchasing-empty-state"
+                        class="hidden flex-col items-center justify-center py-16 bg-white rounded-3xl border-2 border-dashed border-slate-200">
+                        <div class="p-4 bg-slate-50 rounded-full mb-4">
+                            <ion-icon name="basket-outline" class="text-4xl text-slate-300"></ion-icon>
+                        </div>
+                        <h4 class="text-lg font-semibold text-slate-600">ไม่มีรายการสั่งซื้อ</h4>
+                        <p class="text-slate-400 text-sm mt-1">รายการมัดจำจากหน้าร้านจะปรากฏที่นี่</p>
+                    </div>
+                </div>
+
+                <!-- Import Notification View -->
+                <div id="import-view" class="hidden space-y-6 mt-6">
+                    <!-- Header -->
+                    <div
+                        class="bg-white rounded-2xl p-6 shadow-sm border border-slate-100 flex flex-col md:flex-row justify-between items-center gap-4">
+                        <div class="flex items-center gap-4">
+                            <div
+                                class="p-3 bg-gradient-to-br from-blue-400 to-indigo-600 text-white rounded-xl shadow-lg shadow-indigo-500/30">
+                                <ion-icon name="cloud-upload" class="text-2xl"></ion-icon>
+                            </div>
+                            <div>
+                                <h3 class="text-xl font-bold text-slate-800">แจ้งนำเข้าสินค้า</h3>
+                                <p class="text-sm text-slate-500">แจ้งรายการสินค้าเข้าใหม่ไปยังฝ่ายสต็อก</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Tabs -->
+                    <div class="bg-white rounded-2xl shadow-sm border border-slate-100 p-2 overflow-x-auto">
+                        <div class="flex space-x-2 md:space-x-4 min-w-max">
+                            <button onclick="switchImportTab('phone')" id="tab-btn-phone"
+                                class="flex items-center px-4 py-3 rounded-xl text-sm font-semibold transition-all bg-indigo-50 text-indigo-600 ring-2 ring-indigo-100">
+                                <ion-icon name="phone-portrait-outline" class="mr-2 text-lg"></ion-icon>
+                                นำเข้าโทรศัพท์ (Excel)
+                            </button>
+                            <button onclick="switchImportTab('accessory')" id="tab-btn-accessory"
+                                class="flex items-center px-4 py-3 rounded-xl text-sm font-semibold text-slate-500 hover:bg-slate-50 transition-all">
+                                <ion-icon name="headset-outline" class="mr-2 text-lg"></ion-icon>
+                                นำเข้า Accessories (รูปภาพ)
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Phone Import Section -->
+                    <div id="tab-import-phone" class="space-y-6 animate-fade-in">
+                        <!-- Upload Card -->
+                        <div class="bg-white rounded-2xl shadow-sm border border-slate-100 p-6">
+                            <h4 class="text-lg font-bold text-slate-800 mb-4 flex items-center">
+                                <ion-icon name="document-attach-outline" class="mr-2 text-indigo-500"></ion-icon>
+                                อัปโหลดไฟล์รายการ (Excel)
+                            </h4>
+                            <form id="phone-import-form" class="space-y-4">
+                                <div
+                                    class="border-2 border-dashed border-slate-200 rounded-xl p-8 text-center hover:bg-slate-50 transition-all cursor-pointer relative group">
+                                    <input type="file" id="phone-import-file" accept=".xlsx, .xls"
+                                        class="absolute inset-0 w-full h-full opacity-0 cursor-pointer text-sm">
+                                    <div class="flex flex-col items-center pointer-events-none">
+                                        <div
+                                            class="p-4 bg-indigo-50 text-indigo-500 rounded-full mb-3 group-hover:scale-110 transition-transform">
+                                            <ion-icon name="cloud-upload" class="text-3xl"></ion-icon>
+                                        </div>
+                                        <p class="font-medium text-slate-700">คลิกเพื่อเลือกไฟล์ หรือลากไฟล์มาวางที่นี่
+                                        </p>
+                                        <p class="text-xs text-slate-400 mt-1">รองรับไฟล์ .xlsx, .xls</p>
+                                        <p id="file-name-display" class="mt-4 text-sm font-semibold text-indigo-600">
+                                        </p>
+                                    </div>
+                                </div>
+                                <div class="flex justify-end">
+                                    <button type="submit"
+                                        class="bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-2.5 rounded-xl font-semibold shadow-lg shadow-indigo-600/30 transition-all flex items-center">
+                                        <ion-icon name="paper-plane" class="mr-2"></ion-icon>
+                                        ส่งแจ้งนำเข้า
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+
+                        <!-- History List -->
+                        <div class="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
+                            <div class="p-6 border-b border-slate-100">
+                                <h4 class="text-lg font-bold text-slate-800">ประวัติการแจ้งนำเข้า (โทรศัพท์)</h4>
+                            </div>
+                            <div class="overflow-x-auto">
+                                <table class="w-full">
+                                    <thead class="bg-slate-50 border-b border-slate-100">
+                                        <tr>
+                                            <th class="px-6 py-4 text-left text-xs font-semibold text-slate-500">
+                                                วันที่แจ้ง</th>
+                                            <th class="px-6 py-4 text-left text-xs font-semibold text-slate-500">ไฟล์แนบ
+                                            </th>
+                                            <th class="px-6 py-4 text-left text-xs font-semibold text-slate-500">สาขา
+                                            </th>
+                                            <th class="px-6 py-4 text-left text-xs font-semibold text-slate-500">สถานะ
+                                            </th>
+                                            <th class="px-6 py-4 text-left text-xs font-semibold text-slate-500">ผู้แจ้ง
+                                            </th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="phone-import-list" class="divide-y divide-slate-100">
+                                        <!-- Items will be injected here -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Accessory Import Section -->
+                    <div id="tab-import-accessory" class="hidden space-y-6 animate-fade-in">
+                        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                            <!-- Form -->
+                            <div class="lg:col-span-1">
+                                <div class="bg-white rounded-2xl shadow-sm border border-slate-100 p-6">
+                                    <h4 class="text-lg font-bold text-slate-800 mb-4 flex items-center">
+                                        <ion-icon name="create-outline" class="mr-2 text-pink-500"></ion-icon>
+                                        ข้อมูลสินค้า (Accessory)
+                                    </h4>
+                                    <form id="accessory-import-form" class="space-y-4">
+                                        <div>
+                                            <label
+                                                class="block text-sm font-semibold text-slate-700 mb-1">รูปภาพสินค้า</label>
+                                            <div class="border-2 border-dashed border-slate-200 rounded-xl p-4 text-center hover:bg-slate-50 transition-all cursor-pointer relative bg-slate-50/50"
+                                                style="min-height: 200px; display: flex; align-items: center; justify-content: center;">
+                                                <input type="file" id="acc-import-image" accept="image/*"
+                                                    class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
+                                                    onchange="previewImage(this)">
+                                                <div id="image-preview-placeholder" class="flex flex-col items-center">
+                                                    <ion-icon name="image-outline"
+                                                        class="text-4xl text-slate-300 mb-2"></ion-icon>
+                                                    <span class="text-sm text-slate-500">เลือกรูปภาพ</span>
+                                                </div>
+                                                <img id="image-preview" src=""
+                                                    class="hidden max-h-48 rounded-lg object-contain relative z-0">
+                                            </div>
+                                        </div>
+                                        <div>
+                                            <label
+                                                class="block text-sm font-semibold text-slate-700 mb-1">ชื่อสินค้า</label>
+                                            <input type="text" id="acc-name" class="form-input-theme" required
+                                                placeholder="เช่น หูฟัง, เคส...">
+                                        </div>
+                                        <div>
+                                            <label
+                                                class="block text-sm font-semibold text-slate-700 mb-1">จำนวนนำเข้า</label>
+                                            <input type="number" id="acc-qty" class="form-input-theme" required min="1"
+                                                value="1">
+                                        </div>
+                                        <div>
+                                            <label
+                                                class="block text-sm font-semibold text-slate-700 mb-1">วันที่นำเข้า</label>
+                                            <input type="date" id="acc-date" class="form-input-theme" required>
+                                        </div>
+                                        <button type="submit"
+                                            class="w-full bg-pink-500 hover:bg-pink-600 text-white px-6 py-2.5 rounded-xl font-semibold shadow-lg shadow-pink-500/30 transition-all">
+                                            บันทึกรายการ
+                                        </button>
+                                    </form>
+                                </div>
+                            </div>
+
+                            <!-- List -->
+                            <div class="lg:col-span-2">
+                                <div
+                                    class="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden h-full">
+                                    <div class="p-6 border-b border-slate-100 flex justify-between items-center">
+                                        <h4 class="text-lg font-bold text-slate-800">รายการ Accessories ล่าสุด</h4>
+                                    </div>
+                                    <div class="p-6 grid grid-cols-1 sm:grid-cols-2 gap-4" id="accessory-import-list">
+                                        <!-- Accessor Cards Injected Here -->
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
@@ -548,6 +875,128 @@
                                 </tr>
                             </tbody>
                         </table>
+                    </div>
+                </div>
+
+                <!-- =============================================== -->
+                <!-- STOCK IMPORT MANAGEMENT VIEW (ใหม่) -->
+                <!-- =============================================== -->
+                <div id="stock-import-view" class="hidden animate-fade-in">
+                    <!-- Modern Tabs -->
+                    <div
+                        class="mb-6 bg-white p-1.5 rounded-2xl shadow-sm border border-slate-200 inline-flex flex-wrap gap-1">
+                        <button onclick="filterStockType('phone')" id="tab-stock-phone"
+                            class="px-6 py-2.5 rounded-xl text-sm font-bold text-slate-500 hover:text-slate-800 hover:bg-slate-50 transition-all flex items-center gap-2">
+                            <ion-icon name="phone-portrait-outline" class="text-lg"></ion-icon> โทรศัพท์
+                        </button>
+                        <button onclick="filterStockType('accessory')" id="tab-stock-accessory"
+                            class="px-6 py-2.5 rounded-xl text-sm font-bold text-slate-500 hover:text-slate-800 hover:bg-slate-50 transition-all flex items-center gap-2">
+                            <ion-icon name="headset-outline" class="text-lg"></ion-icon> Accessories
+                        </button>
+                    </div>
+
+                    <!-- Enhanced Filter Toolbar -->
+                    <div
+                        class="mb-6 bg-white p-5 rounded-2xl shadow-sm border border-slate-200 flex flex-col xl:flex-row items-start xl:items-center justify-between gap-6">
+                        <!-- Left: Branch Filter -->
+                        <div class="flex items-center gap-4 w-full xl:w-auto">
+                            <div
+                                class="flex-shrink-0 w-10 h-10 bg-indigo-50 text-indigo-600 rounded-xl flex items-center justify-center">
+                                <ion-icon name="storefront" class="text-xl"></ion-icon>
+                            </div>
+                            <div class="w-full xl:w-72">
+                                <label
+                                    class="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-1.5">สาขา
+                                    (Branch)</label>
+                                <select id="stock-import-branch-filter"
+                                    class="form-select-theme py-2.5 pl-3 pr-10 text-sm shadow-none bg-slate-50 border-slate-200 focus:bg-white">
+                                    <option value="all" selected>🏢 ทุกสาขา (All Branches)</option>
+                                    <option value="ยะลา">ยะลา</option>
+                                    <option value="นราธิวาส">นราธิวาส</option>
+                                    <option value="หาดใหญ่">หาดใหญ่</option>
+                                    <option value="หาดใหญ่2">หาดใหญ่2</option>
+                                    <option value="ปัตตานี">ปัตตานี</option>
+                                    <option value="โคลีเซียม">โคลีเซียม</option>
+                                    <option value="สุราษฎร์ธานี">สุราษฎร์ธานี</option>
+                                    <option value="ปากแมว">ปากแมว</option>
+                                    <option value="ภูเก็ต">ภูเก็ต</option>
+                                    <option value="นครศรีธรรมราช">นครศรีธรรมราช</option>
+                                    <option value="กระบี่">กระบี่</option>
+                                    <option value="กะทู้">กะทู้</option>
+                                    <option value="ตรัง">ตรัง</option>
+                                    <option value="คุรุ">คุรุ</option>
+                                    <option value="ชุมพร">ชุมพร</option>
+                                    <option value="สตูล">สตูล</option>
+                                    <option value="พัทลุง">พัทลุง</option>
+                                    <option value="สงขลา">สงขลา</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <!-- Right: Status Filters Pipeline -->
+                        <div class="w-full xl:w-auto overflow-x-auto pb-1">
+                            <label
+                                class="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-1.5 px-1">สถานะ
+                                (Status)</label>
+                            <div class="flex bg-slate-100/80 p-1.5 rounded-xl gap-1 min-w-max"
+                                id="stock-import-filters">
+                                <button onclick="filterStockImports('pending')" id="filter-stock-pending"
+                                    class="px-5 py-2 rounded-lg text-sm font-bold text-white bg-indigo-600 shadow-md ring-1 ring-slate-200 transition-all flex items-center gap-2">
+                                    <div class="w-2 h-2 rounded-full bg-yellow-400 border border-white/30"></div>
+                                    รอนำเข้า
+                                </button>
+                                <button onclick="filterStockImports('importing')" id="filter-stock-importing"
+                                    class="px-5 py-2 rounded-lg text-sm font-bold text-slate-500 hover:text-slate-700 hover:bg-white/50 transition-all flex items-center gap-2">
+                                    <div class="w-2 h-2 rounded-full bg-blue-500"></div> กำลังนำเข้า
+                                </button>
+                                <button onclick="filterStockImports('received')" id="filter-stock-received"
+                                    class="px-5 py-2 rounded-lg text-sm font-bold text-slate-500 hover:text-slate-700 hover:bg-white/50 transition-all flex items-center gap-2">
+                                    <div class="w-2 h-2 rounded-full bg-green-500"></div> นำเข้าแล้ว
+                                </button>
+                                <button onclick="filterStockImports('all')" id="filter-stock-all"
+                                    class="px-5 py-2 rounded-lg text-sm font-bold text-slate-500 hover:text-slate-700 hover:bg-white/50 transition-all flex items-center gap-2">
+                                    <ion-icon name="apps-outline"></ion-icon> ทั้งหมด
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Table Card -->
+                    <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+                        <div class="overflow-x-auto">
+                            <table class="min-w-full divide-y divide-slate-100">
+                                <thead class="bg-slate-50">
+                                    <tr>
+                                        <th
+                                            class="px-6 py-4 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">
+                                            วันที่แจ้ง</th>
+                                        <th
+                                            class="px-6 py-4 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">
+                                            สาขา / ผู้แจ้ง</th>
+                                        <th
+                                            class="px-6 py-4 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">
+                                            รายการสินค้า</th>
+                                        <th
+                                            class="px-6 py-4 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">
+                                            ไฟล์แนบ</th>
+                                        <th
+                                            class="px-6 py-4 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">
+                                            สถานะ</th>
+                                        <th
+                                            class="px-6 py-4 text-right text-xs font-semibold text-slate-500 uppercase tracking-wider">
+                                            จัดการ</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="stock-import-table-body" class="divide-y divide-slate-100">
+                                    <!-- Rows will be populated by JS -->
+                                    <tr>
+                                        <td colspan="6" class="px-6 py-12 text-center text-slate-400">
+                                            <ion-icon name="cube-outline" class="w-8 h-8 mb-2 opacity-50"></ion-icon>
+                                            <p>กำลังโหลดข้อมูล...</p>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -800,8 +1249,32 @@
         </div>
     </div>
 
-    <!-- Confirm Modal -->
-    <div id="confirmModal" class="modal fixed inset-0 z-50 items-center justify-center p-4">
+
+
+    <!-- Confirm Modal for Status Change -->
+    <div id="statusUpdateModal" class="modal fixed inset-0 z-50 items-center justify-center p-4">
+        <div
+            class="modal-content relative w-full max-w-sm bg-white rounded-2xl shadow-2xl p-6 text-center transform transition-all">
+            <div
+                class="w-16 h-16 bg-blue-100/50 text-blue-600 rounded-full flex items-center justify-center mx-auto mb-4">
+                <ion-icon name="sync-outline" class="text-3xl"></ion-icon>
+            </div>
+            <h3 class="text-lg font-bold text-slate-800">อัปเดตสถานะ</h3>
+            <p class="text-sm text-slate-500 mt-2 mb-6">เปลี่ยนสถานะเป็น <span id="target-status-name"
+                    class="font-bold text-indigo-600">...</span> ใช่หรือไม่?</p>
+            <div class="flex gap-3">
+                <button onclick="closeModal('statusUpdateModal')"
+                    class="flex-1 px-4 py-2.5 bg-slate-100 text-slate-700 rounded-xl hover:bg-slate-200 font-medium transition-colors">ยกเลิก</button>
+                <button id="confirm-status-update-btn"
+                    class="flex-1 px-4 py-2.5 bg-indigo-600 text-white rounded-xl hover:bg-indigo-700 font-medium shadow-lg shadow-indigo-200 transition-colors">ยืนยัน</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- =============================================== -->
+    <!-- View: Admin (User Management) -->
+    <!-- =============================================== -->
+    <div id="admin-view-content" class="hidden animate-fade-in">
         <div class="modal-content relative w-full max-w-md bg-white rounded-2xl shadow-2xl p-6 text-center">
             <div class="w-16 h-16 bg-red-100 text-red-500 rounded-full flex items-center justify-center mx-auto mb-4">
                 <ion-icon name="warning" class="text-3xl"></ion-icon>
@@ -943,6 +1416,76 @@
             </div>
         </div>
     </div>
+    <div id="purchasingModal" class="modal fixed inset-0 z-50 items-center justify-center p-4">
+        <div
+            class="modal-content relative w-full max-w-md bg-white rounded-2xl shadow-2xl overflow-hidden transform transition-all scale-100">
+            <div
+                class="bg-gradient-to-r from-blue-600 to-indigo-600 p-5 flex justify-between items-center text-white shadow-md">
+                <div class="flex items-center gap-3">
+                    <div class="p-2 bg-white/20 rounded-lg backdrop-blur-sm">
+                        <ion-icon name="cart" class="text-xl"></ion-icon>
+                    </div>
+                    <div>
+                        <h3 class="text-lg font-bold">อัปเดตสถานะ</h3>
+                        <p class="text-blue-100 text-xs font-light">สำหรับฝ่ายจัดซื้อ</p>
+                    </div>
+                </div>
+                <button onclick="closeModal('purchasingModal')"
+                    class="hover:bg-white/10 p-2 rounded-full transition-colors"><ion-icon name="close"
+                        class="text-2xl"></ion-icon></button>
+            </div>
+            <div class="p-6">
+                <form id="purchasing-form" class="space-y-4">
+                    <input type="hidden" id="pur-id">
+
+                    <div class="bg-slate-50 p-4 rounded-xl border border-slate-100 mb-6 shadow-inner">
+                        <div class="flex items-start gap-3">
+                            <div class="mt-1 p-1.5 bg-yellow-100 text-yellow-600 rounded-md">
+                                <ion-icon name="cube"></ion-icon>
+                            </div>
+                            <div>
+                                <p class="text-xs text-slate-500 font-semibold uppercase tracking-wider">สินค้า</p>
+                                <p id="pur-product-display"
+                                    class="font-bold text-slate-800 text-lg leading-tight mt-0.5">...</p>
+                            </div>
+                        </div>
+                        <div class="mt-3 pt-3 border-t border-slate-200 flex items-start gap-3">
+                            <div class="mt-1 p-1.5 bg-green-100 text-green-600 rounded-md">
+                                <ion-icon name="person"></ion-icon>
+                            </div>
+                            <div>
+                                <p class="text-xs text-slate-500 font-semibold uppercase tracking-wider">ลูกค้า</p>
+                                <p id="pur-customer-display" class="font-medium text-slate-700 mt-0.5">...</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-bold text-slate-700 mb-2">สถานะสินค้า</label>
+                        <select id="pur-status" class="form-select-theme">
+                            <option value="pending">⏳ รอดำเนินการ (Pending)</option>
+                            <option value="ordered">🚚 สั่งของแล้ว (Ordered)</option>
+                            <option value="arrived">✅ ของมาถึงแล้ว (Arrived)</option>
+                            <option value="canceled">❌ ยกเลิก (Canceled)</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-bold text-slate-700 mb-2">หมายเหตุ (เช่น เลขพัสดุ)</label>
+                        <textarea id="pur-note" rows="3" class="form-input-theme"
+                            placeholder="ระบุรายละเอียดเพิ่มเติม..."></textarea>
+                    </div>
+
+                    <div class="pt-4 flex justify-end gap-3">
+                        <button type="button" onclick="closeModal('purchasingModal')"
+                            class="px-4 py-2 rounded-xl text-slate-600 hover:bg-slate-100">ยกเลิก</button>
+                        <button type="submit"
+                            class="px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold shadow-lg shadow-blue-600/30">บันทึกสถานะ</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
     <script>
         const SERVER_URL = '/api';
         let currentUser = null;
@@ -968,6 +1511,11 @@
                 'for-review': { text: 'ส่งตรวจสอบ', bg: 'bg-orange-100', color: 'text-orange-700' },
                 'completed': { text: 'เสร็จสิ้น', bg: 'bg-green-100', color: 'text-green-700' },
                 'overdue': { text: 'เลยกำหนด', bg: 'bg-red-100', color: 'text-red-700' },
+                // Import Statuses
+                'pending': { text: 'รอนำเข้า', bg: 'bg-yellow-50', color: 'text-yellow-700' },
+                'importing': { text: 'กำลังนำเข้า', bg: 'bg-blue-50', color: 'text-blue-700' },
+                'received': { text: 'นำเข้าแล้ว', bg: 'bg-green-50', color: 'text-green-700' },
+                'rejected': { text: 'ยกเลิก', bg: 'bg-red-50', color: 'text-red-700' }
             };
             const s = map[status] || map['todo'];
             return `<span class="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${s.bg} ${s.color}">${s.text}</span>`;
@@ -980,7 +1528,6 @@
         const safeHide = (el) => { if (el) el.classList.add('hidden'); };
         const safeShow = (el) => { if (el) el.classList.remove('hidden'); };
 
-        // --- Core Functions ---
         const initializeAuth = () => {
             const token = localStorage.getItem('token');
             const userString = localStorage.getItem('user');
@@ -996,34 +1543,79 @@
             document.getElementById('user-name').textContent = currentUser.name;
             document.getElementById('user-role').textContent = getRoleName(currentUser.role);
 
-            // --- ส่วนที่แก้ไข: ควบคุมการแสดงเมนู "เงินค่ามัดจำหน้าร้าน" ---
+            // เตรียมข้อมูลแผนก (ตัดช่องว่างซ้ายขวาออกเพื่อความชัวร์)
+            const userDept = (currentUser.department || '').trim();
+
+            // Populate Branches
+            populateBranchSelects();
+
+            // =======================================================
+            // 1. ควบคุมเมนู "เงินค่ามัดจำหน้าร้าน" (Sales / Storefront)
+            // =======================================================
             const depositNav = document.getElementById('nav-Storefront_deposit');
             if (depositNav) {
-                // 1. ดึงชื่อแผนก (เผื่อเช็คคำว่า "ขาย")
-                const userDept = (currentUser.department || '').trim();
                 const isSalesTeam = userDept.includes('ขาย') || userDept.includes('Sales');
 
-                // 2. เงื่อนไขใหม่: แสดงถ้าเป็น...
-                // - ทีมขาย (มีคำว่า "ขาย" ในแผนก)
-                // - หรือเป็น Admin
-                // - หรือเป็น ผู้บริหาร (executive)
-                // - หรือเป็น ผู้จัดการ (manager)
-                // - หรือเป็น HR (hr)
-                if (isSalesTeam ||
-                    currentUser.role === 'admin' ||
-                    currentUser.role === 'executive' ||
-                    currentUser.role === 'manager' ||
-                    currentUser.role === 'hr') {
-
-                    depositNav.style.display = 'flex'; // แสดงเมนู
+                // แสดงเมนูนี้ถ้าเป็น: ทีมขาย, Admin, Executive, Manager, หรือ HR
+                if (isSalesTeam || ['admin', 'executive', 'manager', 'hr'].includes(currentUser.role)) {
+                    depositNav.style.display = 'flex';
                 } else {
-                    depositNav.style.display = 'none'; // ซ่อนเมนู
+                    depositNav.style.display = 'none';
                 }
             }
-            // -------------------------------------------------------
 
-            // Logic เดิมของการจัดการ Role (Staff, Manager, Executive)
+            // =======================================================
+            // 2. [ใหม่] ควบคุมเมนู "ติดตามการสั่งซื้อ" (Purchasing)
+            // =======================================================
+            const purchasingNav = document.getElementById('nav-purchasing');
+            if (purchasingNav) {
+                const isPurchasing = userDept.includes('จัดซื้อ') || userDept.includes('Purchase');
+
+                // แสดงเมนูนี้ถ้าเป็น: ทีมจัดซื้อ, Admin, Executive, หรือ Manager
+                // (HR อาจจะไม่จำเป็นต้องดู แต่ถ้าอยากให้ดูได้ก็เติม 'hr' เข้าไปใน array ได้ครับ)
+                if (isPurchasing || ['admin', 'executive', 'manager'].includes(currentUser.role)) {
+                    purchasingNav.style.display = 'flex';
+                } else {
+                    purchasingNav.style.display = 'none';
+                }
+            }
+
+            // =======================================================
+            // 2.1 [ใหม่] ควบคุมเมนู "แจ้งนำเข้า" (Import Notification)
+            // =======================================================
+            const importNav = document.getElementById('nav-import');
+            if (importNav) {
+                const isSales = userDept.includes('ขาย') || userDept.includes('Sales');
+                // แสดงเมนูนี้ถ้าเป็น: ทีมขาย (Sales), Admin, Executive, Manager
+                if (isSales || ['admin', 'executive', 'manager'].includes(currentUser.role)) {
+                    importNav.classList.remove('hidden');
+                    importNav.style.display = 'flex';
+                } else {
+                    importNav.classList.add('hidden');
+                    importNav.style.display = 'none';
+                }
+            }
+
+            // =======================================================
+            // 2.2 [ใหม่] ควบคุมเมนู "จัดการรายการนำเข้า" (Stock Import)
+            // =======================================================
+            const stockImportNav = document.getElementById('nav-stock-import');
+            if (stockImportNav) {
+                const isStockTeam = userDept.includes('Store') || userDept.includes('Stock') || userDept.includes('สต๊อก');
+                if (isStockTeam || ['admin', 'executive', 'manager'].includes(currentUser.role)) {
+                    stockImportNav.classList.remove('hidden');
+                    stockImportNav.style.display = 'flex';
+                } else {
+                    stockImportNav.classList.add('hidden');
+                    stockImportNav.style.display = 'none';
+                }
+            }
+
+            // =======================================================
+            // 3. กำหนดหน้าจอเริ่มต้นตามตำแหน่ง (Role Logic)
+            // =======================================================
             if (currentUser.role === 'staff') {
+                // --- พนักงานทั่วไป (Staff) ---
                 safeHide(document.getElementById('nav-dashboard'));
                 safeHide(document.getElementById('nav-admin'));
 
@@ -1031,27 +1623,37 @@
                     document.getElementById('company-select').parentElement.style.display = 'none';
                 }
 
-                // Change Header Text for Staff
+                // เปลี่ยนข้อความ Header
                 const header = document.getElementById('header-assignee');
                 if (header) header.textContent = 'ผู้มอบหมายงาน';
 
+                // เข้าสู่หน้า "งานของฉัน" เป็นหน้าแรก
                 updateNavActiveState('mytasks');
                 fetchMyTasks();
 
             } else if (currentUser.role === 'executive') {
+                // --- ผู้บริหาร (Executive) ---
                 safeHide(document.getElementById('nav-mytasks'));
+
+                // เข้าสู่หน้า Dashboard เป็นหน้าแรก
                 updateNavActiveState('dashboard');
                 fetchDashboardTasks();
                 fetchTaskStats();
                 fetchAllUsers();
 
             } else if (currentUser.role === 'manager' || currentUser.role === 'hr') {
+                // --- ผู้จัดการ (Manager) และ HR ---
+                // (แสดง Dashboard แต่ยังเข้าเมนู My Tasks ได้ถ้าไม่ได้ซ่อน)
+
                 updateNavActiveState('dashboard');
                 fetchDashboardTasks();
                 fetchTaskStats();
                 fetchAllUsers();
             }
 
+            // =======================================================
+            // 4. ตั้งค่าระบบอื่นๆ (Logout / Notifications)
+            // =======================================================
             document.getElementById('logout-button').addEventListener('click', () => {
                 localStorage.removeItem('token');
                 localStorage.removeItem('user');
@@ -1703,6 +2305,20 @@
         // --- (D) DEPOSIT FUNCTIONS ---
         // ------------------------------------------
         // ในไฟล์ index.html
+        function getOrderStatusBadge(status) {
+            status = status || 'pending';
+            switch (status) {
+                case 'ordered':
+                    return `<span class="bg-blue-100 text-blue-700 px-2 py-1 rounded text-[10px] font-bold border border-blue-200 whitespace-nowrap">สั่งของแล้ว</span>`;
+                case 'arrived':
+                    return `<span class="bg-green-100 text-green-700 px-2 py-1 rounded text-[10px] font-bold border border-green-200 whitespace-nowrap">ของมาถึงแล้ว</span>`;
+                case 'canceled':
+                    return `<span class="bg-red-100 text-red-700 px-2 py-1 rounded text-[10px] font-bold border border-red-200 whitespace-nowrap">ยกเลิก</span>`;
+                default:
+                    return `<span class="bg-yellow-100 text-yellow-700 px-2 py-1 rounded text-[10px] font-bold border border-yellow-200 whitespace-nowrap">รอดำเนินการ</span>`;
+            }
+        }
+
         async function fetchDeposits() {
             try {
                 const token = localStorage.getItem('token');
@@ -1779,6 +2395,9 @@
                         <td class="text-center border p-2 text-xs">${d.billNo || '-'}</td>
                         <td class="text-center border p-2 text-xs font-mono text-gray-500">${d.imei || '-'}</td>
                         <td class="text-xs border p-2">${d.product || '-'}</td>
+                        <td class="text-center border p-2 text-xs">
+                           ${getOrderStatusBadge(d.orderStatus)}
+                        </td>
                         <td class="text-right border p-2 bg-red-50 text-xs">${price ? price.toLocaleString() : '-'}</td>
                         <td class="text-right border p-2 font-bold bg-blue-50 text-blue-800">${price ? balance.toLocaleString() : '-'}</td>
                         <td class="text-center border p-2 bg-green-50">
@@ -1811,6 +2430,236 @@
             }
         }
 
+        // Global variables for purchasing view
+        let allPurchasingOrders = [];
+        let currentStatusFilter = 'all';
+        let currentSearchText = '';
+
+        // 1. ฟังก์ชันดึงข้อมูล (Fetch & Store)
+        async function fetchPurchasingOrders() {
+            const token = localStorage.getItem('token');
+            const container = document.getElementById('purchasing-list-container');
+            const emptyState = document.getElementById('purchasing-empty-state');
+            const branchFilter = document.getElementById('purchasing-filter-branch').value;
+            const companyId = document.getElementById('company-select').value;
+
+            // Loading State
+            container.innerHTML = `
+                <div class="col-span-full flex flex-col items-center justify-center py-16">
+                    <div class="animate-spin rounded-full h-10 w-10 border-b-2 border-blue-500 mb-4"></div>
+                    <p class="text-slate-400 animate-pulse">กำลังโหลดข้อมูลการสั่งซื้อ...</p>
+                </div>
+            `;
+            emptyState.classList.add('hidden');
+
+            try {
+                let url = `${SERVER_URL}/deposits?companyId=${companyId}&viewMode=purchasing`;
+                if (branchFilter && branchFilter !== 'all') {
+                    url += `&branch=${encodeURIComponent(branchFilter)}`;
+                }
+
+                const res = await fetch(url, { headers: { 'Authorization': `Bearer ${token}` } });
+                if (!res.ok) throw new Error('Failed to fetch');
+
+                const deposits = await res.json();
+                allPurchasingOrders = deposits; // Store data
+
+                // Reset filters
+                currentStatusFilter = 'all';
+                currentSearchText = '';
+                document.getElementById('purchasing-search-input').value = '';
+                clearPurchasingFilterUI();
+
+                updatePurchasingStats(deposits);
+                renderPurchasingOrders();
+
+            } catch (e) {
+                console.error(e);
+                container.innerHTML = `
+                    <div class="col-span-full text-center py-12 bg-red-50 rounded-2xl border border-red-100">
+                        <ion-icon name="alert-circle" class="text-4xl text-red-400 mb-2"></ion-icon>
+                        <p class="text-red-700 font-semibold">เกิดข้อผิดพลาดในการโหลดข้อมูล</p>
+                        <button onclick="fetchPurchasingOrders()" class="mt-4 text-sm bg-white border border-red-200 text-red-600 px-4 py-2 rounded-lg hover:bg-red-50">ลองใหม่</button>
+                    </div>
+                `;
+            }
+        }
+
+        function renderPurchasingOrders() {
+            const container = document.getElementById('purchasing-list-container');
+            const emptyState = document.getElementById('purchasing-empty-state');
+            const searchText = currentSearchText.toLowerCase();
+
+            container.innerHTML = '';
+
+            // Filter Data
+            const filtered = allPurchasingOrders.filter(d => {
+                // Status Filter
+                if (currentStatusFilter !== 'all' && (d.orderStatus || 'pending') !== currentStatusFilter) return false;
+
+                // Search Filter
+                if (searchText) {
+                    const searchMatch = (d.customerName || '').toLowerCase().includes(searchText) ||
+                        (d.phoneNumber || '').toLowerCase().includes(searchText) ||
+                        (d.product || '').toLowerCase().includes(searchText) ||
+                        (d.branch || '').toLowerCase().includes(searchText);
+                    if (!searchMatch) return false;
+                }
+                return true;
+            });
+
+            filtered.forEach(d => {
+                // Status Logic
+                let statusConfig = { text: 'รอดำเนินการ', color: 'bg-yellow-100 text-yellow-700 border-yellow-200', icon: 'time' };
+                const status = d.orderStatus || 'pending';
+
+                if (status === 'ordered') statusConfig = { text: 'สั่งของแล้ว', color: 'bg-blue-100 text-blue-700 border-blue-200', icon: 'cart' };
+                else if (status === 'arrived') statusConfig = { text: 'ของมาถึงแล้ว', color: 'bg-green-100 text-green-700 border-green-200', icon: 'checkmark-circle' };
+                else if (status === 'canceled') statusConfig = { text: 'ยกเลิก', color: 'bg-red-100 text-red-700 border-red-200', icon: 'close-circle' };
+
+                const dataString = JSON.stringify(d).replace(/'/g, "&#39;");
+
+                const card = document.createElement('div');
+                card.className = "bg-white rounded-2xl p-5 shadow-sm border border-slate-100 hover:shadow-md transition-shadow group relative overflow-hidden";
+
+                const statusColorMap = {
+                    'pending': 'bg-yellow-400',
+                    'ordered': 'bg-blue-500',
+                    'arrived': 'bg-green-500',
+                    'canceled': 'bg-red-500'
+                };
+                const sidebarColor = statusColorMap[status] || 'bg-slate-300';
+
+                card.innerHTML = `
+                    <div class="absolute left-0 top-0 bottom-0 w-1.5 ${sidebarColor}"></div>
+                    <div class="flex justify-between items-start mb-4 pl-3">
+                        <div>
+                            <span class="bg-slate-100 text-slate-600 text-xs px-2 py-1 rounded-md font-medium mb-2 inline-block">
+                                <ion-icon name="storefront-outline" class="align-middle mr-1"></ion-icon>${d.branch || '-'}
+                            </span>
+                            <h4 class="font-bold text-slate-800 text-lg leading-tight line-clamp-2" title="${d.product || 'ไม่ระบุสินค้า'}">${d.product || 'ไม่ระบุสินค้า'}</h4>
+                        </div>
+                        <div class="flex flex-col items-end gap-1">
+                            <span class="${statusConfig.color} px-2.5 py-1 rounded-full text-xs font-bold border flex items-center gap-1 shadow-sm">
+                                <ion-icon name="${statusConfig.icon}"></ion-icon> ${statusConfig.text}
+                            </span>
+                        </div>
+                    </div>
+                    
+                    <div class="space-y-3 pl-3">
+                        <div class="flex items-center gap-3 text-sm text-slate-600">
+                            <div class="w-8 h-8 rounded-full bg-slate-50 flex items-center justify-center text-slate-400">
+                                <ion-icon name="person"></ion-icon>
+                            </div>
+                            <div class="flex-1">
+                                <p class="font-semibold text-slate-700">${d.customerName}</p>
+                                <p class="text-xs text-slate-400">${d.phoneNumber}</p>
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-2 gap-2 text-xs bg-slate-50 p-3 rounded-xl border border-slate-100">
+                            <div>
+                                <p class="text-slate-400 font-medium">วันกำหนดรับ</p>
+                                <p class="font-semibold text-slate-700 mt-0.5 flex items-center gap-1">
+                                    <ion-icon name="calendar-outline"></ion-icon> ${formatDateShort(d.pickupDueDate)}
+                                </p>
+                            </div>
+                            <div>
+                                <p class="text-slate-400 font-medium">ยอดมัดจำ</p>
+                                <p class="font-mono font-semibold text-red-500 mt-0.5">฿${(d.depositAmount || 0).toLocaleString()}</p>
+                            </div>
+                        </div>
+
+                            ${d.orderNote ? `
+                            <div class="text-xs text-slate-500 bg-yellow-50/50 p-2 rounded-lg border border-yellow-100/50 flex gap-2">
+                                <ion-icon name="document-text-outline" class="text-yellow-500 mt-0.5"></ion-icon>
+                                <span class="line-clamp-2 italic">"${d.orderNote}"</span>
+                            </div>
+                        ` : ''}
+                    </div>
+
+                    <div class="mt-4 pt-4 border-t border-slate-100 flex justify-end pl-3">
+                        <button onclick='openPurchasingModal(${dataString})' 
+                            class="w-full flex items-center justify-center gap-2 bg-slate-800 hover:bg-slate-900 text-white px-4 py-2.5 rounded-xl font-medium transition-all shadow-lg shadow-slate-800/20 active:scale-95">
+                            <ion-icon name="create-outline"></ion-icon> อัปเดตสถานะ
+                        </button>
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        // Helpers
+        function updatePurchasingStats(deposits) {
+            const pending = deposits.filter(d => !d.orderStatus || d.orderStatus === 'pending').length;
+            const ordered = deposits.filter(d => d.orderStatus === 'ordered').length;
+            const arrived = deposits.filter(d => d.orderStatus === 'arrived').length;
+            const canceled = deposits.filter(d => d.orderStatus === 'canceled').length;
+
+            document.getElementById('count-pending').textContent = pending;
+            document.getElementById('count-ordered').textContent = ordered;
+            document.getElementById('count-arrived').textContent = arrived;
+            document.getElementById('count-canceled').textContent = canceled;
+        }
+
+        function handlePurchasingSearch() {
+            currentSearchText = document.getElementById('purchasing-search-input').value.trim();
+            renderPurchasingOrders();
+        }
+
+        function filterPurchasingByStatus(status) {
+            currentStatusFilter = status;
+
+            // Highlight Logic
+            ['pending', 'ordered', 'arrived', 'canceled'].forEach(s => {
+                const card = document.getElementById(`card-filter-${s}`);
+                if (s === status) {
+                    card.classList.add('ring-2', 'ring-offset-2', 'ring-blue-400', 'bg-slate-50');
+                } else {
+                    card.classList.remove('ring-2', 'ring-offset-2', 'ring-blue-400', 'bg-slate-50');
+                }
+            });
+
+            // Show indicator
+            const indicator = document.getElementById('active-filter-indicator');
+            const nameDisplay = document.getElementById('filter-name-display');
+            indicator.classList.remove('hidden');
+
+            let statusName = '';
+            if (status === 'pending') statusName = 'รอดำเนินการ';
+            else if (status === 'ordered') statusName = 'สั่งของแล้ว';
+            else if (status === 'arrived') statusName = 'ของมาถึงแล้ว';
+            else if (status === 'canceled') statusName = 'ยกเลิก';
+            nameDisplay.textContent = statusName;
+
+            renderPurchasingOrders();
+        }
+
+        function clearPurchasingFilter() {
+            currentStatusFilter = 'all';
+            clearPurchasingFilterUI();
+            renderPurchasingOrders();
+        }
+
+        function clearPurchasingFilterUI() {
+            ['pending', 'ordered', 'arrived', 'canceled'].forEach(s => {
+                document.getElementById(`card-filter-${s}`).classList.remove('ring-2', 'ring-offset-2', 'ring-blue-400', 'bg-slate-50');
+            });
+            document.getElementById('active-filter-indicator').classList.add('hidden');
+        }
+
+
+        // 2. ฟังก์ชันเปิด Modal อัปเดตสถานะ
+        function openPurchasingModal(data) {
+            document.getElementById('pur-id').value = data._id;
+            document.getElementById('pur-product-display').textContent = data.product || 'ไม่ระบุสินค้า';
+            document.getElementById('pur-customer-display').textContent = `${data.customerName} (โทร: ${data.phoneNumber})`;
+            document.getElementById('pur-status').value = data.orderStatus || 'pending';
+            document.getElementById('pur-note').value = data.orderNote || '';
+
+            openModal('purchasingModal');
+        }
+
         async function openDepositModal(data = null) {
             openModal('depositModal');
 
@@ -1831,8 +2680,77 @@
             // Load products
             productTomSelect.clear();
             productTomSelect.clearOptions();
-            const products = await fetchProducts();
-            products.forEach(p => productTomSelect.addOption({ text: p }));
+
+            const defaultProducts = [
+                // iPhone 13
+                "13 128 ดำ New",
+                "13 128 ขาว New",
+
+                // iPhone 15
+                "15 128 ดำ New",
+                "15 128 บลู New",
+                "15 128 ชมพู New",
+                "15 256 บลู New",
+
+                // iPhone 16
+                "16 128 ดำ New",
+                "16 128 บลู New",
+                "16 128 ชมพู New",
+                "16 128 เขียว New",
+                "16 128 ขาว New",
+                "16 256 บลู New",
+
+                // iPhone 16 Plus
+                "16 Plus 128 ดำ New",
+                "16 Plus 128 ชมพู New",
+                "16 Plus 128 ขาว New",
+
+                // iPhone 16 Pro
+                "16 Pro 128 ดำ New",
+                "16 Pro 128 Black Titanium",
+                "16 Pro 128 Graphite",
+
+                // iPhone 16 Pro Max
+                "16 Pro Max 256 Black Titanium",
+                "16 Pro Max 256 Desert",
+                "16 Pro Max 256 Desert Titanium",
+                "16 Pro Max 256 Graphite",
+                "16 Pro Max 256 Silver",
+                "16 Pro Max 256 White Titanium",
+
+                // iPhone 17
+                "17 256 ดำ New",
+                "17 256 บลู New",
+                "17 256 Lavender",
+                "17 256 Purple",
+                "17 256 ขาว New",
+
+                // iPhone 17 Pro
+                "17 Pro 256 Orange",
+                "17 Pro 256 บลู New",
+
+                // iPhone 17 Pro Max
+                "17 Pro Max 256 Blue",
+                "17 Pro Max 256 Orange",
+                "17 Pro Max 256 White",
+
+                // iPad Gen 11
+                "iPad Gen11 128 ขาว New",
+                "iPad Gen11 128 บลู New",
+                "iPad Gen11 128 ชมพู New",
+
+                // iPad Air 7
+                "iPad Air7 128 ขาว New",
+                "iPad Air7 128 ม่วง New",
+                "iPad Air7 128 เทา New",
+                "iPad Air7 128 บลู New"
+            ];
+
+            const serverProducts = await fetchProducts();
+            // Merge and dedup
+            const allProducts = Array.from(new Set([...defaultProducts, ...serverProducts])).sort();
+
+            allProducts.forEach(p => productTomSelect.addOption({ text: p }));
             document.getElementById('deposit-form').reset();
             document.getElementById('dep-id').value = '';
 
@@ -1899,6 +2817,116 @@
 
 
         // ------------------------------------------
+        // --- (F) IMPORT NOTIFICATION FUNCTIONS ---
+        // ------------------------------------------
+        let startImportTab = 'phone';
+
+        function switchImportTab(tab) {
+            startImportTab = tab;
+            const btnPhone = document.getElementById('tab-btn-phone');
+            const btnAcc = document.getElementById('tab-btn-accessory');
+            const viewPhone = document.getElementById('tab-import-phone');
+            const viewAcc = document.getElementById('tab-import-accessory');
+
+            if (tab === 'phone') {
+                // Active Phone
+                btnPhone.className = "flex items-center px-4 py-3 rounded-xl text-sm font-semibold transition-all bg-indigo-50 text-indigo-600 ring-2 ring-indigo-100";
+                btnAcc.className = "flex items-center px-4 py-3 rounded-xl text-sm font-semibold text-slate-500 hover:bg-slate-50 transition-all";
+                safeShow(viewPhone);
+                safeHide(viewAcc);
+            } else {
+                // Active Accessory
+                btnAcc.className = "flex items-center px-4 py-3 rounded-xl text-sm font-semibold transition-all bg-pink-50 text-pink-600 ring-2 ring-pink-100";
+                btnPhone.className = "flex items-center px-4 py-3 rounded-xl text-sm font-semibold text-slate-500 hover:bg-slate-50 transition-all";
+                safeShow(viewAcc);
+                safeHide(viewPhone);
+            }
+            fetchImportRequests();
+        }
+
+        function previewImage(input) {
+            const preview = document.getElementById('image-preview');
+            const placeholder = document.getElementById('image-preview-placeholder');
+            if (input.files && input.files[0]) {
+                const reader = new FileReader();
+                reader.onload = function (e) {
+                    preview.src = e.target.result;
+                    preview.classList.remove('hidden');
+                    placeholder.classList.add('hidden');
+                }
+                reader.readAsDataURL(input.files[0]);
+            }
+        }
+
+        async function fetchImportRequests() {
+            const token = localStorage.getItem('token');
+            const companyId = document.getElementById('company-select').value;
+            try {
+                const res = await fetch(`${SERVER_URL}/imports?companyId=${companyId}`, { headers: { 'Authorization': `Bearer ${token}` } });
+                if (!res.ok) return;
+                const data = await res.json();
+
+                // Render Phone List
+                const phoneList = document.getElementById('phone-import-list');
+                const phoneData = data.filter(d => d.type === 'phone');
+                phoneList.innerHTML = '';
+                if (phoneData.length === 0) {
+                    phoneList.innerHTML = `<tr><td colspan="5" class="text-center py-6 text-slate-400">ไม่มีประวัติการแจ้งนำเข้า</td></tr>`;
+                } else {
+                    phoneData.forEach(item => {
+                        const tr = document.createElement('tr');
+                        tr.className = "hover:bg-slate-50";
+                        tr.innerHTML = `
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-600">${formatDateShort(item.createdAt)}</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-indigo-600 font-medium"><a href="${item.fileUrl}" target="_blank" class="hover:underline flex items-center"><ion-icon name="document-text" class="mr-1"></ion-icon> Download</a></td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-600">${item.branch}</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm">${getStatusTag(item.status)}</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-600">${item.createdBy ? item.createdBy.name : '-'}</td>
+                        `;
+                        phoneList.appendChild(tr);
+                    });
+                }
+
+                // Render Accessory List
+                const accList = document.getElementById('accessory-import-list');
+                const accData = data.filter(d => d.type === 'accessory');
+                accList.innerHTML = '';
+                if (accData.length === 0) {
+                    accList.innerHTML = `<div class="col-span-full text-center py-8 text-slate-400">ไม่มีรายการแจ้งนำเข้า</div>`;
+                } else {
+                    accData.forEach(item => {
+                        const card = document.createElement('div');
+                        card.className = "bg-white p-4 rounded-xl border border-slate-100 shadow-sm flex gap-4";
+
+                        // Use files[0] for image, and details.* for other info
+                        const imageUrl = item.files && item.files.length > 0 ? item.files[0] : 'https://placehold.co/100';
+                        // Handle productName vs name mismatch (schema has productName)
+                        const accName = item.details ? (item.details.productName || item.details.name || 'Unknown') : 'Unknown';
+                        const accQty = item.details ? item.details.quantity : '-';
+                        const accDate = item.details ? formatDateShort(item.details.importDate) : '-';
+
+                        card.innerHTML = `
+                             <img src="${imageUrl}" class="w-20 h-20 object-cover rounded-lg bg-slate-100 border border-slate-200">
+                             <div class="flex-1">
+                                <div class="flex justify-between items-start">
+                                    <h5 class="font-bold text-slate-800 text-sm line-clamp-1">${accName}</h5>
+                                    ${getStatusTag(item.status)}
+                                </div>
+                                <p class="text-xs text-slate-500 mt-1">จำนวน: <span class="font-semibold text-slate-700">${accQty}</span> ชิ้น</p>
+                                <p class="text-xs text-slate-500">วันที่ต้องการ: ${accDate}</p>
+                                <div class="mt-2 flex items-center text-xs text-slate-400">
+                                    <ion-icon name="person" class="mr-1"></ion-icon> ${item.createdBy ? item.createdBy.name : '-'} (${item.branch})
+                                </div>
+                             </div>
+                        `;
+                        accList.appendChild(card);
+                    });
+                }
+
+            } catch (err) { console.error(err); }
+        }
+
+        // ------------------------------------------
         // --- (E) GENERAL HELPERS & INIT ---
         // ------------------------------------------
 
@@ -1921,6 +2949,28 @@
             } catch (error) {
                 select.innerHTML = `<option value="">--- ${error.message} ---</option>`;
             }
+        };
+
+        const populateBranchSelects = () => {
+            const branches = ['ยะลา', 'นราธิวาส', 'ปัตตานี', 'หาดใหญ่', 'หาดใหญ่2', 'โคลีเซียม', 'สุราษฎร์ธานี', 'ปากแมว', 'ภูเก็ต', 'นครศรีธรรมราช', 'กระบี่', 'กะทู้', 'ตรัง', 'คุรุ', 'ชุมพร', 'สตูล', 'พัทลุง', 'สงขลา'];
+            const selects = ['deposit-filter-branch', 'purchasing-filter-branch'];
+
+            selects.forEach(id => {
+                const select = document.getElementById(id);
+                if (select) {
+                    // Keep the first option (all)
+                    const firstOption = select.options[0];
+                    select.innerHTML = '';
+                    select.appendChild(firstOption);
+
+                    branches.forEach(branch => {
+                        const option = document.createElement('option');
+                        option.value = branch;
+                        option.textContent = branch;
+                        select.appendChild(option);
+                    });
+                }
+            });
         };
 
         const openNewUserModal = () => {
@@ -2097,11 +3147,17 @@
             const navDeposit = document.getElementById('nav-Storefront_deposit'); // เพิ่ม Deposit Nav
 
             const companySelectDiv = document.getElementById('company-select').parentElement;
+            const navPurchasing = document.getElementById('nav-purchasing');
+            const purchasingView = document.getElementById('purchasing-view');
+            const navImport = document.getElementById('nav-import');      // [New]
+            const importView = document.getElementById('import-view');    // [New]
 
             // Reset Nav Styles
-            [navDashboard, navMyTasks, navAdmin, navDeposit].forEach(el => {
-                el.classList.remove('bg-amber-500', 'text-white');
-                el.classList.add('text-gray-600', 'hover:bg-gray-100');
+            [navDashboard, navMyTasks, navAdmin, navDeposit, navPurchasing, navImport].forEach(el => {
+                if (el) {
+                    el.classList.remove('bg-amber-500', 'text-white');
+                    el.classList.add('text-slate-600', 'hover:bg-slate-50');
+                }
             });
 
             // Hide All Views
@@ -2109,6 +3165,8 @@
             safeHide(taskView);
             safeHide(adminView);
             safeHide(depositView); // Hide Deposit View
+            safeHide(purchasingView);
+            safeHide(importView);     // [New]
 
             // Hide Buttons & Filters
             safeHide(newTaskBtn); safeHide(newUserBtn);
@@ -2148,6 +3206,38 @@
                 navDeposit.classList.remove('text-gray-600', 'hover:bg-gray-100');
                 // ปกติหน้าร้านก็ควรเลือกบริษัทได้
                 if (companySelectDiv) companySelectDiv.style.display = 'none';
+            }
+            else if (activeView === 'purchasing') { // [เพิ่ม]
+                safeShow(purchasingView);
+                mainHeader.textContent = "จัดซื้อ";
+                navPurchasing.classList.add('bg-amber-500', 'text-white');
+                navPurchasing.classList.remove('text-slate-600', 'hover:bg-slate-50');
+                if (companySelectDiv) companySelectDiv.style.display = 'none';
+            }
+            else if (activeView === 'import') { // [New]
+                safeShow(importView);
+                mainHeader.textContent = "แจ้งนำเข้าสินค้า";
+                navImport.classList.add('bg-amber-500', 'text-white');
+                navImport.classList.remove('text-slate-600', 'hover:bg-slate-50');
+                if (companySelectDiv) companySelectDiv.style.display = 'none';
+                fetchImportRequests();
+            }
+            else if (activeView === 'stock-import') { // [New Stock]
+                const stockImportView = document.getElementById('stock-import-view');
+                const navStockImport = document.getElementById('nav-stock-import');
+                safeShow(stockImportView);
+                mainHeader.textContent = "จัดการรายการนำเข้า";
+                if (navStockImport) {
+                    navStockImport.classList.add('bg-amber-500', 'text-white');
+                    navStockImport.classList.remove('text-slate-600', 'hover:bg-slate-50');
+                }
+                if (companySelectDiv) companySelectDiv.style.display = 'none';
+                // Reset to Pending filter on entry
+                if (typeof filterStockImports === 'function') {
+                    filterStockImports('pending');
+                } else {
+                    fetchStockImports();
+                }
             }
 
             if (currentUser && currentUser.role === 'staff') {
@@ -2190,10 +3280,374 @@
         document.addEventListener('DOMContentLoaded', () => {
             initializeAuth();
 
+
+            // ============================================
+            // STOCK IMPORT LOGIC
+            // ============================================
+            let currentStockFilter = 'pending';
+            let currentStockImportType = 'phone'; // Default to Phone
+            let currentStockBranch = 'all'; // [New] Branch Filter
+            let targetImportId = null;
+            let targetImportStatus = null;
+
+            function filterStockType(type) {
+                currentStockImportType = type;
+
+                // Update Tab Styling
+                const phoneTab = document.getElementById('tab-stock-phone');
+                const accTab = document.getElementById('tab-stock-accessory');
+
+                if (type === 'phone') {
+                    phoneTab.classList.remove('text-slate-600');
+                    phoneTab.classList.add('bg-white', 'text-indigo-600', 'shadow-sm');
+
+                    accTab.classList.add('text-slate-600');
+                    accTab.classList.remove('bg-white', 'text-indigo-600', 'shadow-sm');
+                } else {
+                    accTab.classList.remove('text-slate-600');
+                    accTab.classList.add('bg-white', 'text-indigo-600', 'shadow-sm');
+
+                    phoneTab.classList.add('text-slate-600');
+                    phoneTab.classList.remove('bg-white', 'text-indigo-600', 'shadow-sm');
+                }
+
+                fetchStockImports();
+            }
+
+            function filterStockImports(status) {
+                currentStockFilter = status;
+                // Update UI buttons
+                ['pending', 'importing', 'received', 'all'].forEach(s => {
+                    const btn = document.getElementById(`filter-stock-${s}`);
+                    if (btn) {
+                        if (s === status) {
+                            btn.classList.remove('bg-white', 'text-slate-600');
+                            btn.classList.add('bg-indigo-600', 'text-white', 'shadow-md');
+                        } else {
+                            btn.classList.add('bg-white', 'text-slate-600');
+                            btn.classList.remove('bg-indigo-600', 'text-white', 'shadow-md');
+                        }
+                    }
+                });
+                fetchStockImports();
+            }
+
+            async function fetchStockImports() {
+                try {
+                    // Include type and status in query
+                    let url = `${SERVER_URL}/imports?t=${Date.now()}&type=${currentStockImportType}`;
+                    if (currentStockFilter !== 'all') {
+                        url += `&status=${currentStockFilter}`;
+                    }
+                    // [New] Branch Filter
+                    if (currentStockBranch !== 'all') {
+                        url += `&branch=${encodeURIComponent(currentStockBranch)}`;
+                    }
+
+                    const res = await fetch(url, {
+                        headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
+                    });
+                    if (!res.ok) throw new Error('Failed to fetch');
+                    const data = await res.json();
+                    renderStockImportTable(data);
+                    document.getElementById('stock-import-count').textContent = `${data.length} รายการ`;
+                } catch (err) {
+                    console.error(err);
+                }
+            }
+
+            function renderStockImportTable(data) {
+                console.log('Rendering Stock Import Table:', data);
+                const tbody = document.getElementById('stock-import-table-body');
+                tbody.innerHTML = '';
+
+                if (!data || data.length === 0) {
+                    tbody.innerHTML = `<tr><td colspan="6" class="px-6 py-12 text-center text-slate-400 font-medium">ไม่พบข้อมูลการแจ้งนำเข้า</td></tr>`;
+                    return;
+                }
+
+                data.forEach(item => {
+                    // Determine details
+                    let productName = '-';
+                    let quantity = '-';
+                    let imageUrl = null;
+
+                    // Logic for Name & Quantity
+                    const isPhone = (item.type || '').toLowerCase() === 'phone';
+
+                    if (isPhone && item.files && item.files.length > 0) {
+                        productName = 'Import via Excel';
+                        quantity = 'Many';
+                    } else if (item.details) {
+                        productName = item.details.productName || item.details.name || '-';
+                        quantity = item.details.quantity || '-';
+                    }
+
+                    // Logic for Image URL & File Links
+                    const getFullUrl = (path) => {
+                        if (!path) return '';
+                        if (path.startsWith('http')) return path;
+                        if (path.startsWith('/')) return `${SERVER_URL}${path}`;
+                        return `${SERVER_URL}/uploads/${path}`;
+                    };
+
+                    if (item.files && item.files.length > 0) {
+                        const file = item.files[0];
+                        if (file.match(/\.(jpg|jpeg|png|gif|webp)$/i)) {
+                            imageUrl = getFullUrl(file);
+                        }
+                    }
+
+                    // Build Product Cell
+                    let productCellContent = `
+                        <div class="flex items-center gap-3">
+                            <div class="h-10 w-10 flex-shrink-0 bg-slate-100 rounded-lg flex items-center justify-center text-slate-400">
+                                <ion-icon name="cube-outline" class="text-xl"></ion-icon>
+                            </div>
+                            <div>
+                                <div class="text-sm font-bold text-slate-800">${productName}</div>
+                                <div class="text-xs text-slate-500">จำนวน: ${quantity}</div>
+                            </div>
+                        </div>
+                    `;
+
+                    if (imageUrl) {
+                        productCellContent = `
+                            <div class="flex items-center gap-3">
+                                <div class="h-10 w-10 flex-shrink-0 grouping">
+                                    <img class="h-10 w-10 rounded-lg object-cover border border-slate-200" src="${imageUrl}" alt="Product" onerror="this.src='https://placehold.co/100?text=No+Img'">
+                                </div>
+                                <div>
+                                    <div class="text-sm font-bold text-slate-800 line-clamp-1">${productName}</div>
+                                    <div class="text-xs text-slate-500">จำนวน: ${quantity}</div>
+                                </div>
+                            </div>
+                        `;
+                    }
+
+                    // Build File Links
+                    let fileHtml = '<span class="text-slate-400 text-xs">-</span>';
+                    if (item.files && item.files.length > 0) {
+                        fileHtml = item.files.map((f, i) => {
+                            const url = getFullUrl(f);
+                            return `
+                            <a href="${url}" target="_blank" class="inline-flex items-center px-2.5 py-1 bg-slate-50 text-indigo-600 rounded-lg hover:bg-slate-100 border border-slate-200 text-xs font-medium mr-1.5 mb-1 transition-colors">
+                                <ion-icon name="document-text-outline" class="mr-1.5"></ion-icon> ไฟล์ ${i + 1}
+                            </a>
+                        `}).join('');
+                    }
+
+                    // Status Options with Custom Styling
+                    const statusOptions = [
+                        { val: 'pending', label: 'รอนำเข้า' },
+                        { val: 'importing', label: 'กำลังนำเข้า' },
+                        { val: 'received', label: 'นำเข้าแล้ว' },
+                        { val: 'rejected', label: 'ยกเลิก' }
+                    ];
+
+                    let statusSelectHtml = `
+                        <div class="relative">
+                            <select onchange="openStatusModal('${item._id}', this.value)" 
+                                class="appearance-none w-full bg-white border border-slate-200 text-slate-700 text-xs rounded-lg focus:ring-indigo-500 focus:border-indigo-500 block p-2 pr-8 font-medium shadow-sm transition-all hover:border-indigo-300">
+                                ${statusOptions.map(opt => `<option value="${opt.val}" ${item.status === opt.val ? 'selected' : ''}>${opt.label}</option>`).join('')}
+                            </select>
+                            <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-slate-500">
+                                <ion-icon name="chevron-down-outline" class="text-sm"></ion-icon>
+                            </div>
+                        </div>
+                    `;
+
+                    // Helper for Status Badge
+                    const getStatusBadge = (status) => {
+                        const styles = {
+                            'pending': 'bg-yellow-50 text-yellow-700 border-yellow-200 ring-yellow-500/30',
+                            'importing': 'bg-blue-50 text-blue-700 border-blue-200 ring-blue-500/30',
+                            'received': 'bg-green-50 text-green-700 border-green-200 ring-green-500/30',
+                            'rejected': 'bg-red-50 text-red-700 border-red-200 ring-red-500/30'
+                        };
+                        const labels = {
+                            'pending': 'รอนำเข้า',
+                            'importing': 'กำลังนำเข้า',
+                            'received': 'นำเข้าแล้ว',
+                            'rejected': 'ยกเลิก'
+                        };
+                        const css = styles[status] || 'bg-slate-50 text-slate-600 border-slate-200';
+                        const label = labels[status] || status;
+
+                        return `<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold border ring-1 ring-inset ${css}">
+                                    <span class="w-1.5 h-1.5 rounded-full bg-current mr-1.5 opacity-60"></span>
+                                    ${label}
+                                </span>`;
+                    };
+
+                    // Render Row
+                    const tr = document.createElement('tr');
+                    tr.className = 'group hover:bg-slate-50/80 transition-all border-b border-transparent hover:border-slate-100 last:border-0';
+                    const dateStr = formatDate(item.createdAt);
+
+                    tr.innerHTML = `
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-500">
+                             <div class="font-medium text-slate-700">${dateStr.split(' ')[0]}</div>
+                             <div class="text-xs text-slate-400">${dateStr.split(' ')[1] || ''}</div>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <div class="flex items-center">
+                                <div class="h-8 w-8 rounded-full bg-indigo-100 text-indigo-600 flex items-center justify-center text-xs font-bold mr-3 border border-indigo-200">
+                                    ${(item.branch || 'HO').substring(0, 2)}
+                                </div>
+                                <div>
+                                    <div class="text-sm font-bold text-slate-800">${item.branch}</div>
+                                    <div class="text-xs text-slate-500 flex items-center gap-1">
+                                        <ion-icon name="person-outline" class="text-[10px]"></ion-icon>
+                                        ${item.createdBy ? item.createdBy.name : 'Unknown'}
+                                    </div>
+                                </div>
+                            </div>
+                        </td>
+                        <td class="px-6 py-4">
+                            ${productCellContent}
+                        </td>
+                        <td class="px-6 py-4 text-sm text-slate-500">
+                            <div class="flex flex-wrap max-w-xs">
+                                 ${fileHtml}
+                            </div>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                             ${getStatusBadge(item.status)}
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium w-40">
+                            ${statusSelectHtml}
+                        </td>
+                    `;
+                    tbody.appendChild(tr);
+                });
+            }
+
+            function openStatusModal(id, status) {
+                targetImportId = id;
+                targetImportStatus = status;
+
+                const map = {
+                    'pending': 'รอนำเข้า',
+                    'importing': 'กำลังนำเข้า',
+                    'received': 'นำเข้าแล้ว',
+                    'rejected': 'ยกเลิก (Reject)'
+                };
+                document.getElementById('target-status-name').textContent = map[status] || status;
+
+                openModal('statusUpdateModal');
+            }
+
+            document.getElementById('confirm-status-update-btn').addEventListener('click', async () => {
+                if (!targetImportId || !targetImportStatus) return;
+
+                try {
+                    const res = await fetch(`${SERVER_URL}/imports/${targetImportId}/status`, {
+                        method: 'PUT',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${localStorage.getItem('token')}`
+                        },
+                        body: JSON.stringify({ status: targetImportStatus })
+                    });
+
+                    if (res.ok) {
+                        closeModal('statusUpdateModal');
+                        fetchStockImports();
+                    } else {
+                        alert('Failed to update status');
+                    }
+                } catch (err) {
+                    console.error(err);
+                    alert('Error updating status');
+                }
+            });
+
             // Forms
             document.getElementById('new-task-form').addEventListener('submit', handleNewTaskSubmit);
             document.getElementById('update-task-form').addEventListener('submit', handleUpdateTaskSubmit);
             document.getElementById('user-form').addEventListener('submit', handleUserFormSubmit);
+
+            // Import Forms
+            const phoneImportForm = document.getElementById('phone-import-form');
+            if (phoneImportForm) {
+                phoneImportForm.addEventListener('submit', async (e) => {
+                    e.preventDefault();
+                    const fileInput = document.getElementById('phone-import-file');
+                    if (fileInput.files.length === 0) return alert('กรุณาเลือกไฟล์');
+
+                    const formData = new FormData();
+                    formData.append('type', 'phone');
+                    formData.append('files', fileInput.files[0]);
+                    formData.append('companyId', document.getElementById('company-select').value);
+
+                    try {
+                        const res = await fetch(`${SERVER_URL}/imports`, {
+                            method: 'POST',
+                            headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` },
+                            body: formData
+                        });
+                        if (res.ok) {
+                            alert('แจ้งนำเข้าสำเร็จ');
+                            phoneImportForm.reset();
+                            document.getElementById('file-name-display').textContent = '';
+                            fetchImportRequests();
+                        } else {
+                            const err = await res.json();
+                            alert('Error: ' + err.message);
+                        }
+                    } catch (err) { alert('Error: ' + err.message); }
+                });
+
+                document.getElementById('phone-import-file').addEventListener('change', (e) => {
+                    if (e.target.files.length > 0) {
+                        document.getElementById('file-name-display').textContent = e.target.files[0].name;
+                    } else {
+                        document.getElementById('file-name-display').textContent = '';
+                    }
+                });
+            }
+
+            const accImportForm = document.getElementById('accessory-import-form');
+            if (accImportForm) {
+                accImportForm.addEventListener('submit', async (e) => {
+                    e.preventDefault();
+                    const imageInput = document.getElementById('acc-import-image');
+                    const name = document.getElementById('acc-name').value;
+                    const qty = document.getElementById('acc-qty').value;
+                    const date = document.getElementById('acc-date').value;
+
+                    if (!name || !qty || !date) return alert('กรุณากรอกข้อมูลให้ครบ');
+
+                    const formData = new FormData();
+                    formData.append('type', 'accessory');
+                    formData.append('companyId', document.getElementById('company-select').value);
+                    formData.append('name', name);
+                    formData.append('quantity', qty);
+                    formData.append('importDate', date);
+                    if (imageInput.files.length > 0) {
+                        formData.append('files', imageInput.files[0]);
+                    }
+
+                    try {
+                        const res = await fetch(`${SERVER_URL}/imports`, {
+                            method: 'POST',
+                            headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` },
+                            body: formData
+                        });
+                        if (res.ok) {
+                            alert('บันทึกแจ้งนำเข้าสำเร็จ');
+                            accImportForm.reset();
+                            document.getElementById('image-preview').classList.add('hidden');
+                            document.getElementById('image-preview-placeholder').classList.remove('hidden');
+                            fetchImportRequests();
+                        } else {
+                            const err = await res.json();
+                            alert('Error: ' + err.message);
+                        }
+                    } catch (err) { alert('Error: ' + err.message); }
+                });
+            }
 
             // Buttons
             document.getElementById('confirm-delete-button').addEventListener('click', executeDelete);
@@ -2299,6 +3753,67 @@
                     });
                 });
             }
+
+            const purForm = document.getElementById('purchasing-form');
+            if (purForm) {
+                purForm.addEventListener('submit', async (e) => {
+                    e.preventDefault();
+                    const token = localStorage.getItem('token');
+                    const id = document.getElementById('pur-id').value;
+                    const companyId = document.getElementById('company-select').value;
+
+                    try {
+                        // 1. ดึงข้อมูลเก่ามาก่อนเพื่อความปลอดภัย (ป้องกันข้อมูลลูกค้าหาย)
+                        const resGet = await fetch(`${SERVER_URL}/deposits?companyId=${companyId}`, { headers: { 'Authorization': `Bearer ${token}` } });
+                        const allDeposits = await resGet.json();
+                        const oldData = allDeposits.find(d => d._id === id);
+
+                        if (!oldData) {
+                            alert('ไม่พบข้อมูลเดิม');
+                            return;
+                        }
+
+                        // 2. รวมข้อมูลเก่ากับสถานะใหม่
+                        const payload = {
+                            ...oldData, // แผ่ข้อมูลเดิม
+                            id: oldData._id, // *** สำคัญ: ต้องระบุ id เพื่อให้ Backend รู้ว่าเป็นการแก้ไข ***
+                            orderStatus: document.getElementById('pur-status').value,
+                            orderNote: document.getElementById('pur-note').value
+                        };
+
+                        // 3. ส่งกลับไปบันทึก
+                        const res = await fetch(`${SERVER_URL}/deposits`, {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+                            body: JSON.stringify(payload)
+                        });
+
+                        if (res.ok) {
+                            closeModal('purchasingModal');
+                            fetchPurchasingOrders(); // รีเฟรชตาราง
+                        } else {
+                            alert('บันทึกไม่สำเร็จ');
+                        }
+                    } catch (err) {
+                        alert('Error: ' + err.message);
+                    }
+                });
+            }
+            // Expose Stock Functions to Window
+            window.filterStockImports = filterStockImports;
+            window.fetchStockImports = fetchStockImports;
+            window.openStatusModal = openStatusModal;
+            window.filterStockType = filterStockType;
+
+            // [New] Branch Filter Listener
+            const stockBranchSelect = document.getElementById('stock-import-branch-filter');
+            if (stockBranchSelect) {
+                stockBranchSelect.addEventListener('change', (e) => {
+                    currentStockBranch = e.target.value;
+                    fetchStockImports();
+                });
+            }
+
         });
 
         // Modal Control

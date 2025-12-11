@@ -3,13 +3,13 @@
 const express = require('express');
 const cors = require('cors');
 const path = require('path');
-const connectDB = require('./config/db'); 
-require('dotenv').config(); 
+const connectDB = require('./config/db');
+require('dotenv').config();
 
 // Import Routes
 const authRoutes = require('./routes/authRoutes');
-const taskRoutes = require('./routes/taskRoutes'); 
-const userRoutes = require('./routes/userRoutes'); 
+const taskRoutes = require('./routes/taskRoutes');
+const userRoutes = require('./routes/userRoutes');
 const notificationRoutes = require('./routes/notificationRoutes');
 const depositRoutes = require('./routes/depositRoutes');
 
@@ -30,10 +30,14 @@ app.use(express.static(htmlPath));
 app.use('/image', express.static(path.join(process.cwd(), 'image')));
 // API Routes
 app.use('/api/auth', authRoutes);
-app.use('/api/tasks', taskRoutes); 
-app.use('/api/users', userRoutes); 
+app.use('/api/tasks', taskRoutes);
+app.use('/api/users', userRoutes);
 app.use('/api/notifications', notificationRoutes);
 app.use('/api/deposits', depositRoutes);
+app.use('/api/imports', require('./routes/importRoutes'));
+
+// Serve Uploads
+app.use('/uploads', express.static(path.join(process.cwd(), 'uploads')));
 
 // (*** แก้ไข: Route หน้าเว็บ ให้ใช้ตัวแปร htmlPath ***)
 app.get('/', (req, res) => {
@@ -45,7 +49,7 @@ app.get('/dashboard', (req, res) => {
 });
 // =======================================================
 
-const PORT = process.env.PORT || 5000; 
+const PORT = process.env.PORT || 5000;
 
 if (require.main === module) {
     app.listen(PORT, () => {
