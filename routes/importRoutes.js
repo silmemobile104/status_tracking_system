@@ -19,13 +19,19 @@ cloudinary.config({
 const storage = new CloudinaryStorage({
     cloudinary: cloudinary,
     params: async (req, file) => {
+        // ดึงนามสกุลไฟล์
         const fileFormat = file.originalname.split('.').pop();
         
         return {
             folder: 'status_tracking_uploads',
             resource_type: 'auto',
-            format: fileFormat, 
-            };
+            format: fileFormat, // บังคับนามสกุลเดิม
+            
+            // --- เพิ่ม 2 บรรทัดนี้ ---
+            use_filename: true, // ใช้ชื่อไฟล์เดิมจากเครื่อง
+            unique_filename: false, // ไม่ต้องเติมเลขสุ่มต่อท้าย
+            // ---------------------
+        };
     },
 });
 
