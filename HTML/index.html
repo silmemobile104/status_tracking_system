@@ -2436,7 +2436,8 @@
         let currentSearchText = '';
 
         // 1. ฟังก์ชันดึงข้อมูล (Fetch & Store)
-        async function fetchPurchasingOrders() {
+        // 1. ฟังก์ชันดึงข้อมูล (Fetch & Store)
+        async function fetchPurchasingOrders(initialStatus = null) {
             const token = localStorage.getItem('token');
             const container = document.getElementById('purchasing-list-container');
             const emptyState = document.getElementById('purchasing-empty-state');
@@ -2464,14 +2465,22 @@
                 const deposits = await res.json();
                 allPurchasingOrders = deposits; // Store data
 
-                // Reset filters
-                currentStatusFilter = 'all';
-                currentSearchText = '';
-                document.getElementById('purchasing-search-input').value = '';
-                clearPurchasingFilterUI();
+                // Set Filter Logic
+                if (initialStatus) {
+                    currentStatusFilter = initialStatus;
+                    // Trigger UI update for the filter buttons
+                    // Note: filterPurchasingByStatus sets currentStatusFilter and calls renderPurchasingOrders
+                    filterPurchasingByStatus(initialStatus);
+                } else {
+                    // Reset filters if no initialStatus provided
+                    currentStatusFilter = 'all';
+                    currentSearchText = '';
+                    document.getElementById('purchasing-search-input').value = '';
+                    clearPurchasingFilterUI();
+                    renderPurchasingOrders();
+                }
 
                 updatePurchasingStats(deposits);
-                renderPurchasingOrders();
 
             } catch (e) {
                 console.error(e);
@@ -3218,11 +3227,8 @@
                 if (companySelectDiv) companySelectDiv.style.display = 'none';
 
                 // Default to Pending
-                if (typeof filterPurchasingByStatus === 'function') {
-                    filterPurchasingByStatus('pending');
-                }
                 if (typeof fetchPurchasingOrders === 'function') {
-                    fetchPurchasingOrders();
+                    fetchPurchasingOrders('pending');
                 }
             }
             else if (activeView === 'import') { // [New]
@@ -3308,18 +3314,25 @@
                 const phoneTab = document.getElementById('tab-stock-phone');
                 const accTab = document.getElementById('tab-stock-accessory');
 
+                // Reset Base Styles
+                [phoneTab, accTab].forEach(tab => {
+                    tab.className = "px-6 py-2.5 rounded-xl text-sm font-bold transition-all flex items-center gap-2 border border-transparent";
+                });
+
                 if (type === 'phone') {
-                    phoneTab.classList.remove('text-slate-600');
-                    phoneTab.classList.add('bg-white', 'text-indigo-600', 'shadow-sm');
+                    // Phone Active: Blue Theme
+                    phoneTab.classList.add('bg-blue-600', 'text-white', 'shadow-md', 'shadow-blue-200');
+                    phoneTab.classList.remove('text-slate-500', 'hover:bg-slate-50');
 
-                    accTab.classList.add('text-slate-600');
-                    accTab.classList.remove('bg-white', 'text-indigo-600', 'shadow-sm');
+                    // Acc Inactive
+                    accTab.classList.add('text-slate-500', 'hover:bg-slate-100', 'bg-transparent');
                 } else {
-                    accTab.classList.remove('text-slate-600');
-                    accTab.classList.add('bg-white', 'text-indigo-600', 'shadow-sm');
+                    // Acc Active: Purple Theme
+                    accTab.classList.add('bg-purple-600', 'text-white', 'shadow-md', 'shadow-purple-200');
+                    accTab.classList.remove('text-slate-500', 'hover:bg-slate-50');
 
-                    phoneTab.classList.add('text-slate-600');
-                    phoneTab.classList.remove('bg-white', 'text-indigo-600', 'shadow-sm');
+                    // Phone Inactive
+                    phoneTab.classList.add('text-slate-500', 'hover:bg-slate-100', 'bg-transparent');
                 }
 
                 fetchStockImports();

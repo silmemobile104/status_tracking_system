@@ -4,8 +4,7 @@ const ImportRequest = require('../models/importRequest');
 exports.createImport = async (req, res) => {
     try {
         const { type, details } = req.body;
-        const files = req.files ? req.files.map(file => `/uploads/${file.filename}`) : [];
-
+        const files = req.files ? req.files.map(file => file.path) : [];
         let parsedDetails = {};
         if (details) {
             try {
