@@ -24,9 +24,14 @@ const storage = new CloudinaryStorage({
         resource_type: 'auto' // ให้ระบบเลือกประเภทไฟล์อัตโนมัติ
     }
 });
-// --- จบส่วนที่แก้ไข ---
 
-const upload = multer({ storage: storage });
+let upload;
+try {
+    upload = multer({ storage: storage });
+} catch (error) {
+    console.error('Multer/Cloudinary Storage Init Error:', error);
+    upload = multer({ dest: 'uploads/' });
+}
 
 // Routes (ส่วนนี้เหมือนเดิม)
 router.post('/', verifyToken, upload.array('files', 5), importController.createImport);

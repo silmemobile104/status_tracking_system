@@ -47,6 +47,16 @@ app.get('/', (req, res) => {
 app.get('/dashboard', (req, res) => {
     res.sendFile(path.join(htmlPath, 'index.html'));
 });
+
+// Global Error Handler
+app.use((err, req, res, next) => {
+    console.error('Global Error:', err.stack);
+    res.status(500).json({
+        message: 'Internal Server Error',
+        error: process.env.NODE_ENV === 'production' ? 'An unexpected error occurred' : err.message
+    });
+});
+
 // =======================================================
 
 const PORT = process.env.PORT || 5000;
