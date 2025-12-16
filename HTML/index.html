@@ -527,7 +527,7 @@
                                         ข้อมูลรับเครื่อง</th>
                                 </tr>
                                 <tr>
-                                    <th>บิล</th>
+                                    <th>เลขที่บิล</th>
                                     <th>IMEI</th>
                                     <th>สินค้า</th>
                                     <th>ราคาเต็ม</th>
@@ -1175,14 +1175,16 @@
                                 class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">IMEI</label><input
                                 type="text" id="dep-imei" class="form-input-theme"></div>
 
-                        <div class="col-span-2 flex items-center mt-2 p-4 bg-green-50 rounded-xl border border-green-200 cursor-pointer hover:bg-green-100 transition-colors"
-                            onclick="document.getElementById('dep-success').click()">
+                        <label for="dep-success" 
+                               class="col-span-2 flex items-center mt-2 p-4 bg-green-50 rounded-xl border border-green-200 cursor-pointer hover:bg-green-100 transition-colors">
+
                             <input type="checkbox" id="dep-success"
-                                class="w-5 h-5 text-green-600 rounded focus:ring-green-500 mr-3">
-                            <label for="dep-success"
-                                class="font-bold text-green-800 cursor-pointer select-none">ทำรายการสำเร็จ
-                                (รับเครื่องแล้ว)</label>
-                        </div>
+                                   class="w-5 h-5 text-green-600 rounded focus:ring-green-500 mr-3">
+
+                            <span class="font-bold text-green-800 cursor-pointer select-none">
+                                ทำรายการสำเร็จ (รับเครื่องแล้ว)
+                            </span>
+                        </label>
                     </div>
 
                     <div class="flex justify-end gap-3 pt-6 border-t border-slate-100">
