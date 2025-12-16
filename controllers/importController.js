@@ -22,6 +22,11 @@ exports.createImport = async (req, res) => {
             };
         }
 
+        // (*** เพิ่ม: รับ description สำหรับ Phone Import ***)
+        if (type === 'phone' && req.body.description) {
+            parsedDetails.description = req.body.description;
+        }
+
         const newImport = new ImportRequest({
             type,
             branch: req.user.branch || req.user.department,

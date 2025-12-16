@@ -19,7 +19,7 @@ exports.getDeposits = async (req, res) => {
         // 2. Logic การกรอง Branch
         // หากเป็นฝ่ายจัดซื้อ (เช็คจากชื่อแผนก) หรือ Admin/Manager ให้ดูได้หมด หรือกรองตามเลือก
         const isPurchasing = userDept.includes('จัดซื้อ') || userDept.includes('Purchase');
-        
+
         if (userRole === 'staff' && !isPurchasing) {
             // Staff ทั่วไป (ฝ่ายขาย) เห็นแค่สาขาตัวเอง
             if (req.user.branch) {
@@ -35,8 +35,8 @@ exports.getDeposits = async (req, res) => {
 
         // [Option] ถ้าเป็นหน้าจัดซื้อ อาจจะกรองเฉพาะรายการที่ยังไม่สำเร็จ (isSuccess: false)
         if (viewMode === 'purchasing') {
-             // จัดซื้ออาจจะอยากดูเฉพาะงานที่ยังไม่จบ หรือดูทั้งหมดก็ได้ (ในที่นี้ให้ดูทั้งหมดที่ยังไม่รับเครื่อง)
-             // query.isSuccess = false; 
+            // จัดซื้ออาจจะอยากดูเฉพาะงานที่ยังไม่จบ หรือดูทั้งหมดก็ได้ (ในที่นี้ให้ดูทั้งหมดที่ยังไม่รับเครื่อง)
+            // query.isSuccess = false; 
         }
 
         const deposits = await Deposit.find(query).sort({ depositDate: -1 });
@@ -55,7 +55,7 @@ exports.saveDeposit = async (req, res) => {
             id, depositDate, customerName, phoneNumber, depositAmount, pickupDueDate,
             billNo, imei, product, price, isSuccess,
             // รับค่าใหม่
-            orderStatus, orderNote
+            orderStatus, orderNote, expectedArrivalDate
         } = req.body;
 
         if (id) {
@@ -78,6 +78,7 @@ exports.saveDeposit = async (req, res) => {
             // อัปเดตข้อมูลจัดซื้อ (ถ้าส่งมา)
             if (orderStatus) deposit.orderStatus = orderStatus;
             if (orderNote !== undefined) deposit.orderNote = orderNote;
+            if (expectedArrivalDate !== undefined) deposit.expectedArrivalDate = expectedArrivalDate;
 
             if (isSuccess && !deposit.signName) deposit.signName = req.user.name;
 
@@ -93,7 +94,8 @@ exports.saveDeposit = async (req, res) => {
                 signName: '',
                 // ค่าเริ่มต้น
                 orderStatus: 'pending',
-                orderNote: ''
+                orderNote: '',
+                expectedArrivalDate: null
             });
             await newDeposit.save();
             return res.status(201).json(newDeposit);
