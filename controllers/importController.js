@@ -18,7 +18,7 @@ exports.createImport = async (req, res) => {
                 productName: req.body.name,
                 quantity: req.body.quantity,
                 importDate: req.body.importDate,
-                description: req.body.description // Optional
+                description: req.body.description // (*** เพิ่ม: Description for Accessory ***)
             };
         }
 
@@ -44,7 +44,7 @@ exports.createImport = async (req, res) => {
     }
 };
 
-// @desc    Get import requests
+// @desc    Get import requests (with Pagination & Search)
 exports.getImports = async (req, res) => {
     try {
         const keepingRoles = ['admin', 'manager', 'executive'];
@@ -54,7 +54,7 @@ exports.getImports = async (req, res) => {
 
         let query = { companyId: req.user.companyId };
 
-        // Filters
+        // 1. Filters
         if (req.query.type) {
             if (req.query.type === 'accessory' || req.query.type === 'accessories') {
                 query.type = { $in: ['accessory', 'accessories'] };
@@ -62,25 +62,55 @@ exports.getImports = async (req, res) => {
                 query.type = req.query.type;
             }
         }
-        if (req.query.branch) query.branch = req.query.branch;
-        if (req.query.status && req.query.status !== 'all') query.status = req.query.status;
-
-        // Role-based access
-        if (req.user.role === 'staff' && !isStock) {
-            query.branch = req.user.branch; // Staff sees only their branch
+        if (req.query.branch && req.query.branch !== 'all') {
+            query.branch = req.query.branch;
         }
-        // Stock/Admin sees all (optionally filtered by branch in query)
+        if (req.query.status && req.query.status !== 'all') {
+            query.status = req.query.status;
+        }
 
-        console.log('DEBUG: getImports User:', req.user.username, req.user.role, req.user.department);
-        console.log('DEBUG: getImports Query:', query);
+        // 2. Date Filter
+        if (req.query.startDate || req.query.endDate) {
+            query.createdAt = {};
+            if (req.query.startDate) {
+                const start = new Date(req.query.startDate);
+                start.setHours(0, 0, 0, 0);
+                query.createdAt.$gte = start;
+            }
+            if (req.query.endDate) {
+                const end = new Date(req.query.endDate);
+                end.setHours(23, 59, 59, 999);
+                query.createdAt.$lte = end;
+            }
+        }
+
+        // 3. Role-based access
+        if (req.user.role === 'staff' && !isStock) {
+            query.branch = req.user.branch;
+        }
+
+        // 4. Pagination
+        const page = parseInt(req.query.page, 10) || 1;
+        const limit = parseInt(req.query.limit, 10) || 20; // Default 20
+        const startIndex = (page - 1) * limit;
+
+        const total = await ImportRequest.countDocuments(query);
 
         const imports = await ImportRequest.find(query)
             .populate('createdBy', 'name')
-            .sort({ createdAt: -1 });
+            .sort({ createdAt: -1 })
+            .skip(startIndex)
+            .limit(limit);
 
-        console.log('DEBUG: Found imports:', imports.length);
+        res.status(200).json({
+            success: true,
+            count: imports.length,
+            total,
+            page,
+            totalPages: Math.ceil(total / limit),
+            data: imports
+        });
 
-        res.status(200).json(imports);
     } catch (error) {
         console.error('Get Imports Error:', error);
         res.status(500).json({ message: 'Server Error' });
@@ -104,5 +134,27 @@ exports.updateImportStatus = async (req, res) => {
     } catch (error) {
         console.error('Update Import Status Error:', error);
         res.status(500).json({ message: 'Server Error' });
+    }
+};
+
+
+// @desc    Delete import request
+exports.deleteImport = async (req, res) => {
+    try {
+        const importRequest = await ImportRequest.findById(req.params.id);
+
+        if (!importRequest) {
+            return res.status(404).json({ message: 'Request not found' });
+        }
+
+        // Optional: Check permissions (e.g., only Admin or Creator)
+        // For now, assuming middleware handles role check
+
+        await importRequest.deleteOne(); // Use deleteOne() for Mongoose v6+
+
+        res.status(200).json({ message: 'Import request removed' });
+    } catch (error) {
+        console.error('Delete Import Error:', error);
+        res.status(500).json({ message: 'Server Error', error: error.message });
     }
 };

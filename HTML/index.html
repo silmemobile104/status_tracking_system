@@ -689,14 +689,18 @@
                     </div>
                 </div>
 
-                <!-- Import Notification View -->
+                <!-- Import Notification View (Theme: Yellow / Black) -->
                 <div id="import-view" class="hidden space-y-6 mt-6">
                     <!-- Header -->
                     <div
-                        class="bg-white rounded-2xl p-6 shadow-sm border border-slate-100 flex flex-col md:flex-row justify-between items-center gap-4">
-                        <div class="flex items-center gap-4">
-                            <div
-                                class="p-3 bg-gradient-to-br from-blue-400 to-indigo-600 text-white rounded-xl shadow-lg shadow-indigo-500/30">
+                        class="bg-white rounded-3xl p-6 shadow-sm border border-slate-100 flex flex-col md:flex-row justify-between items-center gap-4 relative overflow-hidden">
+                        <!-- Decorative bg -->
+                        <div
+                            class="absolute top-0 right-0 w-32 h-32 bg-yellow-400 opacity-10 rounded-full blur-3xl -mr-10 -mt-10">
+                        </div>
+
+                        <div class="flex items-center gap-4 relative z-10">
+                            <div class="p-3 bg-slate-900 text-yellow-400 rounded-2xl shadow-lg shadow-slate-900/20">
                                 <ion-icon name="cloud-upload" class="text-2xl"></ion-icon>
                             </div>
                             <div>
@@ -710,334 +714,654 @@
                     <div class="bg-white rounded-2xl shadow-sm border border-slate-100 p-2 overflow-x-auto">
                         <div class="flex space-x-2 md:space-x-4 min-w-max">
                             <button onclick="switchImportTab('phone')" id="tab-btn-phone"
-                                class="flex items-center px-4 py-3 rounded-xl text-sm font-semibold transition-all bg-indigo-50 text-indigo-600 ring-2 ring-indigo-100">
+                                class="flex items-center px-6 py-3 rounded-xl text-sm font-bold transition-all bg-yellow-400 text-slate-900 shadow-md shadow-yellow-400/30">
                                 <ion-icon name="phone-portrait-outline" class="mr-2 text-lg"></ion-icon>
                                 นำเข้าโทรศัพท์ (Excel)
                             </button>
                             <button onclick="switchImportTab('accessory')" id="tab-btn-accessory"
-                                class="flex items-center px-4 py-3 rounded-xl text-sm font-semibold text-slate-500 hover:bg-slate-50 transition-all">
+                                class="flex items-center px-6 py-3 rounded-xl text-sm font-bold text-slate-500 hover:bg-slate-50 transition-all">
                                 <ion-icon name="headset-outline" class="mr-2 text-lg"></ion-icon>
                                 นำเข้า Accessories (รูปภาพ)
                             </button>
                         </div>
                     </div>
 
-                    <!-- Phone Import Section -->
-                    <div id="tab-import-phone" class="space-y-6 animate-fade-in">
-                        <!-- Upload Card -->
-                        <div class="bg-white rounded-2xl shadow-sm border border-slate-100 p-6">
-                            <h4 class="text-lg font-bold text-slate-800 mb-4 flex items-center">
-                                <ion-icon name="document-attach-outline" class="mr-2 text-indigo-500"></ion-icon>
-                                อัปโหลดไฟล์รายการ (Excel)
-                            </h4>
-                            <form id="phone-import-form" class="space-y-4">
-                                <div
-                                    class="border-2 border-dashed border-slate-200 rounded-xl p-8 text-center hover:bg-slate-50 transition-all cursor-pointer relative group">
-                                    <input type="file" id="phone-import-file" accept=".xlsx, .xls"
-                                        class="absolute inset-0 w-full h-full opacity-0 cursor-pointer text-sm">
-                                    <div class="flex flex-col items-center pointer-events-none">
-                                        <div
-                                            class="p-4 bg-indigo-50 text-indigo-500 rounded-full mb-3 group-hover:scale-110 transition-transform">
-                                            <ion-icon name="cloud-upload" class="text-3xl"></ion-icon>
-                                        </div>
-                                        <p class="font-medium text-slate-700">คลิกเพื่อเลือกไฟล์ หรือลากไฟล์มาวางที่นี่
-                                        </p>
-                                        <p class="text-xs text-slate-400 mt-1">รองรับไฟล์ .xlsx, .xls</p>
-                                        <p id="file-name-display" class="mt-4 text-sm font-semibold text-indigo-600">
-                                        </p>
-                                    </div>
-                                </div>
-                        </div>
+                    <!-- (*** New: Filter Toolbar ***) -->
+                    <div
+                        class="bg-white rounded-2xl shadow-sm border border-slate-100 p-4 mb-6 flex flex-col md:flex-row gap-4 items-center justify-between">
+                        <div class="flex items-center gap-4 w-full md:w-auto flex-1">
+                            <div class="relative w-full md:w-64">
+                                <ion-icon name="search"
+                                    class="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"></ion-icon>
+                                <input type="text" id="import-filter-search" oninput="renderImportLists()"
+                                    class="w-full pl-10 pr-4 py-2 rounded-xl border border-slate-200 focus:border-yellow-400 focus:ring-2 focus:ring-yellow-100 outline-none text-sm font-bold text-slate-700 transition-all"
+                                    placeholder="ค้นหา Supplier, สาขา...">
+                            </div>
 
-                        <!-- (*** เพิ่ม: ช่องรายละเอียด ***) -->
-                        <div>
-                            <label class="block text-sm font-semibold text-slate-700 mb-1">รายละเอียดเพิ่มเติม</label>
-                            <textarea id="phone-import-description" rows="2" class="form-input-theme resize-none"
-                                placeholder="ระบุรายละเอียด (ถ้ามี) เช่น ล็อตสินค้า, หมายเหตุ..."></textarea>
+                            <div class="flex items-center gap-2">
+                                <ion-icon name="filter" class="text-slate-400"></ion-icon>
+                                <select id="import-filter-status" onchange="renderImportLists()"
+                                    class="pl-2 pr-8 py-2 rounded-xl border border-slate-200 focus:border-yellow-400 focus:ring-2 focus:ring-yellow-100 outline-none text-sm font-bold text-slate-700 bg-white cursor-pointer">
+                                    <option value="all">สถานะทั้งหมด</option>
+                                    <option value="pending">รอนำเข้า</option>
+                                    <option value="importing">กำลังนำเข้า</option>
+                                    <option value="received">สำเร็จ</option>
+                                </select>
+                            </div>
                         </div>
-                        <div class="flex justify-end">
-                            <button type="submit"
-                                class="bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-2.5 rounded-xl font-semibold shadow-lg shadow-indigo-600/30 transition-all flex items-center">
-                                <ion-icon name="paper-plane" class="mr-2"></ion-icon>
-                                ส่งแจ้งนำเข้า
-                            </button>
+                        <div class="text-xs text-slate-400 font-bold" id="import-count-display">
+                            ทั้งหมด 0 รายการ
                         </div>
-                        </form>
                     </div>
 
-                    <!-- History List -->
-                    <div class="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
-                        <div class="p-6 border-b border-slate-100">
-                            <h4 class="text-lg font-bold text-slate-800">ประวัติการแจ้งนำเข้า (โทรศัพท์)</h4>
+                    <!-- Phone Import Section -->
+                    <div id="tab-import-phone" class="space-y-6 animate-fade-in">
+                        <!-- Upload Button Area -->
+                        <div
+                            class="bg-white rounded-3xl shadow-sm border border-slate-100 p-8 flex flex-col md:flex-row justify-between items-center gap-6">
+                            <div>
+                                <h4 class="text-xl font-bold text-slate-800 flex items-center gap-3">
+                                    <div
+                                        class="w-10 h-10 rounded-xl bg-yellow-100 text-yellow-600 flex items-center justify-center">
+                                        <ion-icon name="document-text"></ion-icon>
+                                    </div>
+                                    รายการนำเข้าโทรศัพท์
+                                </h4>
+                                <p class="text-slate-500 mt-1 pl-[3.25rem]">สร้างรายการนำเข้าใหม่โดยการอัปโหลดไฟล์ Excel
+                                </p>
+                            </div>
+                            <button onclick="openPhoneImportModal()"
+                                class="bg-slate-900 hover:bg-black text-yellow-400 px-6 py-3 rounded-xl font-bold shadow-lg hover:shadow-xl hover:-translate-y-0.5 transition-all flex items-center gap-2 group">
+                                <div
+                                    class="p-1 bg-yellow-400 text-slate-900 rounded-lg group-hover:scale-110 transition-transform">
+                                    <ion-icon name="add"></ion-icon>
+                                </div>
+                                <span>เพิ่มรายการนำเข้า</span>
+                            </button>
                         </div>
+
+                        <!-- (*** New: Phone Import Modal ***) -->
+                        <div id="phoneImportModal" class="modal fixed inset-0 z-50 items-center justify-center p-4">
+                            <div
+                                class="modal-content relative w-full max-w-lg bg-white rounded-3xl shadow-2xl overflow-hidden ring-4 ring-yellow-400/20 transform transition-all scale-100">
+                                <!-- Header -->
+                                <div
+                                    class="bg-slate-900 p-6 flex justify-between items-center text-white relative overflow-hidden">
+                                    <div
+                                        class="absolute top-0 right-0 w-24 h-24 bg-yellow-400 rounded-full opacity-10 blur-xl -mr-10 -mt-10">
+                                    </div>
+                                    <h3 class="text-xl font-bold flex items-center gap-3 relative z-10">
+                                        <div
+                                            class="p-2 bg-yellow-400 text-slate-900 rounded-lg shadow-lg shadow-yellow-400/50">
+                                            <ion-icon name="cloud-upload"></ion-icon>
+                                        </div>
+                                        <span class="text-white tracking-wide">นำเข้าไฟล์ Excel</span>
+                                    </h3>
+                                    <button onclick="closeModal('phoneImportModal')"
+                                        class="hover:bg-white/10 p-2 rounded-full transition-colors relative z-10 text-slate-400 hover:text-white">
+                                        <ion-icon name="close" class="text-2xl"></ion-icon>
+                                    </button>
+                                </div>
+
+                                <!-- Form Body -->
+                                <div class="p-8">
+                                    <form id="phone-import-form" class="space-y-6">
+                                        <!-- File Input -->
+                                        <div>
+                                            <label class="block text-sm font-bold text-slate-700 mb-2">เลือกไฟล์ Excel
+                                                (.xlsx, .xls)</label>
+                                            <div
+                                                class="border-2 border-dashed border-slate-200 rounded-2xl p-6 text-center hover:bg-slate-50 hover:border-yellow-400 transition-all cursor-pointer relative group bg-slate-50/30">
+                                                <input type="file" id="phone-import-file" accept=".xlsx, .xls"
+                                                    class="absolute inset-0 w-full h-full opacity-0 cursor-pointer text-sm">
+                                                <div class="flex flex-col items-center pointer-events-none">
+                                                    <ion-icon name="document-text-outline"
+                                                        class="text-3xl text-slate-300 mb-2 group-hover:text-yellow-500 transition-colors"></ion-icon>
+                                                    <p class="font-bold text-slate-600 text-sm">คลิกเลือกไฟล์</p>
+                                                    <p id="file-name-display"
+                                                        class="mt-2 text-xs font-bold text-yellow-600 bg-yellow-50 px-3 py-1 rounded-lg hidden">
+                                                    </p>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <!-- Supplier Input -->
+                                        <div>
+                                            <label class="block text-sm font-bold text-slate-700 mb-2">Supplier
+                                                (แหล่งที่มา)</label>
+                                            <input type="text" id="phone-import-supplier" class="form-input-theme"
+                                                required placeholder="เช่น Samsung Thailand, Com7...">
+                                        </div>
+
+                                        <!-- Description Input -->
+                                        <div>
+                                            <label
+                                                class="block text-sm font-bold text-slate-700 mb-2">รายละเอียดเพิ่มเติม</label>
+                                            <textarea id="phone-import-description" rows="2"
+                                                class="form-input-theme resize-none"
+                                                placeholder="ระบุรายละเอียด (ถ้ามี)..."></textarea>
+                                        </div>
+
+                                        <!-- Submit Button -->
+                                        <div class="pt-2">
+                                            <button type="submit"
+                                                class="w-full bg-slate-900 hover:bg-black text-yellow-400 py-3 rounded-xl font-bold shadow-lg hover:shadow-xl hover:-translate-y-0.5 transition-all flex items-center justify-center gap-2">
+                                                <ion-icon name="checkmark-circle"></ion-icon>
+                                                ยืนยันการนำเข้า
+                                            </button>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- History List -->
+                        <div class="bg-white rounded-3xl shadow-sm border border-slate-100 overflow-hidden">
+                            <div class="p-6 border-b border-slate-100 bg-slate-50/50">
+                                <h4 class="text-lg font-bold text-slate-800">ประวัติการแจ้งนำเข้า (โทรศัพท์)</h4>
+                            </div>
+                            <div class="overflow-x-auto">
+                                <table class="w-full">
+                                    <thead class="bg-white border-b border-slate-100">
+                                        <tr>
+                                            <th
+                                                class="px-6 py-4 text-left text-xs font-bold text-slate-400 uppercase tracking-wider">
+                                                วันที่แจ้ง</th>
+                                            <th
+                                                class="px-6 py-4 text-left text-xs font-bold text-slate-400 uppercase tracking-wider">
+                                                ไฟล์แนบ</th>
+                                            <th
+                                                class="px-6 py-4 text-left text-xs font-bold text-slate-400 uppercase tracking-wider">
+                                                Supplier</th> <!-- (New Header) -->
+                                            <th
+                                                class="px-6 py-4 text-left text-xs font-bold text-slate-400 uppercase tracking-wider">
+                                                สาขา</th>
+                                            <th
+                                                class="px-6 py-4 text-left text-xs font-bold text-slate-400 uppercase tracking-wider">
+                                                สถานะ</th>
+                                            <th
+                                                class="px-6 py-4 text-left text-xs font-bold text-slate-400 uppercase tracking-wider">
+                                                ผู้แจ้ง</th>
+                                            <th
+                                                class="px-6 py-4 text-center text-xs font-bold text-slate-400 uppercase tracking-wider">
+                                                จัดการ</th> <!-- (New) -->
+                                        </tr>
+                                    </thead>
+                                    <tbody id="phone-import-list" class="divide-y divide-slate-100">
+                                        <!-- Items will be injected here -->
+                                        <tr>
+                                            <td colspan="5" class="px-6 py-10 text-center text-slate-400">
+                                                กำลังโหลดข้อมูล...</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Accessory Import Section -->
+                    <div id="tab-import-accessory" class="hidden space-y-6 animate-fade-in">
+                        <!-- Top Bar with Button -->
+                        <div class="col-span-full">
+                            <div
+                                class="bg-white rounded-3xl shadow-sm border border-slate-100 p-8 flex flex-col md:flex-row justify-between items-center gap-6">
+                                <div>
+                                    <h4 class="text-xl font-bold text-slate-800 flex items-center gap-3">
+                                        <div
+                                            class="w-10 h-10 rounded-xl bg-slate-900 text-yellow-400 flex items-center justify-center shadow-lg shadow-slate-900/20">
+                                            <ion-icon name="headset"></ion-icon>
+                                        </div>
+                                        รายการนำเข้า Accessories
+                                    </h4>
+                                    <p class="text-slate-500 mt-1 pl-[3.25rem]">
+                                        จัดการรายการนำเข้าสินค้าประเภทอุปกรณ์เสริม</p>
+                                </div>
+                                <button onclick="openAccessoryImportModal()"
+                                    class="bg-slate-900 hover:bg-black text-white px-6 py-3 rounded-xl font-bold shadow-lg hover:shadow-xl hover:-translate-y-0.5 transition-all flex items-center gap-2 group">
+                                    <div class="p-1 bg-white/20 rounded-lg group-hover:scale-110 transition-transform">
+                                        <ion-icon name="add"></ion-icon>
+                                    </div>
+                                    <span>เพิ่มรายการ (บิล)</span>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Full Width List -->
+                        <div class="col-span-full">
+                            <div
+                                class="bg-white rounded-3xl shadow-sm border border-slate-100 overflow-hidden h-full flex flex-col">
+                                <div
+                                    class="p-6 border-b border-slate-100 flex justify-between items-center bg-slate-50/50">
+                                    <h4 class="text-lg font-bold text-slate-800">ประวัติการนำเข้า Accessories</h4>
+                                </div>
+                                <div class="p-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 flex-grow overflow-y-auto max-h-[600px] custom-scrollbar"
+                                    id="accessory-import-list">
+                                    <!-- Accessor Cards Injected Here -->
+                                    <div class="col-span-full py-12 text-center text-slate-400">กำลังโหลดข้อมูล...</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- (*** New: Accessory Import Modal (Multi-Item) ***) -->
+                    <div id="accImportModal" class="modal fixed inset-0 z-50 items-center justify-center p-4">
+                        <div
+                            class="modal-content relative w-full h-full max-w-4xl max-h-[90vh] bg-white rounded-3xl shadow-2xl overflow-hidden ring-4 ring-slate-900/10 flex flex-col transform transition-all scale-100">
+                            <!-- Header -->
+                            <div
+                                class="bg-slate-900 p-6 flex justify-between items-center text-white flex-shrink-0 relative overflow-hidden">
+                                <div
+                                    class="absolute top-0 right-0 w-32 h-32 bg-white/5 rounded-full blur-2xl -mr-10 -mt-10">
+                                </div>
+                                <h3 class="text-xl font-bold flex items-center gap-3 relative z-10">
+                                    <div class="p-2 bg-white/10 rounded-lg backdrop-blur-sm">
+                                        <ion-icon name="receipt-outline"></ion-icon>
+                                    </div>
+                                    <span class="tracking-wide">บันทึกบิลนำเข้า (Accessories)</span>
+                                </h3>
+                                <button onclick="closeModal('accImportModal')"
+                                    class="hover:bg-white/10 p-2 rounded-full transition-colors text-slate-400 hover:text-white relative z-10">
+                                    <ion-icon name="close" class="text-2xl"></ion-icon>
+                                </button>
+                            </div>
+
+                            <!-- Body (Scrollable) -->
+                            <div class="flex-1 overflow-y-auto custom-scrollbar p-8 bg-slate-50">
+                                <form id="accessory-import-form-multi" class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+                                    <!-- Left Column: Bill Image & Info -->
+                                    <div class="lg:col-span-4 space-y-6">
+                                        <div
+                                            class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 sticky top-0">
+                                            <h5 class="font-bold text-slate-800 mb-4 flex items-center gap-2">
+                                                <ion-icon name="image" class="text-yellow-500"></ion-icon>
+                                                ข้อมูลบิล
+                                            </h5>
+
+                                            <div class="space-y-4">
+                                                <!-- Image Upload -->
+                                                <div>
+                                                    <label
+                                                        class="block text-xs font-bold text-slate-500 mb-2 uppercase">รูปถ่ายบิลสินค้า</label>
+                                                    <div
+                                                        class="border-2 border-dashed border-slate-200 rounded-xl p-2 text-center hover:bg-slate-50 hover:border-yellow-400 transition-all cursor-pointer relative bg-slate-50/50 group h-48 flex items-center justify-center">
+                                                        <input type="file" id="acc-bill-image" accept="image/*"
+                                                            class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
+                                                            onchange="previewImage(this)">
+                                                        <div id="image-preview-placeholder"
+                                                            class="flex flex-col items-center pointer-events-none transition-opacity">
+                                                            <div
+                                                                class="w-12 h-12 rounded-full bg-slate-100 flex items-center justify-center mb-2 group-hover:bg-yellow-100 group-hover:text-yellow-600 transition-colors">
+                                                                <ion-icon name="camera"
+                                                                    class="text-2xl text-slate-400 group-hover:text-yellow-600"></ion-icon>
+                                                            </div>
+                                                            <span
+                                                                class="text-xs font-bold text-slate-400">คลิกอัปโหลด</span>
+                                                        </div>
+                                                        <img id="image-preview" src=""
+                                                            class="hidden w-full h-full object-contain rounded-lg relative z-0">
+                                                    </div>
+                                                </div>
+
+                                                <!-- Date & Supplier -->
+                                                <div>
+                                                    <label
+                                                        class="block text-xs font-bold text-slate-500 mb-1 uppercase">วันที่ในบิล</label>
+                                                    <input type="date" id="acc-bill-date"
+                                                        class="form-input-theme w-full" required>
+                                                </div>
+                                                <div>
+                                                    <label
+                                                        class="block text-xs font-bold text-slate-500 mb-1 uppercase">Supplier
+                                                        (ร้านที่ซื้อ)</label>
+                                                    <input type="text" id="acc-bill-supplier"
+                                                        class="form-input-theme w-full" placeholder="ระบุร้านค้า...">
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Right Column: Items List -->
+                                    <div class="lg:col-span-8 space-y-6">
+                                        <div class="flex justify-between items-center">
+                                            <h5 class="font-bold text-slate-800 flex items-center gap-2">
+                                                <ion-icon name="list" class="text-blue-500"></ion-icon>
+                                                รายการสินค้าในบิล
+                                            </h5>
+                                            <button type="button" onclick="addAccessoryItemRow()"
+                                                class="text-sm font-bold text-blue-600 bg-blue-50 hover:bg-blue-100 px-3 py-2 rounded-lg transition-colors flex items-center gap-1">
+                                                <ion-icon name="add-circle"></ion-icon> เพิ่มสินค้า
+                                            </button>
+                                        </div>
+
+                                        <!-- Items Container -->
+                                        <div id="acc-items-container" class="space-y-3">
+                                            <!-- Dynamic Rows will be added here -->
+                                        </div>
+
+                                        <!-- Empty State Helper -->
+                                        <div id="acc-items-empty"
+                                            class="text-center py-10 border-2 border-dashed border-slate-200 rounded-2xl bg-slate-50/50">
+                                            <ion-icon name="basket-outline"
+                                                class="text-4xl text-slate-300 mb-2"></ion-icon>
+                                            <p class="text-slate-400 text-sm">ยังไม่มีรายการสินค้า</p>
+                                            <button type="button" onclick="addAccessoryItemRow()"
+                                                class="mt-2 text-xs font-bold text-blue-500 hover:underline">คลิกเพื่อเพิ่มสินค้าแรก</button>
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
+
+                            <!-- Footer -->
+                            <div
+                                class="bg-white p-6 border-t border-slate-100 flex justify-between items-center flex-shrink-0 z-20">
+                                <div class="text-sm text-slate-500">
+                                    จำนวนรายการ: <span id="acc-total-items-count"
+                                        class="font-bold text-slate-900">0</span>
+                                </div>
+                                <div class="flex gap-3">
+                                    <button type="button" onclick="closeModal('accImportModal')"
+                                        class="px-6 py-2.5 rounded-xl text-slate-500 font-bold hover:bg-slate-50 transition-colors">ยกเลิก</button>
+                                    <button type="button" onclick="submitAccessoryImport()"
+                                        class="bg-slate-900 hover:bg-black text-yellow-400 px-8 py-2.5 rounded-xl font-bold shadow-lg hover:shadow-xl hover:-translate-y-0.5 transition-all flex items-center gap-2">
+                                        <ion-icon name="checkmark-circle"></ion-icon>
+                                        บันทึกทั้งหมด
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- List -->
+                    <div class="lg:col-span-2">
+                        <div
+                            class="bg-white rounded-3xl shadow-sm border border-slate-100 overflow-hidden h-full flex flex-col">
+                            <div class="p-6 border-b border-slate-100 flex justify-between items-center bg-slate-50/50">
+                                <h4 class="text-lg font-bold text-slate-800">รายการ Accessories ล่าสุด</h4>
+                            </div>
+                            <div class="p-6 grid grid-cols-1 sm:grid-cols-2 gap-4 flex-grow overflow-y-auto max-h-[600px] custom-scrollbar"
+                                id="accessory-import-list">
+                                <!-- Accessor Cards Injected Here -->
+                                <div class="col-span-full py-12 text-center text-slate-400">กำลังโหลดข้อมูล...
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div id="stock-import-view" class="hidden space-y-8 mt-8 animate-fade-in pb-20">
+                <!-- 1. Header & Stats Section -->
+                <div
+                    class="relative bg-white rounded-[2rem] p-8 shadow-xl shadow-slate-200/50 border border-slate-100 overflow-visible">
+                    <!-- Decorative Background Elements -->
+                    <div
+                        class="absolute -top-10 -right-10 w-64 h-64 bg-indigo-500/10 rounded-full blur-3xl mix-blend-multiply">
+                    </div>
+                    <div
+                        class="absolute -bottom-10 -left-10 w-64 h-64 bg-yellow-400/10 rounded-full blur-3xl mix-blend-multiply">
+                    </div>
+
+                    <div
+                        class="relative z-10 flex flex-col lg:flex-row justify-between items-start lg:items-center gap-8">
+                        <!-- Title Area -->
+                        <div class="flex items-center gap-6">
+                            <div
+                                class="w-20 h-20 bg-gradient-to-br from-indigo-600 to-violet-700 rounded-2xl text-white flex items-center justify-center shadow-lg shadow-indigo-600/30 transform -rotate-3 hover:rotate-0 transition-all duration-300">
+                                <ion-icon name="cube" class="text-4xl drop-shadow-md"></ion-icon>
+                            </div>
+                            <div>
+                                <h3 class="text-3xl font-extrabold text-slate-800 tracking-tight">Stock Management</h3>
+                                <p class="text-slate-500 font-medium mt-1 flex items-center gap-2">
+                                    <span class="w-1.5 h-1.5 rounded-full bg-green-500"></span>
+                                    จัดการรายการนำเข้าสินค้าจากสาขา
+                                </p>
+                            </div>
+                        </div>
+
+                        <!-- Stats Cards Group -->
+                        <div class="grid grid-cols-3 gap-4 w-full lg:w-auto">
+                            <!-- All -->
+                            <div
+                                class="bg-slate-50 border border-slate-100 p-4 rounded-2xl text-center min-w-[100px] hover:bg-white hover:shadow-md transition-all group">
+                                <p
+                                    class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-1 group-hover:text-indigo-600 transition-colors">
+                                    ทั้งหมด</p>
+                                <p id="stat-stock-all"
+                                    class="text-2xl font-black text-slate-700 group-hover:scale-110 transition-transform">
+                                    0</p>
+                            </div>
+                            <!-- Pending -->
+                            <div class="bg-yellow-50 border border-yellow-100 p-4 rounded-2xl text-center min-w-[100px] hover:bg-yellow-100 hover:shadow-md transition-all group cursor-pointer"
+                                onclick="filterStockImports('pending')">
+                                <p class="text-xs font-bold text-yellow-600 uppercase tracking-wider mb-1">รอนำเข้า</p>
+                                <p id="stat-stock-pending"
+                                    class="text-2xl font-black text-yellow-600 group-hover:scale-110 transition-transform">
+                                    0</p>
+                            </div>
+                            <!-- Importing -->
+                            <div class="bg-blue-50 border border-blue-100 p-4 rounded-2xl text-center min-w-[100px] hover:bg-blue-100 hover:shadow-md transition-all group cursor-pointer"
+                                onclick="filterStockImports('importing')">
+                                <p class="text-xs font-bold text-blue-600 uppercase tracking-wider mb-1">กำลังนำเข้า</p>
+                                <p id="stat-stock-importing"
+                                    class="text-2xl font-black text-blue-600 group-hover:scale-110 transition-transform">
+                                    0</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 2. Controls & Filters Toolbar -->
+                <div
+                    class="sticky top-4 z-30 bg-white/80 backdrop-blur-xl p-2 rounded-2xl shadow-lg border border-slate-200/60 flex flex-col md:flex-row gap-4 items-center justify-between transition-all">
+                    <!-- Type Toggle Switch (Pill Shape) -->
+                    <div class="bg-slate-100 p-1.5 rounded-xl flex gap-1 w-full md:w-auto">
+                        <button onclick="filterStockType('phone')" id="tab-stock-phone"
+                            class="flex-1 md:flex-none px-6 py-2.5 rounded-lg text-sm font-bold flex items-center justify-center gap-2 transition-all shadow-sm bg-white text-indigo-600 ring-1 ring-black/5">
+                            <ion-icon name="phone-portrait" class="text-lg"></ion-icon> Phone (Excel)
+                        </button>
+                        <button onclick="filterStockType('accessory')" id="tab-stock-accessory"
+                            class="flex-1 md:flex-none px-6 py-2.5 rounded-lg text-sm font-bold flex items-center justify-center gap-2 transition-all text-slate-500 hover:text-slate-700 hover:bg-slate-200/50">
+                            <ion-icon name="headset" class="text-lg"></ion-icon> Accessories
+                        </button>
+                        <button onclick="filterStockType('all')" id="tab-stock-all"
+                            class="flex-1 md:flex-none px-4 py-2.5 rounded-lg text-sm font-bold flex items-center justify-center gap-2 transition-all text-slate-500 hover:text-slate-700 hover:bg-slate-200/50 hidden">
+                            รวม
+                        </button>
+                    </div>
+
+                    <!-- Filters Group -->
+                    <div class="flex items-center gap-3 w-full md:w-auto overflow-x-auto pb-1 md:pb-0 px-1">
+                        <!-- Branch Select -->
+                        <div class="relative group">
+                            <ion-icon name="storefront"
+                                class="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 group-hover:text-indigo-500 transition-colors"></ion-icon>
+                            <select id="stock-import-branch-filter"
+                                class="pl-9 pr-8 py-2.5 rounded-xl border border-slate-200 bg-white text-sm font-bold text-slate-700 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none cursor-pointer hover:border-indigo-300 transition-colors shadow-sm appearance-none min-w-[160px]">
+                                <option value="all">🏢 ทุกสาขา (All)</option>
+                                <!-- JS Populated -->
+                            </select>
+                            <ion-icon name="chevron-down"
+                                class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none text-xs"></ion-icon>
+                        </div>
+
+                        <!-- Status Filter (Dropdown Style) -->
+                        <div class="relative group">
+                            <ion-icon name="filter"
+                                class="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 group-hover:text-indigo-500 transition-colors"></ion-icon>
+                            <select id="stock-import-status-filter" onchange="filterStockImports(this.value)"
+                                class="pl-9 pr-8 py-2.5 rounded-xl border border-slate-200 bg-white text-sm font-bold text-slate-700 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none cursor-pointer hover:border-indigo-300 transition-colors shadow-sm appearance-none">
+                                <option value="all">สถานะทั้งหมด</option>
+                                <option value="pending">🟡 รอนำเข้า</option>
+                                <option value="importing">🔵 กำลังนำเข้า</option>
+                                <option value="received">🟢 สำเร็จ</option>
+                                <option value="rejected">🔴 ยกเลิก</option>
+                            </select>
+                            <ion-icon name="chevron-down"
+                                class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none text-xs"></ion-icon>
+                        </div>
+
+                        <!-- Date Range Filters -->
+                        <div class="h-8 w-px bg-slate-200 mx-1 hidden md:block"></div>
+                        <div class="flex items-center gap-2">
+                            <div class="relative group">
+                                <ion-icon name="calendar-outline"
+                                    class="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"></ion-icon>
+                                <input type="text" onfocus="(this.type='date')" onblur="(this.type='text')"
+                                    id="stock-filter-date-start" placeholder="วันเริ่มต้น"
+                                    class="pl-9 pr-2 py-2.5 rounded-xl border border-slate-200 bg-white text-sm font-bold text-slate-700 focus:ring-2 focus:ring-indigo-500 outline-none w-32 shadow-sm"
+                                    onchange="fetchStockImports()">
+                            </div>
+                            <span class="text-slate-300">-</span>
+                            <div class="relative group">
+                                <ion-icon name="calendar-outline"
+                                    class="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"></ion-icon>
+                                <input type="text" onfocus="(this.type='date')" onblur="(this.type='text')"
+                                    id="stock-filter-date-end" placeholder="วันสิ้นสุด"
+                                    class="pl-9 pr-2 py-2.5 rounded-xl border border-slate-200 bg-white text-sm font-bold text-slate-700 focus:ring-2 focus:ring-indigo-500 outline-none w-32 shadow-sm"
+                                    onchange="fetchStockImports()">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 3. Content Views Container -->
+                <div
+                    class="bg-white rounded-[2rem] shadow-sm border border-slate-200 min-h-[500px] overflow-hidden relative">
+                    <!-- Loading Overlay -->
+                    <div id="stock-loading"
+                        class="absolute inset-0 bg-white/80 backdrop-blur-sm z-20 flex flex-col items-center justify-center hidden">
+                        <div
+                            class="w-12 h-12 border-4 border-indigo-100 border-t-indigo-500 rounded-full animate-spin mb-4">
+                        </div>
+                        <p class="text-indigo-900 font-bold animate-pulse">กำลังโหลดข้อมูล...</p>
+                    </div>
+
+                    <!-- PHONE VIEW (Table) -->
+                    <div id="stock-view-phone" class="hidden animate-fade-in relative z-10">
                         <div class="overflow-x-auto">
-                            <table class="w-full">
-                                <thead class="bg-slate-50 border-b border-slate-100">
+                            <table class="min-w-full divide-y divide-slate-100">
+                                <thead class="bg-slate-50/80 backdrop-blur-sm sticky top-0 z-10">
                                     <tr>
-                                        <th class="px-6 py-4 text-left text-xs font-semibold text-slate-500">
-                                            วันที่แจ้ง</th>
-                                        <th class="px-6 py-4 text-left text-xs font-semibold text-slate-500">ไฟล์แนบ
-                                        </th>
-                                        <th class="px-6 py-4 text-left text-xs font-semibold text-slate-500">สาขา
-                                        </th>
-                                        <th class="px-6 py-4 text-left text-xs font-semibold text-slate-500">สถานะ
-                                        </th>
-                                        <th class="px-6 py-4 text-left text-xs font-semibold text-slate-500">ผู้แจ้ง
-                                        </th>
+                                        <th
+                                            class="px-6 py-5 text-left text-xs font-bold text-slate-500 uppercase tracking-wider">
+                                            🗓️ วันที่แจ้ง</th>
+                                        <th
+                                            class="px-6 py-5 text-left text-xs font-bold text-slate-500 uppercase tracking-wider">
+                                            🏪 สาขา / ผู้แจ้ง</th>
+                                        <th
+                                            class="px-6 py-5 text-left text-xs font-bold text-slate-500 uppercase tracking-wider">
+                                            📦 ข้อมูลสินค้า</th>
+                                        <th
+                                            class="px-6 py-5 text-left text-xs font-bold text-slate-500 uppercase tracking-wider">
+                                            📎 ไฟล์แนบ</th>
+                                        <th
+                                            class="px-6 py-5 text-center text-xs font-bold text-slate-500 uppercase tracking-wider">
+                                            สถานะ</th>
+                                        <th
+                                            class="px-6 py-5 text-right text-xs font-bold text-slate-500 uppercase tracking-wider">
+                                            จัดการ</th>
                                     </tr>
                                 </thead>
-                                <tbody id="phone-import-list" class="divide-y divide-slate-100">
-                                    <!-- Items will be injected here -->
+                                <tbody id="stock-phone-tbody" class="divide-y divide-slate-100 bg-white">
+                                    <!-- JS Injected -->
                                 </tbody>
                             </table>
                         </div>
                     </div>
-                </div>
 
-                <!-- Accessory Import Section -->
-                <div id="tab-import-accessory" class="hidden space-y-6 animate-fade-in">
-                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                        <!-- Form -->
-                        <div class="lg:col-span-1">
-                            <div class="bg-white rounded-2xl shadow-sm border border-slate-100 p-6">
-                                <h4 class="text-lg font-bold text-slate-800 mb-4 flex items-center">
-                                    <ion-icon name="create-outline" class="mr-2 text-pink-500"></ion-icon>
-                                    ข้อมูลสินค้า (Accessory)
-                                </h4>
-                                <form id="accessory-import-form" class="space-y-4">
-                                    <div>
-                                        <label
-                                            class="block text-sm font-semibold text-slate-700 mb-1">รูปภาพสินค้า</label>
-                                        <div class="border-2 border-dashed border-slate-200 rounded-xl p-4 text-center hover:bg-slate-50 transition-all cursor-pointer relative bg-slate-50/50"
-                                            style="min-height: 200px; display: flex; align-items: center; justify-content: center;">
-                                            <input type="file" id="acc-import-image" accept="image/*"
-                                                class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
-                                                onchange="previewImage(this)">
-                                            <div id="image-preview-placeholder" class="flex flex-col items-center">
-                                                <ion-icon name="image-outline"
-                                                    class="text-4xl text-slate-300 mb-2"></ion-icon>
-                                                <span class="text-sm text-slate-500">เลือกรูปภาพ</span>
-                                            </div>
-                                            <img id="image-preview" src=""
-                                                class="hidden max-h-48 rounded-lg object-contain relative z-0">
-                                        </div>
-                                    </div>
-                                    <div>
-                                        <label
-                                            class="block text-sm font-semibold text-slate-700 mb-1">ชื่อสินค้า</label>
-                                        <input type="text" id="acc-name" class="form-input-theme" required
-                                            placeholder="เช่น หูฟัง, เคส...">
-                                    </div>
-                                    <div>
-                                        <label
-                                            class="block text-sm font-semibold text-slate-700 mb-1">จำนวนนำเข้า</label>
-                                        <input type="number" id="acc-qty" class="form-input-theme" required min="1"
-                                            value="1">
-                                    </div>
-                                    <div>
-                                        <label
-                                            class="block text-sm font-semibold text-slate-700 mb-1">วันที่นำเข้า</label>
-                                        <input type="date" id="acc-date" class="form-input-theme" required>
-                                    </div>
-                                    <button type="submit"
-                                        class="w-full bg-pink-500 hover:bg-pink-600 text-white px-6 py-2.5 rounded-xl font-semibold shadow-lg shadow-pink-500/30 transition-all">
-                                        บันทึกรายการ
-                                    </button>
-                                </form>
-                            </div>
+                    <!-- ACCESSORY VIEW (Grid) -->
+                    <div id="stock-view-accessory" class="p-6 hidden animate-fade-in relative z-10">
+                        <div id="stock-acc-grid"
+                            class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                            <!-- JS Injected Cards -->
                         </div>
+                    </div>
 
-                        <!-- List -->
-                        <div class="lg:col-span-2">
-                            <div class="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden h-full">
-                                <div class="p-6 border-b border-slate-100 flex justify-between items-center">
-                                    <h4 class="text-lg font-bold text-slate-800">รายการ Accessories ล่าสุด</h4>
-                                </div>
-                                <div class="p-6 grid grid-cols-1 sm:grid-cols-2 gap-4" id="accessory-import-list">
-                                    <!-- Accessor Cards Injected Here -->
-                                </div>
-                            </div>
+                    <!-- Empty State (Common) -->
+                    <div id="stock-empty-state"
+                        class="hidden absolute inset-0 flex flex-col items-center justify-center text-center p-8 z-0">
+                        <div class="w-24 h-24 bg-slate-50 rounded-full flex items-center justify-center mb-6">
+                            <ion-icon name="file-tray-outline" class="text-5xl text-slate-300"></ion-icon>
+                        </div>
+                        <h4 class="text-xl font-bold text-slate-700">ไม่พบรายการนำเข้า</h4>
+                        <p class="text-slate-400 mt-2">ยังไม่มีการแจ้งนำเข้าในหมวดหมู่นี้ หรือสถานะที่เลือก</p>
+                    </div>
+
+                    <!-- Pagination Controls -->
+                    <div id="stock-pagination"
+                        class="hidden border-t border-slate-100 bg-slate-50 p-4 flex flex-col md:flex-row justify-between items-center gap-4 relative z-20">
+                        <div class="text-xs font-bold text-slate-500">
+                            แสดง <span id="pagination-info-start">0</span> - <span id="pagination-info-end">0</span> จาก
+                            <span id="pagination-info-total">0</span> รายการ
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <button id="btn-prev-page" onclick="changeStockPage(-1)" disabled
+                                class="p-2 rounded-lg bg-white border border-slate-200 text-slate-400 hover:text-indigo-600 hover:border-indigo-200 disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-sm">
+                                <ion-icon name="chevron-back"></ion-icon>
+                            </button>
+                            <span id="pagination-page-display"
+                                class="px-4 py-2 bg-white border border-slate-200 rounded-lg text-sm font-bold text-slate-700 shadow-sm">
+                                หน้า 1 / 1
+                            </span>
+                            <button id="btn-next-page" onclick="changeStockPage(1)" disabled
+                                class="p-2 rounded-lg bg-white border border-slate-200 text-slate-400 hover:text-indigo-600 hover:border-indigo-200 disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-sm">
+                                <ion-icon name="chevron-forward"></ion-icon>
+                            </button>
                         </div>
                     </div>
                 </div>
             </div>
+    </div>
+    </div>
 
-            <!-- Admin View -->
-            <div id="admin-view-content"
-                class="hidden bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
-                <div id="loading-users" class="text-center p-12 hidden">
-                    <div class="animate-spin rounded-full h-10 w-10 border-b-2 border-yellow-500 mx-auto mb-4">
-                    </div>
-                    <p class="text-slate-500">กำลังดึงข้อมูลผู้ใช้...</p>
-                </div>
-                <div
-                    class="p-6 border-b border-slate-100 flex flex-col sm:flex-row justify-between items-center bg-slate-50/50 gap-4">
-                    <div class="flex items-center gap-4">
-                        <h3 class="text-lg font-bold text-slate-800">รายชื่อผู้ใช้ในระบบ</h3>
-                        <span id="user-count"
-                            class="text-xs font-semibold text-slate-500 bg-white border border-slate-200 px-3 py-1 rounded-full shadow-sm">0
-                            คน</span>
-                    </div>
-                    <div class="relative w-full sm:w-64">
-                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                            <ion-icon name="search-outline" class="text-slate-400"></ion-icon>
-                        </div>
-                        <input type="text" id="user-search-input"
-                            class="block w-full pl-10 pr-3 py-2 border border-slate-200 rounded-xl leading-5 bg-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:border-yellow-400 sm:text-sm transition-shadow"
-                            placeholder="ค้นหาชื่อ หรือ Username...">
-                    </div>
-                </div>
-                <div class="overflow-x-auto">
-                    <table class="w-full min-w-lg">
-                        <thead class="bg-slate-50 border-b border-slate-100">
-                            <tr>
-                                <th
-                                    class="px-6 py-4 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">
-                                    ชื่อ-สกุล</th>
-                                <th
-                                    class="px-6 py-4 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">
-                                    Username</th>
-                                <th
-                                    class="px-6 py-4 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">
-                                    ตำแหน่ง</th>
-                                <th
-                                    class="px-6 py-4 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">
-                                    แผนก / สาขา</th>
-                                <th
-                                    class="px-6 py-4 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">
-                                    หัวหน้า</th>
-                                <th
-                                    class="px-6 py-4 text-right text-xs font-semibold text-slate-500 uppercase tracking-wider">
-                                    จัดการ</th>
-                            </tr>
-                        </thead>
-                        <tbody id="user-table-body" class="divide-y divide-slate-100">
-                            <tr id="no-user-row" class="text-center">
-                                <td colspan="6" class="px-6 py-12 text-slate-400">ไม่มีผู้ใช้ในระบบ</td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
+    <!-- Admin View -->
+    <div id="admin-view-content" class="hidden bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
+        <div id="loading-users" class="text-center p-12 hidden">
+            <div class="animate-spin rounded-full h-10 w-10 border-b-2 border-yellow-500 mx-auto mb-4">
             </div>
-
-            <!-- =============================================== -->
-            <!-- STOCK IMPORT MANAGEMENT VIEW (ใหม่) -->
-            <!-- =============================================== -->
-            <div id="stock-import-view" class="hidden animate-fade-in">
-                <!-- Modern Tabs -->
-                <div
-                    class="mb-6 bg-white p-1.5 rounded-2xl shadow-sm border border-slate-200 inline-flex flex-wrap gap-1">
-                    <button onclick="filterStockType('phone')" id="tab-stock-phone"
-                        class="px-6 py-2.5 rounded-xl text-sm font-bold text-slate-500 hover:text-slate-800 hover:bg-slate-50 transition-all flex items-center gap-2">
-                        <ion-icon name="phone-portrait-outline" class="text-lg"></ion-icon> โทรศัพท์
-                    </button>
-                    <button onclick="filterStockType('accessory')" id="tab-stock-accessory"
-                        class="px-6 py-2.5 rounded-xl text-sm font-bold text-slate-500 hover:text-slate-800 hover:bg-slate-50 transition-all flex items-center gap-2">
-                        <ion-icon name="headset-outline" class="text-lg"></ion-icon> Accessories
-                    </button>
-                </div>
-
-                <!-- Enhanced Filter Toolbar -->
-                <div
-                    class="mb-6 bg-white p-5 rounded-2xl shadow-sm border border-slate-200 flex flex-col xl:flex-row items-start xl:items-center justify-between gap-6">
-                    <!-- Left: Branch Filter -->
-                    <div class="flex items-center gap-4 w-full xl:w-auto">
-                        <div
-                            class="flex-shrink-0 w-10 h-10 bg-indigo-50 text-indigo-600 rounded-xl flex items-center justify-center">
-                            <ion-icon name="storefront" class="text-xl"></ion-icon>
-                        </div>
-                        <div class="w-full xl:w-72">
-                            <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-1.5">สาขา
-                                (Branch)</label>
-                            <select id="stock-import-branch-filter"
-                                class="form-select-theme py-2.5 pl-3 pr-10 text-sm shadow-none bg-slate-50 border-slate-200 focus:bg-white">
-                                <option value="all" selected>🏢 ทุกสาขา (All Branches)</option>
-                                <option value="ยะลา">ยะลา</option>
-                                <option value="นราธิวาส">นราธิวาส</option>
-                                <option value="หาดใหญ่">หาดใหญ่</option>
-                                <option value="หาดใหญ่2">หาดใหญ่2</option>
-                                <option value="ปัตตานี">ปัตตานี</option>
-                                <option value="โคลีเซียม">โคลีเซียม</option>
-                                <option value="สุราษฎร์ธานี">สุราษฎร์ธานี</option>
-                                <option value="ปากแมว">ปากแมว</option>
-                                <option value="ภูเก็ต">ภูเก็ต</option>
-                                <option value="นครศรีธรรมราช">นครศรีธรรมราช</option>
-                                <option value="กระบี่">กระบี่</option>
-                                <option value="กะทู้">กะทู้</option>
-                                <option value="ตรัง">ตรัง</option>
-                                <option value="คุรุ">คุรุ</option>
-                                <option value="ชุมพร">ชุมพร</option>
-                                <option value="สตูล">สตูล</option>
-                                <option value="พัทลุง">พัทลุง</option>
-                                <option value="สงขลา">สงขลา</option>
-                            </select>
-                        </div>
-                    </div>
-
-                    <!-- Right: Status Filters Pipeline -->
-                    <div class="w-full xl:w-auto overflow-x-auto pb-1">
-                        <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-1.5 px-1">สถานะ
-                            (Status)</label>
-                        <div class="flex bg-slate-100/80 p-1.5 rounded-xl gap-1 min-w-max" id="stock-import-filters">
-                            <button onclick="filterStockImports('pending')" id="filter-stock-pending"
-                                class="px-5 py-2 rounded-lg text-sm font-bold text-white bg-indigo-600 shadow-md ring-1 ring-slate-200 transition-all flex items-center gap-2">
-                                <div class="w-2 h-2 rounded-full bg-yellow-400 border border-white/30"></div>
-                                รอนำเข้า
-                            </button>
-                            <button onclick="filterStockImports('importing')" id="filter-stock-importing"
-                                class="px-5 py-2 rounded-lg text-sm font-bold text-slate-500 hover:text-slate-700 hover:bg-white/50 transition-all flex items-center gap-2">
-                                <div class="w-2 h-2 rounded-full bg-blue-500"></div> กำลังนำเข้า
-                            </button>
-                            <button onclick="filterStockImports('received')" id="filter-stock-received"
-                                class="px-5 py-2 rounded-lg text-sm font-bold text-slate-500 hover:text-slate-700 hover:bg-white/50 transition-all flex items-center gap-2">
-                                <div class="w-2 h-2 rounded-full bg-green-500"></div> นำเข้าแล้ว
-                            </button>
-                            <button onclick="filterStockImports('all')" id="filter-stock-all"
-                                class="px-5 py-2 rounded-lg text-sm font-bold text-slate-500 hover:text-slate-700 hover:bg-white/50 transition-all flex items-center gap-2">
-                                <ion-icon name="apps-outline"></ion-icon> ทั้งหมด
-                            </button>
-                        </div>
-                    </div>
-                </div>
-                <!-- Table Card -->
-                <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
-                    <div class="overflow-x-auto">
-                        <table class="min-w-full divide-y divide-slate-100">
-                            <thead class="bg-slate-50">
-                                <tr>
-                                    <th
-                                        class="px-6 py-4 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">
-                                        วันที่แจ้ง</th>
-                                    <th
-                                        class="px-6 py-4 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">
-                                        สาขา / ผู้แจ้ง</th>
-                                    <th
-                                        class="px-6 py-4 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">
-                                        รายการสินค้า</th>
-                                    <th
-                                        class="px-6 py-4 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">
-                                        ไฟล์แนบ</th>
-                                    <th
-                                        class="px-6 py-4 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">
-                                        สถานะ</th>
-                                    <th
-                                        class="px-6 py-4 text-right text-xs font-semibold text-slate-500 uppercase tracking-wider">
-                                        จัดการ</th>
-                                </tr>
-                            </thead>
-                            <tbody id="stock-import-table-body" class="divide-y divide-slate-100">
-                                <!-- Rows will be populated by JS -->
-                                <tr>
-                                    <td colspan="6" class="px-6 py-12 text-center text-slate-400">
-                                        <ion-icon name="cube-outline" class="w-8 h-8 mb-2 opacity-50"></ion-icon>
-                                        <p>กำลังโหลดข้อมูล...</p>
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
+            <p class="text-slate-500">กำลังดึงข้อมูลผู้ใช้...</p>
+        </div>
+        <div
+            class="p-6 border-b border-slate-100 flex flex-col sm:flex-row justify-between items-center bg-slate-50/50 gap-4">
+            <div class="flex items-center gap-4">
+                <h3 class="text-lg font-bold text-slate-800">รายชื่อผู้ใช้ในระบบ</h3>
+                <span id="user-count"
+                    class="text-xs font-semibold text-slate-500 bg-white border border-slate-200 px-3 py-1 rounded-full shadow-sm">0
+                    คน</span>
             </div>
+            <div class="relative w-full sm:w-64">
+                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                    <ion-icon name="search-outline" class="text-slate-400"></ion-icon>
+                </div>
+                <input type="text" id="user-search-input"
+                    class="block w-full pl-10 pr-3 py-2 border border-slate-200 rounded-xl leading-5 bg-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:border-yellow-400 sm:text-sm transition-shadow"
+                    placeholder="ค้นหาชื่อ หรือ Username...">
+            </div>
+        </div>
+        <div class="overflow-x-auto">
+            <table class="w-full min-w-lg">
+                <thead class="bg-slate-50 border-b border-slate-100">
+                    <tr>
+                        <th class="px-6 py-4 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">
+                            ชื่อ-สกุล</th>
+                        <th class="px-6 py-4 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">
+                            Username</th>
+                        <th class="px-6 py-4 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">
+                            ตำแหน่ง</th>
+                        <th class="px-6 py-4 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">
+                            แผนก / สาขา</th>
+                        <th class="px-6 py-4 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">
+                            หัวหน้า</th>
+                        <th class="px-6 py-4 text-right text-xs font-semibold text-slate-500 uppercase tracking-wider">
+                            จัดการ</th>
+                    </tr>
+                </thead>
+                <tbody id="user-table-body" class="divide-y divide-slate-100">
+                    <tr id="no-user-row" class="text-center">
+                        <td colspan="6" class="px-6 py-12 text-slate-400">ไม่มีผู้ใช้ในระบบ</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
     </div>
     </main>
     </div>
@@ -1175,11 +1499,11 @@
                                 class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">IMEI</label><input
                                 type="text" id="dep-imei" class="form-input-theme"></div>
 
-                        <label for="dep-success" 
-                               class="col-span-2 flex items-center mt-2 p-4 bg-green-50 rounded-xl border border-green-200 cursor-pointer hover:bg-green-100 transition-colors">
+                        <label for="dep-success"
+                            class="col-span-2 flex items-center mt-2 p-4 bg-green-50 rounded-xl border border-green-200 cursor-pointer hover:bg-green-100 transition-colors">
 
                             <input type="checkbox" id="dep-success"
-                                   class="w-5 h-5 text-green-600 rounded focus:ring-green-500 mr-3">
+                                class="w-5 h-5 text-green-600 rounded focus:ring-green-500 mr-3">
 
                             <span class="font-bold text-green-800 cursor-pointer select-none">
                                 ทำรายการสำเร็จ (รับเครื่องแล้ว)
@@ -1308,6 +1632,84 @@
                     class="flex-1 px-4 py-2.5 bg-slate-100 text-slate-700 rounded-xl hover:bg-slate-200 font-medium transition-colors">ยกเลิก</button>
                 <button id="confirm-status-update-btn"
                     class="flex-1 px-4 py-2.5 bg-indigo-600 text-white rounded-xl hover:bg-indigo-700 font-medium shadow-lg shadow-indigo-200 transition-colors">ยืนยัน</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- (*** NEW: Stock Detail Modal for Accessories ***) -->
+    <div id="stockDetailModal" class="modal fixed inset-0 z-50 items-center justify-center p-4">
+        <div
+            class="modal-content relative w-full max-w-5xl h-[90vh] bg-white rounded-3xl shadow-2xl overflow-hidden flex flex-col md:flex-row">
+            <!-- Left Column: Image Area -->
+            <div class="w-full md:w-1/2 bg-slate-900 relative flex items-center justify-center group overflow-hidden">
+                <img id="detail-bill-image" src=""
+                    class="max-w-full max-h-full object-contain shadow-2xl transition-transform duration-500 group-hover:scale-105"
+                    alt="Bill Image">
+
+                <div class="absolute top-4 left-4 z-10">
+                    <span
+                        class="px-3 py-1 bg-black/50 text-white text-xs font-bold rounded-full backdrop-blur-md">รูปใบเสร็จ/บิล</span>
+                </div>
+
+                <!-- Expand Button -->
+                <a id="detail-bill-link" href="#" target="_blank"
+                    class="absolute bottom-6 right-6 p-3 bg-white text-slate-900 rounded-full shadow-lg hover:bg-yellow-400 transition-colors"
+                    title="ดูรูปเต็ม">
+                    <ion-icon name="expand-outline" class="text-xl"></ion-icon>
+                </a>
+            </div>
+
+            <!-- Right Column: Info & Actions -->
+            <div class="w-full md:w-1/2 flex flex-col h-full">
+                <!-- Header -->
+                <div class="p-6 border-b border-slate-100 flex justify-between items-start bg-slate-50/50">
+                    <div>
+                        <div class="flex items-center gap-2 mb-1">
+                            <span id="detail-branch-badge"
+                                class="px-2 py-0.5 rounded-md bg-white border border-slate-200 text-xs font-bold text-slate-600 shadow-sm">สาขา...</span>
+                            <span id="detail-date-display" class="text-xs text-slate-400">...</span>
+                        </div>
+                        <h3 id="detail-supplier-title" class="text-xl font-bold text-slate-800 line-clamp-1">Supplier
+                            Name</h3>
+                        <p id="detail-by-user" class="text-xs text-slate-500 mt-0.5">แจ้งโดย: ...</p>
+                    </div>
+                    <button onclick="closeModal('stockDetailModal')" class="text-slate-400 hover:text-slate-600 p-1">
+                        <ion-icon name="close" class="text-2xl"></ion-icon>
+                    </button>
+                </div>
+
+                <!-- Items List (Scrollable) -->
+                <div class="flex-1 overflow-y-auto p-6 bg-white custom-scrollbar">
+                    <h4 class="text-sm font-bold text-slate-700 mb-4 flex items-center gap-2">
+                        <ion-icon name="list-circle" class="text-indigo-500 text-lg"></ion-icon> รายการสินค้าที่แจ้งเข้า
+                    </h4>
+                    <div id="detail-items-list" class="space-y-3">
+                        <!-- Items injected here -->
+                    </div>
+                </div>
+
+                <!-- Footer Actions -->
+                <div class="p-6 border-t border-slate-100 bg-slate-50/30">
+                    <div class="flex items-center justify-between mb-4">
+                        <span class="text-sm font-bold text-slate-600">สถานะปัจจุบัน:</span>
+                        <span id="detail-current-status" class="px-3 py-1 rounded-full text-xs font-bold">...</span>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-3">
+                        <button id="btn-action-importing" onclick="updateStockStatusFromModal('importing')"
+                            class="col-span-1 py-3 rounded-xl bg-blue-100 text-blue-700 font-bold hover:bg-blue-200 transition-colors flex items-center justify-center gap-2">
+                            <ion-icon name="timer-outline"></ion-icon> กดรับงาน (กำลังนำเข้า)
+                        </button>
+                        <button id="btn-action-received" onclick="updateStockStatusFromModal('received')"
+                            class="col-span-1 py-3 rounded-xl bg-green-100 text-green-700 font-bold hover:bg-green-200 transition-colors flex items-center justify-center gap-2">
+                            <ion-icon name="checkmark-circle-outline"></ion-icon> ตรวจรับครบถ้วน
+                        </button>
+                        <button id="btn-action-reject" onclick="updateStockStatusFromModal('rejected')"
+                            class="col-span-2 py-3 rounded-xl bg-white border border-red-200 text-red-500 font-bold hover:bg-red-50 transition-colors flex items-center justify-center gap-2">
+                            <ion-icon name="close-circle-outline"></ion-icon> ปฏิเสธ / ยกเลิกรายการ
+                        </button>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -3162,77 +3564,98 @@
             try {
                 const res = await fetch(`${SERVER_URL}/imports?companyId=${companyId}`, { headers: { 'Authorization': `Bearer ${token}` } });
                 if (!res.ok) return;
-                const data = await res.json();
+                const responseData = await res.json();
+                const data = Array.isArray(responseData) ? responseData : (responseData.data || []);
 
                 // Render Phone List
                 const phoneList = document.getElementById('phone-import-list');
                 const phoneData = data.filter(d => d.type === 'phone');
-                phoneList.innerHTML = '';
-                if (phoneData.length === 0) {
-                    phoneList.innerHTML = `<tr><td colspan="5" class="text-center py-6 text-slate-400">ไม่มีประวัติการแจ้งนำเข้า</td></tr>`;
-                } else {
-                    phoneData.forEach(item => {
-                        // ดึงลิงก์ไฟล์จาก Array ตัวแรก ถ้าไม่มีให้ใส่เครื่องหมาย #
-                        const fileLink = (item.files && item.files.length > 0) ? item.files[0] : '#';
+                if (phoneList) {
+                    phoneList.innerHTML = '';
+                    if (phoneData.length === 0) {
+                        phoneList.innerHTML = `<tr><td colspan="5" class="text-center py-6 text-slate-400">ไม่มีประวัติการแจ้งนำเข้า</td></tr>`;
+                    } else {
+                        phoneData.forEach(item => {
+                            const fileLink = (item.files && item.files.length > 0) ? item.files[0] : '#';
+                            const linkClass = (fileLink !== '#') ? 'text-indigo-600 hover:underline' : 'text-gray-400 cursor-not-allowed';
+                            const targetAttr = (fileLink !== '#') ? 'target="_blank"' : '';
 
-                        // ตรวจสอบว่ามีลิงก์ไหม เพื่อกำหนดสีและให้กดได้หรือไม่ (UX เพิ่มเติม)
-                        const linkClass = (fileLink !== '#') ? 'text-indigo-600 hover:underline' : 'text-gray-400 cursor-not-allowed';
-                        const targetAttr = (fileLink !== '#') ? 'target="_blank"' : '';
-
-                        const tr = document.createElement('tr');
-                        tr.className = "hover:bg-slate-50";
-                        tr.innerHTML = `
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-600">${formatDateShort(item.createdAt)}</td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                                <a href="${fileLink}" ${targetAttr} class="${linkClass} flex items-center">
-                                    <ion-icon name="document-text" class="mr-1"></ion-icon> Download
-                                </a>
-                            </td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-600">${item.branch}</td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm">${getStatusTag(item.status)}</td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-600">${item.createdBy ? item.createdBy.name : '-'}</td>
-                        `;
-                        phoneList.appendChild(tr);
-                    });
+                            const tr = document.createElement('tr');
+                            tr.className = "hover:bg-slate-50";
+                            tr.innerHTML = `
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-600">${formatDateShort(item.createdAt)}</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                                    <a href="${fileLink}" ${targetAttr} class="${linkClass} flex items-center">
+                                        <ion-icon name="document-text" class="mr-1"></ion-icon> Download
+                                    </a>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-600">${item.branch}</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm">${getStatusTag(item.status)}</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-600">${item.createdBy ? item.createdBy.name : '-'}</td>
+                            `;
+                            phoneList.appendChild(tr);
+                        });
+                    }
                 }
 
                 // Render Accessory List
                 const accList = document.getElementById('accessory-import-list');
                 const accData = data.filter(d => d.type === 'accessory');
-                accList.innerHTML = '';
-                if (accData.length === 0) {
-                    accList.innerHTML = `<div class="col-span-full text-center py-8 text-slate-400">ไม่มีรายการแจ้งนำเข้า</div>`;
-                } else {
-                    accData.forEach(item => {
-                        const card = document.createElement('div');
-                        card.className = "bg-white p-4 rounded-xl border border-slate-100 shadow-sm flex gap-4";
+                if (accList) {
+                    accList.innerHTML = '';
+                    if (accData.length === 0) {
+                        accList.innerHTML = `<div class="col-span-full text-center py-8 text-slate-400">ไม่มีรายการแจ้งนำเข้า</div>`;
+                    } else {
+                        accData.forEach(item => {
+                            const card = document.createElement('div');
+                            card.className = "bg-white p-4 rounded-xl border border-slate-100 shadow-sm flex gap-4";
 
-                        // Use files[0] for image, and details.* for other info
-                        const imageUrl = item.files && item.files.length > 0 ? item.files[0] : 'https://placehold.co/100';
-                        // Handle productName vs name mismatch (schema has productName)
-                        const accName = item.details ? (item.details.productName || item.details.name || 'Unknown') : 'Unknown';
-                        const accQty = item.details ? item.details.quantity : '-';
-                        const accDate = item.details ? formatDateShort(item.details.importDate) : '-';
+                            let imgUrl = 'https://placehold.co/100';
+                            if (item.files && item.files.length > 0) {
+                                imgUrl = `${SERVER_URL.replace('/api', '')}/${item.files[0]}`;
+                            }
 
-                        card.innerHTML = `
-                             <img src="${imageUrl}" class="w-20 h-20 object-cover rounded-lg bg-slate-100 border border-slate-200">
-                             <div class="flex-1">
-                                <div class="flex justify-between items-start">
-                                    <h5 class="font-bold text-slate-800 text-sm line-clamp-1">${accName}</h5>
-                                    ${getStatusTag(item.status)}
-                                </div>
-                                <p class="text-xs text-slate-500 mt-1">จำนวน: <span class="font-semibold text-slate-700">${accQty}</span> ชิ้น</p>
-                                <p class="text-xs text-slate-500">วันที่ต้องการ: ${accDate}</p>
-                                <div class="mt-2 flex items-center text-xs text-slate-400">
-                                    <ion-icon name="person" class="mr-1"></ion-icon> ${item.createdBy ? item.createdBy.name : '-'} (${item.branch})
-                                </div>
-                             </div>
-                        `;
-                        accList.appendChild(card);
-                    });
+                            // Handle Multi-Item vs Single Item
+                            let accName = item.details?.productName || item.details?.name || 'Unknown';
+                            let accQty = item.details?.quantity || '-';
+
+                            if (item.details?.items && item.details.items.length > 0) {
+                                const totalQty = item.details.items.reduce((sum, i) => sum + (i.qty || 0), 0);
+                                const firstItem = item.details.items[0].name;
+                                const moreCount = item.details.items.length - 1;
+
+                                accName = moreCount > 0 ? `${firstItem} (+${moreCount})` : firstItem;
+                                accQty = totalQty;
+                            }
+
+                            const accDate = item.details ? formatDateShort(item.details.importDate || item.createdAt) : '-';
+
+                            // Safe Status Tag
+                            const statusTagHtml = (typeof getStatusTag === 'function') ? getStatusTag(item.status) : `<span class="text-xs">${item.status}</span>`;
+
+                            card.innerHTML = `
+                                 <img src="${imgUrl}" class="w-20 h-20 object-cover rounded-lg bg-slate-100 border border-slate-200" loading="lazy" onerror="this.src='https://placehold.co/100?text=No+Image'">
+                                 <div class="flex-1">
+                                    <div class="flex justify-between items-start">
+                                        <h5 class="font-bold text-slate-800 text-sm line-clamp-1" title="${accName}">${accName}</h5>
+                                        ${statusTagHtml}
+                                    </div>
+                                    <p class="text-xs text-slate-500 mt-1">จำนวน: <span class="font-semibold text-slate-700">${accQty}</span> ชิ้น</p>
+                                    <p class="text-xs text-slate-500">วันที่: ${accDate}</p>
+                                    <div class="mt-2 flex items-center text-xs text-slate-400">
+                                        <ion-icon name="person" class="mr-1"></ion-icon> ${item.createdBy ? item.createdBy.name : '-'} (${item.branch})
+                                    </div>
+                                 </div>
+                            `;
+                            accList.appendChild(card);
+                        });
+                    }
                 }
-
-            } catch (err) { console.error(err); }
+            } catch (err) {
+                console.error(err);
+                const accList = document.getElementById('accessory-import-list');
+                if (accList) accList.innerHTML = `<div class="col-span-full text-center py-8 text-red-400">Error loading data: ${err.message}</div>`;
+            }
         }
 
         // ------------------------------------------
@@ -3549,10 +3972,13 @@
                     navStockImport.classList.remove('text-slate-600', 'hover:bg-slate-50');
                 }
                 if (companySelectDiv) companySelectDiv.style.display = 'none';
-                // Reset to Pending filter on entry
-                if (typeof filterStockImports === 'function') {
-                    filterStockImports('pending');
-                } else {
+                // Reset to All filter on entry
+                // Reset to All filter on entry
+                if (typeof filterStockType === 'function' && typeof filterStockImports === 'function') {
+                    filterStockType('all', false);
+                    filterStockImports('all', false);
+                    fetchStockImports();
+                } else if (typeof fetchStockImports === 'function') {
                     fetchStockImports();
                 }
             }
@@ -3607,243 +4033,332 @@
             let targetImportId = null;
             let targetImportStatus = null;
 
-            function filterStockType(type) {
-                currentStockImportType = type;
+            // Pagination Vars
+            let currentStockPage = 1;
+            let currentStockLimit = 20;
+            let currentStockTotalPages = 1;
 
-                // Update Tab Styling
-                const phoneTab = document.getElementById('tab-stock-phone');
-                const accTab = document.getElementById('tab-stock-accessory');
+            // (*** Updated Stock Functions ***)
+            function renderStockImportTable(data) {
+                const phoneTbody = document.getElementById('stock-phone-tbody');
+                const accGrid = document.getElementById('stock-acc-grid');
+                const emptyState = document.getElementById('stock-empty-state');
+                const loading = document.getElementById('stock-loading');
 
-                // Reset Base Styles
-                [phoneTab, accTab].forEach(tab => {
-                    tab.className = "px-6 py-2.5 rounded-xl text-sm font-bold transition-all flex items-center gap-2 border border-transparent";
-                });
+                if (loading) loading.classList.add('hidden');
 
-                if (type === 'phone') {
-                    // Phone Active: Blue Theme
-                    phoneTab.classList.add('bg-blue-600', 'text-white', 'shadow-md', 'shadow-blue-200');
-                    phoneTab.classList.remove('text-slate-500', 'hover:bg-slate-50');
+                // Clear both
+                if (phoneTbody) phoneTbody.innerHTML = '';
+                if (accGrid) accGrid.innerHTML = '';
 
-                    // Acc Inactive
-                    accTab.classList.add('text-slate-500', 'hover:bg-slate-100', 'bg-transparent');
+                if (!data || data.length === 0) {
+                    if (emptyState) emptyState.classList.remove('hidden');
+                    return;
                 } else {
-                    // Acc Active: Purple Theme
-                    accTab.classList.add('bg-purple-600', 'text-white', 'shadow-md', 'shadow-purple-200');
-                    accTab.classList.remove('text-slate-500', 'hover:bg-slate-50');
-
-                    // Phone Inactive
-                    phoneTab.classList.add('text-slate-500', 'hover:bg-slate-100', 'bg-transparent');
+                    if (emptyState) emptyState.classList.add('hidden');
                 }
 
-                fetchStockImports();
+                // Render based on current mode
+                if (currentStockImportType === 'phone') {
+                    // --- RENDER TABLE ---
+                    data.forEach(item => {
+                        const date = new Date(item.createdAt).toLocaleDateString('th-TH', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' });
+                        const branch = item.branch || '-';
+                        const createdBy = item.createdBy ? item.createdBy.name : '-';
+                        const supplier = item.details?.supplier || '-';
+                        const desc = item.details?.description || '-';
+
+                        // File
+                        const fileCount = item.files ? item.files.length : 0;
+                        const fileLink = fileCount > 0 ?
+                            `<a href="${SERVER_URL.replace('/api', '')}/${item.files[0]}" target="_blank" class="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-indigo-50 text-indigo-600 hover:bg-indigo-100 border border-indigo-200 transition-colors text-xs font-bold">
+                                <ion-icon name="document-text"></ion-icon> โหลด Excel
+                            </a>` : '<span class="text-slate-400 text-xs">-</span>';
+
+                        // Status
+                        const statusBadge = getStockStatusBadge(item.status);
+
+                        const tr = document.createElement('tr');
+                        tr.className = "hover:bg-slate-50/80 transition-colors border-b border-slate-50 last:border-0 group";
+                        tr.innerHTML = `
+                            <td class="px-6 py-4">
+                                <span class="text-sm font-bold text-slate-600">${date}</span>
+                            </td>
+                            <td class="px-6 py-4">
+                                <div class="flex items-center gap-2">
+                                    <div class="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center text-slate-500 font-bold text-xs uppercase tracking-tighter border border-slate-200">
+                                        ${branch.substring(0, 2)}
+                                    </div>
+                                    <div>
+                                        <div class="text-sm font-bold text-slate-700">${branch}</div>
+                                        <div class="text-xs text-slate-400">${createdBy}</div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td class="px-6 py-4">
+                                <div class="text-sm font-bold text-slate-800">${supplier}</div>
+                                <div class="text-xs text-slate-500 truncate max-w-[150px]" title="${desc}">${desc}</div>
+                            </td>
+                            <td class="px-6 py-4 text-sm">${fileLink}</td>
+                            <td class="px-6 py-4 text-center">
+                                <button onclick="openStatusModal('${item._id}', '${item.status}')" class="hover:scale-105 active:scale-95 transition-transform">
+                                    ${statusBadge}
+                                </button>
+                            </td>
+                             <td class="px-6 py-4 text-right">
+                                <button onclick="deleteImportRequest('${item._id}')" class="p-2 text-slate-300 hover:text-red-500 hover:bg-red-50 rounded-full transition-all" title="ลบรายการ">
+                                    <ion-icon name="trash-outline" class="text-lg"></ion-icon>
+                                </button>
+                            </td>
+                        `;
+                        phoneTbody.appendChild(tr);
+                    });
+
+                } else {
+                    // --- RENDER GRID (ACCESSORIES) ---
+                    data.forEach(item => {
+                        const date = new Date(item.createdAt).toLocaleDateString('th-TH', { day: '2-digit', month: '2-digit' });
+                        const branch = item.branch || 'Unknown';
+                        const itemsCount = item.details?.items?.length || 1;
+                        let title = item.details?.productName || `${itemsCount} รายการ`;
+                        if (itemsCount > 1) title = `บิลรวม (${itemsCount} รายการ)`;
+
+                        // Image
+                        let imgUrl = 'image/placeholder.jpg'; // Path placeholder
+                        if (item.files && item.files.length > 0) {
+                            imgUrl = `${SERVER_URL.replace('/api', '')}/${item.files[0]}`;
+                        } else {
+                            // Fallback icon
+                        }
+
+                        // Status
+                        const statusBadge = getStockStatusBadge(item.status);
+
+                        const card = document.createElement('div');
+                        card.className = "bg-white rounded-2xl border border-slate-100 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 overflow-hidden cursor-pointer group flex flex-col h-full";
+                        card.onclick = (e) => {
+                            // prevent opening if clicked on specific action buttons if any (but here whole card is clickable)
+                            openImportDetailModal(item);
+                        };
+
+                        card.innerHTML = `
+                            <div class="relative h-48 bg-slate-100 overflow-hidden">
+                                <img src="${imgUrl}" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" loading="lazy" onerror="this.src='https://placehold.co/400x300?text=No+Image'">
+                                <div class="absolute top-3 left-3">
+                                    <span class="px-2 py-1 bg-white/90 backdrop-blur-sm rounded-lg text-xs font-bold text-slate-700 shadow-sm flex items-center gap-1">
+                                        <ion-icon name="storefront"></ion-icon> ${branch}
+                                    </span>
+                                </div>
+                                <div class="absolute top-3 right-3">
+                                     <span class="px-2 py-1 bg-black/50 backdrop-blur-md rounded-lg text-xs font-bold text-white border border-white/20">
+                                        ${date}
+                                    </span>
+                                </div>
+                            </div>
+                            <div class="p-5 flex-1 flex flex-col">
+                                <h4 class="font-bold text-slate-800 text-lg mb-1 line-clamp-1">${title}</h4>
+                                <p class="text-sm text-slate-500 mb-4 flex items-center gap-1">
+                                    <ion-icon name="person-circle-outline"></ion-icon> ${item.createdBy?.name || '-'}
+                                </p>
+                                <div class="mt-auto flex items-center justify-between pt-4 border-t border-slate-50">
+                                   ${statusBadge}
+                                   <div class="w-8 h-8 rounded-full bg-slate-50 flex items-center justify-center text-slate-400 group-hover:bg-indigo-500 group-hover:text-white transition-colors">
+                                        <ion-icon name="arrow-forward"></ion-icon>
+                                   </div>
+                                </div>
+                            </div>
+                        `;
+                        accGrid.appendChild(card);
+                    });
+                }
+
+                // Update Dashboard Stats (Simple Client-side count based on loaded data - ideal for 'All')
+                // Note: If filters strictly limit data, these stats will only reflect filtered data.
+                // Ideal solution: Separate stats API. For now, we update specific stats if we are in 'all' mode.
+                updateStockStatsUI(data);
             }
 
-            function filterStockImports(status) {
-                currentStockFilter = status;
-                // Update UI buttons
-                ['pending', 'importing', 'received', 'all'].forEach(s => {
-                    const btn = document.getElementById(`filter-stock-${s}`);
-                    if (btn) {
-                        if (s === status) {
-                            btn.classList.remove('bg-white', 'text-slate-600');
-                            btn.classList.add('bg-indigo-600', 'text-white', 'shadow-md');
-                        } else {
-                            btn.classList.add('bg-white', 'text-slate-600');
-                            btn.classList.remove('bg-indigo-600', 'text-white', 'shadow-md');
-                        }
-                    }
-                });
-                fetchStockImports();
+            function getStockStatusBadge(status) {
+                if (status === 'pending') return `<span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold bg-yellow-100 text-yellow-700 ring-1 ring-yellow-500/20"><div class="w-1.5 h-1.5 rounded-full bg-yellow-500 mr-1.5 animate-pulse"></div>รอนำเข้า</span>`;
+                if (status === 'importing') return `<span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold bg-blue-100 text-blue-700 ring-1 ring-blue-500/20"><div class="w-1.5 h-1.5 rounded-full bg-blue-500 mr-1.5"></div>กำลังนำเข้า</span>`;
+                if (status === 'received') return `<span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold bg-green-100 text-green-700 ring-1 ring-green-500/20"><div class="w-1.5 h-1.5 rounded-full bg-green-500 mr-1.5"></div>นำเข้าแล้ว</span>`;
+                return `<span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold bg-slate-100 text-slate-600 ring-1 ring-slate-500/20">${status}</span>`;
+            }
+
+            function updateStockStatsUI(data) {
+                if (currentStockFilter !== 'all') return; // Don't update global stats if filtered
+
+                const all = data.length;
+                const pending = data.filter(i => i.status === 'pending').length;
+                const importing = data.filter(i => i.status === 'importing').length;
+
+                const anim = (id, val) => {
+                    const el = document.getElementById(id);
+                    if (el) el.textContent = val;
+                };
+
+                anim('stat-stock-all', all);
+                anim('stat-stock-pending', pending);
+                anim('stat-stock-importing', importing);
+            }
+
+            window.changeStockPage = function (delta) {
+                const newPage = currentStockPage + delta;
+                if (newPage >= 1 && newPage <= currentStockTotalPages) {
+                    currentStockPage = newPage;
+                    fetchStockImports();
+                }
+            };
+
+            function updatePaginationUI(meta) {
+                const paginationEl = document.getElementById('stock-pagination');
+                if (!paginationEl) return;
+
+                if (meta.total > 0) {
+                    paginationEl.classList.remove('hidden');
+
+                    const start = (meta.page - 1) * currentStockLimit + 1;
+                    const end = Math.min(meta.page * currentStockLimit, meta.total);
+
+                    document.getElementById('pagination-info-start').textContent = start;
+                    document.getElementById('pagination-info-end').textContent = end;
+                    document.getElementById('pagination-info-total').textContent = meta.total;
+                    document.getElementById('pagination-page-display').textContent = `หน้า ${meta.page} / ${meta.totalPages}`;
+
+                    const btnPrev = document.getElementById('btn-prev-page');
+                    const btnNext = document.getElementById('btn-next-page');
+
+                    if (btnPrev) btnPrev.disabled = (meta.page <= 1);
+                    if (btnNext) btnNext.disabled = (meta.page >= meta.totalPages);
+                } else {
+                    paginationEl.classList.add('hidden');
+                }
             }
 
             async function fetchStockImports() {
                 try {
-                    // Include type and status in query
-                    let url = `${SERVER_URL}/imports?t=${Date.now()}&type=${currentStockImportType}`;
+                    let url = `${SERVER_URL}/imports?t=${Date.now()}`;
+
+                    // Pagination
+                    url += `&page=${currentStockPage}&limit=${currentStockLimit}`;
+
+                    if (currentStockImportType && currentStockImportType !== 'all') {
+                        url += `&type=${currentStockImportType}`;
+                    }
+
                     if (currentStockFilter !== 'all') {
                         url += `&status=${currentStockFilter}`;
                     }
-                    // [New] Branch Filter
                     if (currentStockBranch !== 'all') {
                         url += `&branch=${encodeURIComponent(currentStockBranch)}`;
                     }
+
+                    // Date Filters
+                    const startDate = document.getElementById('stock-filter-date-start').value;
+                    const endDate = document.getElementById('stock-filter-date-end').value;
+                    if (startDate) url += `&startDate=${startDate}`;
+                    if (endDate) url += `&endDate=${endDate}`;
+
+                    if (document.getElementById('stock-loading')) document.getElementById('stock-loading').classList.remove('hidden');
 
                     const res = await fetch(url, {
                         headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
                     });
                     if (!res.ok) throw new Error('Failed to fetch');
-                    const data = await res.json();
+
+                    const responseData = await res.json();
+
+                    // Support both old array format (fallback) and new paginated object
+                    const data = Array.isArray(responseData) ? responseData : (responseData.data || []);
+                    const total = responseData.total || data.length;
+                    const totalPages = responseData.totalPages || 1;
+
+                    // Update State
+                    currentStockTotalPages = totalPages;
+                    updatePaginationUI({ page: currentStockPage, total, totalPages });
+
                     renderStockImportTable(data);
-                    document.getElementById('stock-import-count').textContent = `${data.length} รายการ`;
+
+                    const countEl = document.getElementById('stock-import-count');
+                    // if (countEl) countEl.textContent = `${total}`;
+
                 } catch (err) {
                     console.error(err);
                 }
             }
 
-            function renderStockImportTable(data) {
-                console.log('Rendering Stock Import Table:', data);
-                const tbody = document.getElementById('stock-import-table-body');
-                tbody.innerHTML = '';
-
-                if (!data || data.length === 0) {
-                    tbody.innerHTML = `<tr><td colspan="6" class="px-6 py-12 text-center text-slate-400 font-medium">ไม่พบข้อมูลการแจ้งนำเข้า</td></tr>`;
-                    return;
-                }
-
-                data.forEach(item => {
-                    // Determine details
-                    let productName = '-';
-                    let quantity = '-';
-                    let imageUrl = null;
-
-                    // Logic for Name & Quantity
-                    const isPhone = (item.type || '').toLowerCase() === 'phone';
-
-                    if (isPhone && item.files && item.files.length > 0) {
-                        productName = 'Import via Excel';
-                        quantity = 'Many';
-                    } else if (item.details) {
-                        productName = item.details.productName || item.details.name || '-';
-                        quantity = item.details.quantity || '-';
-                    }
-
-                    // Logic for Image URL & File Links
-                    const getFullUrl = (path) => {
-                        if (!path) return '';
-                        if (path.startsWith('http')) return path;
-                        if (path.startsWith('/')) return `${SERVER_URL}${path}`;
-                        return `${SERVER_URL}/uploads/${path}`;
-                    };
-
-                    if (item.files && item.files.length > 0) {
-                        const file = item.files[0];
-                        if (file.match(/\.(jpg|jpeg|png|gif|webp)$/i)) {
-                            imageUrl = getFullUrl(file);
+            function filterStockImports(status, doFetch = true) {
+                currentStockFilter = status;
+                currentStockPage = 1; // Reset page
+                // Update UI buttons
+                ['pending', 'importing', 'received', 'all'].forEach(s => {
+                    const btn = document.getElementById(`filter-stock-${s}`);
+                    if (btn) {
+                        let base = "px-4 py-2 rounded-lg text-xs font-bold transition-all flex items-center gap-2";
+                        if (s === status) {
+                            btn.className = base + " text-white bg-indigo-600 shadow-md ring-1 ring-slate-200";
+                            // Fix inner dots colors if needed
+                            const dot = btn.querySelector('div');
+                            if (dot && s !== 'all') dot.className = "w-2 h-2 rounded-full border border-white/30 " + (s === 'pending' ? 'bg-yellow-400' : (s === 'importing' ? 'bg-blue-400' : 'bg-green-400'));
+                        } else {
+                            btn.className = base + " text-slate-500 hover:text-slate-700 hover:bg-white/50";
+                            const dot = btn.querySelector('div');
+                            if (dot && s !== 'all') dot.className = "w-2 h-2 rounded-full " + (s === 'pending' ? 'bg-yellow-400' : (s === 'importing' ? 'bg-blue-500' : 'bg-green-500'));
                         }
                     }
+                });
+                if (doFetch) fetchStockImports();
+            }
 
-                    // Build Product Cell
-                    let productCellContent = `
-                        <div class="flex items-center gap-3">
-                            <div class="h-10 w-10 flex-shrink-0 bg-slate-100 rounded-lg flex items-center justify-center text-slate-400">
-                                <ion-icon name="cube-outline" class="text-xl"></ion-icon>
-                            </div>
-                            <div>
-                                <div class="text-sm font-bold text-slate-800">${productName}</div>
-                                <div class="text-xs text-slate-500">จำนวน: ${quantity}</div>
-                            </div>
-                        </div>
-                    `;
+            function filterStockType(type, doFetch = true) {
+                currentStockImportType = type;
+                currentStockPage = 1; // Reset page
 
-                    if (imageUrl) {
-                        productCellContent = `
-                            <div class="flex items-center gap-3">
-                                <div class="h-10 w-10 flex-shrink-0 grouping">
-                                    <img class="h-10 w-10 rounded-lg object-cover border border-slate-200" src="${imageUrl}" alt="Product" onerror="this.src='https://placehold.co/100?text=No+Img'">
-                                </div>
-                                <div>
-                                    <div class="text-sm font-bold text-slate-800 line-clamp-1">${productName}</div>
-                                    <div class="text-xs text-slate-500">จำนวน: ${quantity}</div>
-                                </div>
-                            </div>
-                        `;
-                    }
+                const phoneTab = document.getElementById('tab-stock-phone');
+                const accTab = document.getElementById('tab-stock-accessory');
+                const allTab = document.getElementById('tab-stock-all'); // Not really used for view switch, but for button style
 
-                    // Build File Links
-                    let fileHtml = '<span class="text-slate-400 text-xs">-</span>';
-                    if (item.files && item.files.length > 0) {
-                        fileHtml = item.files.map((f, i) => {
-                            const url = getFullUrl(f);
-                            return `
-                            <a href="${url}" target="_blank" class="inline-flex items-center px-2.5 py-1 bg-slate-50 text-indigo-600 rounded-lg hover:bg-slate-100 border border-slate-200 text-xs font-medium mr-1.5 mb-1 transition-colors">
-                                <ion-icon name="document-text-outline" class="mr-1.5"></ion-icon> ไฟล์ ${i + 1}
-                            </a>
-                        `}).join('');
-                    }
+                // View Contrainers
+                const phoneView = document.getElementById('stock-view-phone');
+                const accView = document.getElementById('stock-view-accessory');
 
-                    // Status Options with Custom Styling
-                    const statusOptions = [
-                        { val: 'pending', label: 'รอนำเข้า' },
-                        { val: 'importing', label: 'กำลังนำเข้า' },
-                        { val: 'received', label: 'นำเข้าแล้ว' },
-                        { val: 'rejected', label: 'ยกเลิก' }
-                    ];
+                // Toggle Views
+                if (type === 'phone') {
+                    if (phoneView) phoneView.classList.remove('hidden');
+                    if (accView) accView.classList.add('hidden');
+                } else if (type === 'accessory') {
+                    if (phoneView) phoneView.classList.add('hidden');
+                    if (accView) accView.classList.remove('hidden');
+                } else {
+                    // Should technically show both or redirect to one, defaulting to phone for now if 'all'
+                    if (phoneView) phoneView.classList.remove('hidden');
+                    if (accView) accView.classList.add('hidden');
+                }
 
-                    let statusSelectHtml = `
-                        <div class="relative">
-                            <select onchange="openStatusModal('${item._id}', this.value)" 
-                                class="appearance-none w-full bg-white border border-slate-200 text-slate-700 text-xs rounded-lg focus:ring-indigo-500 focus:border-indigo-500 block p-2 pr-8 font-medium shadow-sm transition-all hover:border-indigo-300">
-                                ${statusOptions.map(opt => `<option value="${opt.val}" ${item.status === opt.val ? 'selected' : ''}>${opt.label}</option>`).join('')}
-                            </select>
-                            <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-slate-500">
-                                <ion-icon name="chevron-down-outline" class="text-sm"></ion-icon>
-                            </div>
-                        </div>
-                    `;
+                // Update Button Styles
+                const baseClass = "flex-1 md:flex-none px-6 py-2.5 rounded-lg text-sm font-bold flex items-center justify-center gap-2 transition-all";
+                const activeClass = baseClass + " shadow-sm bg-white text-indigo-600 ring-1 ring-black/5";
+                const inactiveClass = baseClass + " text-slate-500 hover:text-slate-700 hover:bg-slate-200/50";
 
-                    // Helper for Status Badge
-                    const getStatusBadge = (status) => {
-                        const styles = {
-                            'pending': 'bg-yellow-50 text-yellow-700 border-yellow-200 ring-yellow-500/30',
-                            'importing': 'bg-blue-50 text-blue-700 border-blue-200 ring-blue-500/30',
-                            'received': 'bg-green-50 text-green-700 border-green-200 ring-green-500/30',
-                            'rejected': 'bg-red-50 text-red-700 border-red-200 ring-red-500/30'
-                        };
-                        const labels = {
-                            'pending': 'รอนำเข้า',
-                            'importing': 'กำลังนำเข้า',
-                            'received': 'นำเข้าแล้ว',
-                            'rejected': 'ยกเลิก'
-                        };
-                        const css = styles[status] || 'bg-slate-50 text-slate-600 border-slate-200';
-                        const label = labels[status] || status;
+                if (phoneTab) phoneTab.className = (type === 'phone') ? activeClass : inactiveClass;
+                if (accTab) accTab.className = (type === 'accessory') ? activeClass : inactiveClass;
+                // if (allTab) allTab.className = (type === 'all') ? activeClass : inactiveClass;
 
-                        return `<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold border ring-1 ring-inset ${css}">
-                                    <span class="w-1.5 h-1.5 rounded-full bg-current mr-1.5 opacity-60"></span>
-                                    ${label}
-                                </span>`;
-                    };
+                if (doFetch) fetchStockImports();
+            }
 
-                    // Render Row
-                    const tr = document.createElement('tr');
-                    tr.className = 'group hover:bg-slate-50/80 transition-all border-b border-transparent hover:border-slate-100 last:border-0';
-                    const dateStr = formatDate(item.createdAt);
+            // Expose Stock Functions to Window
+            window.filterStockImports = filterStockImports;
+            window.fetchStockImports = fetchStockImports;
+            window.openStatusModal = openStatusModal;
+            window.filterStockType = filterStockType;
 
-                    tr.innerHTML = `
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-500">
-                             <div class="font-medium text-slate-700">${dateStr.split(' ')[0]}</div>
-                             <div class="text-xs text-slate-400">${dateStr.split(' ')[1] || ''}</div>
-                        </td>
-                        <td class="px-6 py-4 whitespace-nowrap">
-                            <div class="flex items-center">
-                                <div class="h-8 w-8 rounded-full bg-indigo-100 text-indigo-600 flex items-center justify-center text-xs font-bold mr-3 border border-indigo-200">
-                                    ${(item.branch || 'HO').substring(0, 2)}
-                                </div>
-                                <div>
-                                    <div class="text-sm font-bold text-slate-800">${item.branch}</div>
-                                    <div class="text-xs text-slate-500 flex items-center gap-1">
-                                        <ion-icon name="person-outline" class="text-[10px]"></ion-icon>
-                                        ${item.createdBy ? item.createdBy.name : 'Unknown'}
-                                    </div>
-                                </div>
-                            </div>
-                        </td>
-                        <td class="px-6 py-4">
-                            ${productCellContent}
-                        </td>
-                        <td class="px-6 py-4 text-sm text-slate-500">
-                            <div class="flex flex-wrap max-w-xs">
-                                 ${fileHtml}
-                            </div>
-                        </td>
-                        <td class="px-6 py-4 whitespace-nowrap">
-                             ${getStatusBadge(item.status)}
-                        </td>
-                        <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium w-40">
-                            ${statusSelectHtml}
-                        </td>
-                    `;
-                    tbody.appendChild(tr);
+            // [New] Branch Filter Listener
+            const stockBranchSelect = document.getElementById('stock-import-branch-filter');
+            if (stockBranchSelect) {
+                stockBranchSelect.addEventListener('change', (e) => {
+                    currentStockBranch = e.target.value;
+                    fetchStockImports();
                 });
             }
 
@@ -3857,9 +4372,102 @@
                     'received': 'นำเข้าแล้ว',
                     'rejected': 'ยกเลิก (Reject)'
                 };
-                document.getElementById('target-status-name').textContent = map[status] || status;
+                const el = document.getElementById('target-status-name');
+                if (el) el.textContent = map[status] || status;
 
                 openModal('statusUpdateModal');
+            }
+
+            // *** NEW: Open Detail Modal for Accessory ***
+            let currentDetailItem = null;
+            function openImportDetailModal(item) {
+                currentDetailItem = item;
+                targetImportId = item._id;
+
+                const d = item.details || {};
+                const supplier = d.supplier || '-';
+                const branch = item.branch || '-';
+                const createdBy = item.createdBy ? item.createdBy.name : '-';
+                const date = new Date(item.createdAt).toLocaleDateString('th-TH');
+
+                // Populate Info
+                document.getElementById('detail-supplier-title').textContent = supplier;
+                document.getElementById('detail-branch-badge').textContent = branch;
+                document.getElementById('detail-date-display').textContent = date;
+                document.getElementById('detail-by-user').textContent = `แจ้งโดย: ${createdBy}`;
+                document.getElementById('detail-current-status').textContent = item.status;
+
+                // Image
+                const imgEl = document.getElementById('detail-bill-image');
+                const linkEl = document.getElementById('detail-bill-link');
+                if (item.files && item.files.length > 0) {
+                    const path = `${SERVER_URL.replace('/api', '')}/${item.files[0]}`;
+                    imgEl.src = path;
+                    linkEl.href = path;
+                } else {
+                    imgEl.src = 'image/placeholder.jpg';
+                    linkEl.href = '#';
+                }
+
+                // Items List
+                const listContainer = document.getElementById('detail-items-list');
+                listContainer.innerHTML = '';
+
+                if (d.items && d.items.length > 0) {
+                    d.items.forEach((subItem, index) => {
+                        const div = document.createElement('div');
+                        div.className = "flex justify-between items-center p-3 rounded-xl bg-slate-50 border border-slate-100";
+                        div.innerHTML = `
+                             <div class="flex items-center gap-3">
+                                 <span class="w-6 h-6 rounded-full bg-indigo-100 text-indigo-600 flex items-center justify-center text-xs font-bold">${index + 1}</span>
+                                 <span class="font-bold text-slate-700">${subItem.name}</span>
+                             </div>
+                             <span class="font-bold text-slate-900">x${subItem.qty}</span>
+                         `;
+                        listContainer.appendChild(div);
+                    });
+                } else {
+                    // Single Item Fallback
+                    listContainer.innerHTML = `
+                         <div class="flex justify-between items-center p-3 rounded-xl bg-slate-50 border border-slate-100">
+                             <div class="flex items-center gap-3">
+                                 <span class="w-6 h-6 rounded-full bg-indigo-100 text-indigo-600 flex items-center justify-center text-xs font-bold">1</span>
+                                 <span class="font-bold text-slate-700">${d.productName || '-'}</span>
+                             </div>
+                             <span class="font-bold text-slate-900">x${d.quantity || 1}</span>
+                         </div>
+                     `;
+                }
+
+                openModal('stockDetailModal');
+            }
+
+            async function updateStockStatusFromModal(newStatus) {
+                if (!targetImportId) return;
+
+                // Close details modal first
+                closeModal('stockDetailModal');
+
+                // Call API
+                try {
+                    const res = await fetch(`${SERVER_URL}/imports/${targetImportId}/status`, {
+                        method: 'PUT',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${localStorage.getItem('token')}`
+                        },
+                        body: JSON.stringify({ status: newStatus })
+                    });
+
+                    if (res.ok) {
+                        fetchStockImports(); // Refresh Grid
+                    } else {
+                        alert('Failed to update status');
+                    }
+                } catch (err) {
+                    console.error(err);
+                    alert('Error updating status');
+                }
             }
 
             document.getElementById('confirm-status-update-btn').addEventListener('click', async () => {
@@ -3900,12 +4508,17 @@
                     const fileInput = document.getElementById('phone-import-file');
                     if (fileInput.files.length === 0) return alert('กรุณาเลือกไฟล์');
 
+                    // Get Supplier (New)
+                    const supplier = document.getElementById('phone-import-supplier').value;
+                    if (!supplier) return alert('กรุณาระบุ Supplier');
+
                     const formData = new FormData();
                     formData.append('type', 'phone');
                     formData.append('files', fileInput.files[0]);
                     formData.append('companyId', document.getElementById('company-select').value);
+                    formData.append('supplier', supplier); // (*** ส่ง Supplier ***)
 
-                    // (*** เพิ่ม: ส่ง Description ***)
+                    // Description
                     const desc = document.getElementById('phone-import-description').value;
                     if (desc) formData.append('description', desc);
 
@@ -3917,8 +4530,7 @@
                         });
                         if (res.ok) {
                             alert('แจ้งนำเข้าสำเร็จ');
-                            phoneImportForm.reset();
-                            document.getElementById('file-name-display').textContent = '';
+                            closeModal('phoneImportModal'); // (Close Modal)
                             fetchImportRequests();
                         } else {
                             const err = await res.json();
@@ -3928,54 +4540,140 @@
                 });
 
                 document.getElementById('phone-import-file').addEventListener('change', (e) => {
+                    const display = document.getElementById('file-name-display');
                     if (e.target.files.length > 0) {
-                        document.getElementById('file-name-display').textContent = e.target.files[0].name;
+                        display.textContent = e.target.files[0].name;
+                        display.classList.remove('hidden');
+                        display.classList.add('inline-block');
                     } else {
-                        document.getElementById('file-name-display').textContent = '';
+                        display.textContent = '';
+                        display.classList.add('hidden');
+                        display.classList.remove('inline-block');
                     }
                 });
             }
 
-            const accImportForm = document.getElementById('accessory-import-form');
-            if (accImportForm) {
-                accImportForm.addEventListener('submit', async (e) => {
-                    e.preventDefault();
-                    const imageInput = document.getElementById('acc-import-image');
-                    const name = document.getElementById('acc-name').value;
-                    const qty = document.getElementById('acc-qty').value;
-                    const date = document.getElementById('acc-date').value;
+            // --- Dynamic Accessory Import Logic ---
+            let accItemCount = 0;
 
-                    if (!name || !qty || !date) return alert('กรุณากรอกข้อมูลให้ครบ');
+            // Remove legacy listener if exists (it targeted 'accessory-import-form' which is replaced by 'accessory-import-form-multi')
+            // We expose these functions to global scope because they are called by onclick attributes in HTML
+            window.addAccessoryItemRow = function () {
+                const container = document.getElementById('acc-items-container');
+                const emptyState = document.getElementById('acc-items-empty');
+                if (emptyState) emptyState.classList.add('hidden');
 
-                    const formData = new FormData();
-                    formData.append('type', 'accessory');
-                    formData.append('companyId', document.getElementById('company-select').value);
-                    formData.append('name', name);
-                    formData.append('quantity', qty);
-                    formData.append('importDate', date);
-                    if (imageInput.files.length > 0) {
-                        formData.append('files', imageInput.files[0]);
-                    }
+                accItemCount++;
+                const rowId = `acc-row-${Date.now()}`;
 
-                    try {
-                        const res = await fetch(`${SERVER_URL}/imports`, {
-                            method: 'POST',
-                            headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` },
-                            body: formData
-                        });
-                        if (res.ok) {
-                            alert('บันทึกแจ้งนำเข้าสำเร็จ');
-                            accImportForm.reset();
-                            document.getElementById('image-preview').classList.add('hidden');
-                            document.getElementById('image-preview-placeholder').classList.remove('hidden');
-                            fetchImportRequests();
-                        } else {
-                            const err = await res.json();
-                            alert('Error: ' + err.message);
-                        }
-                    } catch (err) { alert('Error: ' + err.message); }
+                const div = document.createElement('div');
+                div.className = "grid grid-cols-12 gap-3 p-4 bg-white rounded-xl border border-slate-100 shadow-sm animate-fade-in relative group";
+                div.id = rowId;
+                div.innerHTML = `
+                    <div class="col-span-1 flex items-center justify-center">
+                        <span class="w-8 h-8 rounded-full bg-slate-100 text-slate-500 flex items-center justify-center text-sm font-bold row-index">#</span>
+                    </div>
+                    <div class="col-span-7">
+                        <label class="block text-xs font-bold text-slate-400 mb-1">ชื่อสินค้า</label>
+                        <input type="text" class="acc-item-name form-input-theme w-full" placeholder="ระบุชื่อสินค้า..." required>
+                    </div>
+                    <div class="col-span-3">
+                        <label class="block text-xs font-bold text-slate-400 mb-1">จำนวน</label>
+                        <input type="number" class="acc-item-qty form-input-theme w-full text-center font-bold text-indigo-600" value="1" min="1" required>
+                    </div>
+                    <div class="col-span-1 flex items-center justify-center pt-5">
+                        <button type="button" onclick="removeAccessoryRow('${rowId}')" class="text-slate-300 hover:text-red-500 transition-colors p-2">
+                            <ion-icon name="trash" class="text-xl"></ion-icon>
+                        </button>
+                    </div>
+                `;
+                container.appendChild(div);
+                updateAccTotalCount();
+            };
+
+            window.removeAccessoryRow = function (id) {
+                const row = document.getElementById(id);
+                if (row) row.remove();
+
+                const container = document.getElementById('acc-items-container');
+                if (container.children.length === 0) {
+                    const emptyState = document.getElementById('acc-items-empty');
+                    if (emptyState) emptyState.classList.remove('hidden');
+                }
+                updateAccTotalCount();
+            };
+
+            function updateAccTotalCount() {
+                const rows = document.querySelectorAll('#acc-items-container > div');
+                const countDisplay = document.getElementById('acc-total-items-count');
+                if (countDisplay) countDisplay.textContent = rows.length;
+
+                rows.forEach((row, index) => {
+                    const idx = row.querySelector('.row-index');
+                    if (idx) idx.textContent = index + 1;
                 });
             }
+
+            window.submitAccessoryImport = async function () {
+                const rows = document.querySelectorAll('#acc-items-container > div');
+                if (rows.length === 0) return alert('กรุณาเพิ่มรายการสินค้าอย่างน้อย 1 รายการ');
+
+                const supplier = document.getElementById('acc-bill-supplier').value;
+                const billDate = document.getElementById('acc-bill-date').value;
+                const imageInput = document.getElementById('acc-bill-image');
+
+                if (!supplier || !billDate) return alert('กรุณาระบุวันที่และชื่อร้านค้า (Supplier)');
+
+                const items = [];
+                let isValid = true;
+                rows.forEach(row => {
+                    const name = row.querySelector('.acc-item-name').value;
+                    const qty = row.querySelector('.acc-item-qty').value;
+                    if (!name || parseInt(qty) <= 0) isValid = false;
+                    items.push({ name, qty: parseInt(qty) });
+                });
+
+                if (!isValid) return alert('กรุณากรอกข้อมูลสินค้าให้ครบถ้วน');
+
+                const formData = new FormData();
+                formData.append('type', 'accessory');
+                formData.append('companyId', document.getElementById('company-select').value);
+
+                const details = {
+                    supplier,
+                    billDate,
+                    items
+                };
+                formData.append('details', JSON.stringify(details));
+
+                if (imageInput.files.length > 0) {
+                    formData.append('files', imageInput.files[0]);
+                }
+
+                try {
+                    const res = await fetch(`${SERVER_URL}/imports`, {
+                        method: 'POST',
+                        headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` },
+                        body: formData
+                    });
+                    if (res.ok) {
+                        alert('บันทึกแจ้งนำเข้าสำเร็จ');
+                        // Reset Form
+                        document.getElementById('accessory-import-form-multi').reset();
+                        document.getElementById('acc-items-container').innerHTML = '';
+                        document.getElementById('acc-items-empty').classList.remove('hidden');
+                        document.getElementById('image-preview').classList.add('hidden');
+                        document.getElementById('image-preview-placeholder').classList.remove('hidden');
+                        updateAccTotalCount();
+
+                        closeModal('accImportModal');
+                        fetchImportRequests();
+                    } else {
+                        const err = await res.json();
+                        alert('Error: ' + err.message);
+                    }
+                } catch (err) { alert('Error: ' + err.message); }
+            };
 
             // Buttons
             document.getElementById('confirm-delete-button').addEventListener('click', executeDelete);
@@ -4023,6 +4721,13 @@
             document.getElementById('nav-admin').addEventListener('click', (e) => {
                 e.preventDefault(); updateNavActiveState('admin');
                 fetchAllUsersForTable();
+            });
+
+            // (*** เพิ่ม: Listener สำหรับเมนู Import ***)
+            document.getElementById('nav-import').addEventListener('click', (e) => {
+                e.preventDefault();
+                updateNavActiveState('import');
+                fetchImportRequests(); // เรียกฟังก์ชันดึงข้อมูล (ที่เราเพิ่งสร้าง)
             });
 
             // (*** เพิ่ม Listener สำหรับเมนู Deposit ***)
@@ -4167,20 +4872,7 @@
                     }
                 });
             }
-            // Expose Stock Functions to Window
-            window.filterStockImports = filterStockImports;
-            window.fetchStockImports = fetchStockImports;
-            window.openStatusModal = openStatusModal;
-            window.filterStockType = filterStockType;
 
-            // [New] Branch Filter Listener
-            const stockBranchSelect = document.getElementById('stock-import-branch-filter');
-            if (stockBranchSelect) {
-                stockBranchSelect.addEventListener('change', (e) => {
-                    currentStockBranch = e.target.value;
-                    fetchStockImports();
-                });
-            }
 
         });
 
@@ -4189,6 +4881,411 @@
         function closeModal(modalId) {
             document.getElementById(modalId).classList.remove('active');
         }
+
+        // (*** New: Import System Functions ***)
+        function switchImportTab(type) {
+            const phoneSection = document.getElementById('tab-import-phone');
+            const accSection = document.getElementById('tab-import-accessory');
+            const phoneBtn = document.getElementById('tab-btn-phone');
+            const accBtn = document.getElementById('tab-btn-accessory');
+
+            if (type === 'phone') {
+                safeShow(phoneSection);
+                safeHide(accSection);
+
+                phoneBtn.classList.remove('text-slate-500', 'hover:bg-slate-50');
+                phoneBtn.classList.add('bg-yellow-400', 'text-slate-900', 'shadow-md', 'shadow-yellow-400/30');
+
+                accBtn.classList.add('text-slate-500', 'hover:bg-slate-50');
+                accBtn.classList.remove('bg-slate-800', 'text-white', 'shadow-md');
+            } else {
+                safeHide(phoneSection);
+                safeShow(accSection);
+
+                accBtn.classList.remove('text-slate-500', 'hover:bg-slate-50');
+                accBtn.classList.add('bg-slate-900', 'text-white', 'shadow-md', 'shadow-slate-900/20');
+
+                phoneBtn.classList.add('text-slate-500', 'hover:bg-slate-50');
+                phoneBtn.classList.remove('bg-yellow-400', 'text-slate-900', 'shadow-md', 'shadow-yellow-400/30');
+            }
+        }
+
+        function previewImage(input) {
+            const preview = document.getElementById('image-preview');
+            const placeholder = document.getElementById('image-preview-placeholder');
+            if (input.files && input.files[0]) {
+                const reader = new FileReader();
+                reader.onload = function (e) {
+                    preview.src = e.target.result;
+                    preview.classList.remove('hidden');
+                    placeholder.classList.add('hidden');
+                }
+                reader.readAsDataURL(input.files[0]);
+            }
+        }
+
+        let allImportsData = []; // Store data locally
+
+        async function fetchImportRequests() {
+            try {
+                const token = localStorage.getItem('token');
+                if (!token) return;
+
+                const res = await fetch(`${SERVER_URL}/imports?limit=100`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                if (!res.ok) return;
+                allImportsData = await res.json();
+                renderImportLists();
+            } catch (e) {
+                console.error(e);
+            }
+        }
+
+        function renderImportLists() {
+            const searchInput = document.getElementById('import-filter-search');
+            // Check if element exists to avoid error if HTML update failed
+            const searchText = searchInput ? searchInput.value.toLowerCase() : '';
+
+            const statusInput = document.getElementById('import-filter-status');
+            const statusFilter = statusInput ? statusInput.value : 'all';
+
+            // Filter Data
+            const filteredData = allImportsData.filter(item => {
+                const s = item.status || 'pending';
+                const statusMatch = statusFilter === 'all' || s === statusFilter;
+
+                // Search: Supplier, Branch, Description, Type
+                const supplier = (item.details?.supplier || '').toLowerCase();
+                const branch = (item.branch || '').toLowerCase();
+                const desc = (item.details?.description || item.details?.note || '').toLowerCase();
+                const type = item.type.toLowerCase();
+
+                const searchMatch = !searchText ||
+                    supplier.includes(searchText) ||
+                    branch.includes(searchText) ||
+                    desc.includes(searchText) ||
+                    type.includes(searchText);
+
+                return statusMatch && searchMatch;
+            });
+
+            // Update Count
+            const countDisplay = document.getElementById('import-count-display');
+            if (countDisplay) countDisplay.textContent = `พบ ${filteredData.length} รายการ`;
+
+            // 1. Phone List
+            const phoneList = document.getElementById('phone-import-list');
+            if (phoneList) {
+                phoneList.innerHTML = '';
+                const phoneItems = filteredData.filter(d => d.type === 'phone');
+                if (phoneItems.length === 0) {
+                    phoneList.innerHTML = `<tr><td colspan="7" class="px-6 py-10 text-center text-slate-400">ไม่พบรายการ</td></tr>`;
+                } else {
+                    phoneItems.forEach(item => {
+                        const dateStr = new Date(item.createdAt).toLocaleDateString('th-TH');
+                        const fileCount = item.files ? item.files.length : 0;
+                        const fileName = fileCount > 0 ? `<a href="${SERVER_URL.replace('/api', '')}/${item.files[0]}" target="_blank" class="text-indigo-500 font-bold hover:underline flex items-center gap-1"><ion-icon name="document-text"></ion-icon> ไฟล์ (${fileCount})</a>` : '-';
+                        const branch = item.branch || '-';
+                        const createdBy = item.createdBy ? item.createdBy.name : '-';
+                        const details = item.details || {};
+                        const supplier = details.supplier || '-';
+                        const desc = details.description || '-';
+
+                        let statusBadge = `<span class="px-3 py-1 bg-slate-100 text-slate-500 rounded-full text-xs font-bold cursor-pointer hover:bg-slate-200 transition-colors" onclick="updateImportAction('${item._id}', '${item.status}')">รอตรวจสอบ <ion-icon name="create-outline"></ion-icon></span>`;
+                        if (item.status === 'pending') statusBadge = `<span class="px-3 py-1 bg-yellow-100 text-yellow-700 rounded-full text-xs font-bold ring-1 ring-yellow-200 cursor-pointer hover:bg-yellow-200 transition-colors" onclick="updateImportAction('${item._id}', '${item.status}')">รอนำเข้า <ion-icon name="create-outline"></ion-icon></span>`;
+                        else if (item.status === 'importing') statusBadge = `<span class="px-3 py-1 bg-blue-100 text-blue-700 rounded-full text-xs font-bold ring-1 ring-blue-200 cursor-pointer hover:bg-blue-200 transition-colors" onclick="updateImportAction('${item._id}', '${item.status}')">กำลังนำเข้า <ion-icon name="create-outline"></ion-icon></span>`;
+                        else if (item.status === 'received') statusBadge = `<span class="px-3 py-1 bg-green-100 text-green-700 rounded-full text-xs font-bold ring-1 ring-green-200 cursor-pointer hover:bg-green-200 transition-colors" onclick="updateImportAction('${item._id}', '${item.status}')">สำเร็จ <ion-icon name="create-outline"></ion-icon></span>`;
+
+                        const tr = document.createElement('tr');
+                        tr.className = "hover:bg-slate-50 transition-all border-b border-slate-100 last:border-0";
+                        tr.innerHTML = `
+                            <td class="px-6 py-4 text-sm font-bold text-slate-600">${dateStr}</td>
+                            <td class="px-6 py-4 text-sm">${fileName}</td>
+                            <td class="px-6 py-4 text-sm text-slate-600">
+                                <span class="font-bold text-slate-800">${supplier}</span>
+                                ${desc !== '-' ? `<div class="text-xs text-slate-400 mt-1">${desc}</div>` : ''}
+                            </td>
+                            <td class="px-6 py-4 text-sm font-bold text-slate-700">${branch}</td>
+                            <td class="px-6 py-4">${statusBadge}</td>
+                            <td class="px-6 py-4 text-sm text-slate-500">${createdBy}</td>
+                            <td class="px-6 py-4 text-sm text-right">
+                                <button onclick="deleteImportRequest('${item._id}')" class="text-slate-300 hover:text-red-500 transition-colors p-2 rounded-full hover:bg-red-50">
+                                    <ion-icon name="trash" class="text-lg"></ion-icon>
+                                </button>
+                            </td>
+                        `;
+                        phoneList.appendChild(tr);
+                    });
+                }
+            }
+
+            // 2. Accessory List
+            const accList = document.getElementById('accessory-import-list');
+            if (accList) {
+                accList.innerHTML = '';
+                const accItems = filteredData.filter(d => d.type === 'accessory' || d.type === 'accessories');
+                if (accItems.length === 0) {
+                    accList.innerHTML = `<div class="col-span-full py-12 text-center text-slate-400">ไม่พบรายการ Accessory</div>`;
+                } else {
+                    accItems.forEach(item => {
+                        const details = item.details || {};
+                        const imgUrl = (item.files && item.files.length > 0) ? `${SERVER_URL.replace('/api', '')}/${item.files[0]}` : null;
+
+                        let statusBadge = `bg-slate-100 text-slate-400`;
+                        let statusText = item.status;
+                        if (item.status === 'pending') { statusBadge = `bg-yellow-100 text-yellow-700 ring-1 ring-yellow-200`; statusText = 'รอนำเข้า'; }
+                        else if (item.status === 'importing') { statusBadge = `bg-blue-100 text-blue-700 ring-1 ring-blue-200`; statusText = 'กำลังนำเข้า'; }
+                        else if (item.status === 'received') { statusBadge = `bg-green-100 text-green-700 ring-1 ring-green-200`; statusText = 'สำเร็จ'; }
+
+                        let nameDisplay = details.productName || 'สินค้า';
+                        let qtyDisplay = details.quantity || 0;
+                        let descDisplay = details.description || '-';
+
+                        if (details.items && details.items.length > 0) {
+                            if (details.items.length === 1) {
+                                nameDisplay = details.items[0].productName;
+                                qtyDisplay = details.items[0].quantity;
+                                descDisplay = details.items[0].note || '-';
+                            } else {
+                                nameDisplay = `${details.items[0].productName} <span class="text-slate-400 font-normal text-xs">+${details.items.length - 1} รายการ</span>`;
+                                const totalQty = details.items.reduce((sum, i) => sum + (Number(i.quantity) || 0), 0);
+                                qtyDisplay = totalQty;
+                                descDisplay = details.items.map(i => `${i.productName} (x${i.quantity})`).join(', ');
+                            }
+                        }
+
+                        const card = document.createElement('div');
+                        card.className = "bg-white border border-slate-100 rounded-2xl p-4 flex gap-4 hover:shadow-lg transition-all group relative overflow-hidden";
+                        card.innerHTML = `
+                            <div class="w-24 h-24 rounded-xl bg-slate-50 flex-shrink-0 flex items-center justify-center overflow-hidden border border-slate-100 relative group-hover:border-yellow-400 transition-colors">
+                                ${imgUrl ? `<img src="${imgUrl}" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500">` : `<ion-icon name="receipt-outline" class="text-3xl text-slate-300"></ion-icon>`}
+                            </div>
+                            <div class="flex-1 min-w-0 flex flex-col justify-between py-1 relative z-10">
+                                <div>
+                                    <div class="flex justify-between items-start">
+                                        <h5 class="font-bold text-slate-800 text-sm truncate pr-2 w-full" title="${descDisplay}">${nameDisplay}</h5>
+                                         <button onclick="deleteImportRequest('${item._id}')" class="absolute top-0 right-0 text-slate-300 hover:text-red-500 transition-colors bg-white/80 p-1 rounded-full backdrop-blur-sm opacity-0 group-hover:opacity-100">
+                                            <ion-icon name="trash"></ion-icon>
+                                        </button>
+                                    </div>
+                                    <div class="flex items-center gap-2 mt-1 cursor-pointer hover:opacity-80 transition-opacity" onclick="updateImportAction('${item._id}', '${item.status}')">
+                                        <span class="px-2 py-0.5 rounded-md text-[10px] font-bold ${statusBadge}">${statusText} <ion-icon name="create-outline" class="text-xs"></ion-icon></span>
+                                        ${details.supplier ? `<span class="text-[10px] text-slate-400 flex items-center gap-1"><ion-icon name="storefront"></ion-icon> ${details.supplier}</span>` : ''}
+                                    </div>
+                                    <p class="text-xs text-slate-500 mt-2 line-clamp-1">${descDisplay}</p>
+                                </div>
+                                <div class="flex justify-between items-end mt-2 border-t border-slate-50 pt-2">
+                                    <p class="text-[10px] bg-slate-100 text-slate-600 px-2 py-1 rounded-lg font-bold">รวม ${qtyDisplay} ชิ้น</p>
+                                    <p class="text-[10px] text-slate-400 flex items-center gap-1"><ion-icon name="calendar-outline"></ion-icon> ${new Date(item.details.importDate || item.createdAt).toLocaleDateString('th-TH')}</p>
+                                </div>
+                            </div>
+                        `;
+                        accList.appendChild(card);
+                    });
+                }
+            }
+        }
+
+        async function updateImportAction(id, currentStatus) {
+            const nextMap = { 'pending': 'importing', 'importing': 'received', 'received': 'pending' };
+            const next = nextMap[currentStatus] || 'pending';
+            if (confirm(`ต้องการเปลี่ยนสถานะจาก "${currentStatus}" เป็น "${next}" หรือไม่?`)) {
+                try {
+                    const res = await fetch(`${SERVER_URL}/imports/${id}/status`, {
+                        method: 'PUT',
+                        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${localStorage.getItem('token')}` },
+                        body: JSON.stringify({ status: next })
+                    });
+                    if (res.ok) {
+                        const updated = await res.json();
+                        const index = allImportsData.findIndex(i => i._id === id);
+                        if (index !== -1) allImportsData[index].status = updated.status;
+                        renderImportLists();
+                    } else { alert('Update Failed'); }
+                } catch (e) { alert('Error: ' + e.message); }
+            }
+        }
+
+        async function deleteImportRequest(id) {
+            if (confirm('คุณแน่ใจหรือไม่ที่จะลบรายการนี้?')) {
+                try {
+                    const res = await fetch(`${SERVER_URL}/imports/${id}`, {
+                        method: 'DELETE',
+                        headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
+                    });
+                    if (res.ok) {
+                        allImportsData = allImportsData.filter(i => i._id !== id);
+                        renderImportLists();
+                    } else { alert('Delete Failed'); }
+                } catch (e) { alert('Error: ' + e.message); }
+            }
+        }
+
+
+        // (*** New: Open Acc Modal ***)
+        function openAccessoryImportModal() {
+            // Reset
+            const form = document.getElementById('accessory-import-form-multi');
+            if (form) form.reset();
+
+            const container = document.getElementById('acc-items-container');
+            if (container) container.innerHTML = ''; // Clear items
+
+            const emptyState = document.getElementById('acc-items-empty');
+            if (emptyState) emptyState.classList.remove('hidden');
+
+            // Preview Image Reset
+            const imgPreview = document.getElementById('image-preview');
+            const imgPlaceholder = document.getElementById('image-preview-placeholder');
+            if (imgPreview) {
+                imgPreview.classList.add('hidden');
+                imgPreview.src = '';
+            }
+            if (imgPlaceholder) imgPlaceholder.classList.remove('hidden');
+
+            // Set Default Date
+            const dateInput = document.getElementById('acc-bill-date');
+            if (dateInput) dateInput.valueAsDate = new Date();
+
+            const countDisplay = document.getElementById('acc-total-items-count');
+            if (countDisplay) countDisplay.textContent = '0';
+
+            openModal('accImportModal');
+            // Add first row by default (optional, user might want to see empty state first, but let's add one)
+            addAccessoryItemRow();
+        }
+
+        // (*** New: Add Item Row ***)
+        function addAccessoryItemRow() {
+            const emptyState = document.getElementById('acc-items-empty');
+            if (emptyState) emptyState.classList.add('hidden');
+
+            const container = document.getElementById('acc-items-container');
+            const rowId = 'acc-row-' + Date.now();
+
+            const div = document.createElement('div');
+            div.className = "bg-white p-4 rounded-xl border border-slate-200 shadow-sm flex flex-col md:flex-row gap-4 items-start md:items-center animate-fade-in group";
+            div.id = rowId;
+            div.innerHTML = `
+                <div class="flex-1 w-full">
+                    <input type="text" name="acc-item-name" placeholder="ชื่อสินค้า (เช่น หูฟัง, กระจก)" class="form-input-theme w-full" required>
+                </div>
+                <div class="w-24">
+                    <input type="number" name="acc-item-qty" value="1" min="1" class="form-input-theme w-full text-center" placeholder="จำนวน" required>
+                </div>
+                <div class="flex-1 w-full">
+                    <input type="text" name="acc-item-desc" placeholder="รายละเอียด/หมายเหตุ" class="form-input-theme w-full">
+                </div>
+                <button type="button" onclick="removeAccessoryItemRow('${rowId}')" class="text-slate-400 hover:text-red-500 p-2 rounded-full hover:bg-red-50 transition-all">
+                    <ion-icon name="trash-outline" class="text-xl"></ion-icon>
+                </button>
+            `;
+            container.appendChild(div);
+            updateAccTotalCount();
+        }
+
+        function removeAccessoryItemRow(id) {
+            const row = document.getElementById(id);
+            if (row) row.remove();
+
+            const container = document.getElementById('acc-items-container');
+            if (container.children.length === 0) {
+                document.getElementById('acc-items-empty').classList.remove('hidden');
+            }
+            updateAccTotalCount();
+        }
+
+        function updateAccTotalCount() {
+            const container = document.getElementById('acc-items-container');
+            if (container) {
+                const count = container.children.length;
+                document.getElementById('acc-total-items-count').textContent = count;
+            }
+        }
+
+        // (*** New: Submit Multi-Item Import ***)
+        async function submitAccessoryImport() {
+            const fileInput = document.getElementById('acc-bill-image');
+            const date = document.getElementById('acc-bill-date').value;
+            const supplier = document.getElementById('acc-bill-supplier').value;
+
+            if (!date) return alert('กรุณาระบุวันที่');
+
+            // Collect Items
+            const rows = document.getElementById('acc-items-container').children;
+            if (rows.length === 0) return alert('กรุณาเพิ่มรายการสินค้าอย่างน้อย 1 รายการ');
+
+            let items = [];
+            for (let row of rows) {
+                const name = row.querySelector('[name="acc-item-name"]').value;
+                const qty = row.querySelector('[name="acc-item-qty"]').value;
+                const desc = row.querySelector('[name="acc-item-desc"]').value;
+
+                if (!name || !qty) return alert('กรุณากรอกชื่อสินค้าและจำนวนให้ครบถ้วน');
+                items.push({
+                    productName: name,
+                    quantity: Number(qty),
+                    note: desc
+                });
+            }
+
+            const formData = new FormData();
+            formData.append('type', 'accessory');
+            formData.append('companyId', document.getElementById('company-select').value);
+            formData.append('importDate', date);
+            if (supplier) formData.append('supplier', supplier);
+
+            // Send Items as JSON String
+            formData.append('items', JSON.stringify(items));
+
+            if (fileInput.files.length > 0) {
+                formData.append('files', fileInput.files[0]);
+            }
+
+            try {
+                const res = await fetch(`${SERVER_URL}/imports`, {
+                    method: 'POST',
+                    headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` },
+                    body: formData
+                });
+
+                if (res.ok) {
+                    alert('บันทึกนำเข้าสำเร็จ!');
+                    closeModal('accImportModal');
+                    fetchImportRequests();
+                } else {
+                    const err = await res.json();
+                    alert('Error: ' + err.message);
+                }
+            } catch (err) { alert('Error: ' + err.message); }
+        }
+
+        // Expose Functions
+        window.openAccessoryImportModal = openAccessoryImportModal;
+        window.addAccessoryItemRow = addAccessoryItemRow;
+        window.removeAccessoryItemRow = removeAccessoryItemRow;
+        window.submitAccessoryImport = submitAccessoryImport;
+
+        // (*** New: Open Phone Import Modal ***)
+        function openPhoneImportModal() {
+            const form = document.getElementById('phone-import-form');
+            if (form) form.reset();
+
+            const display = document.getElementById('file-name-display');
+            if (display) {
+                display.textContent = '';
+                display.classList.add('hidden');
+                display.classList.remove('inline-block');
+            }
+            openModal('phoneImportModal');
+        }
+
+        // Expose to Window
+        window.openPhoneImportModal = openPhoneImportModal;
+        window.switchImportTab = switchImportTab;
+        window.previewImage = previewImage;
+        window.fetchImportRequests = fetchImportRequests;
 
         window.addEventListener('click', (event) => {
             if (event.target.classList.contains('modal')) {

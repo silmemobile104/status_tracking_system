@@ -31,7 +31,15 @@ const ImportRequestSchema = new mongoose.Schema({
         productName: String,
         quantity: Number,
         importDate: Date,
-        description: String
+        importDate: Date,
+        importDate: Date,
+        description: String,
+        supplier: String,
+        items: [{                 // (*** เพิ่ม: รองรับหลายสินค้าใน 1 บิล ***)
+            productName: String,
+            quantity: Number,
+            note: String
+        }]
     },
     createdAt: {
         type: Date,

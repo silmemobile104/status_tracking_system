@@ -21,12 +21,12 @@ const storage = new CloudinaryStorage({
     params: async (req, file) => {
         // ดึงนามสกุลไฟล์
         const fileFormat = file.originalname.split('.').pop();
-        
+
         return {
             folder: 'status_tracking_uploads',
             resource_type: 'auto',
             format: fileFormat, // บังคับนามสกุลเดิม
-            
+
             // --- เพิ่ม 2 บรรทัดนี้ ---
             use_filename: true, // ใช้ชื่อไฟล์เดิมจากเครื่อง
             unique_filename: false, // ไม่ต้องเติมเลขสุ่มต่อท้าย
@@ -47,5 +47,6 @@ try {
 router.post('/', verifyToken, upload.array('files', 5), importController.createImport);
 router.get('/', verifyToken, importController.getImports);
 router.put('/:id/status', verifyToken, checkRole(['admin', 'manager', 'executive', 'staff']), importController.updateImportStatus);
+router.delete('/:id', verifyToken, checkRole(['admin', 'manager']), importController.deleteImport);
 
 module.exports = router;
