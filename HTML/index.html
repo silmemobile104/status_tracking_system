@@ -1002,6 +1002,16 @@
                                                     </div>
                                                 </div>
 
+                                                <!-- Bill Name (New) -->
+                                                <div>
+                                                    <label
+                                                        class="block text-xs font-bold text-slate-500 mb-1 uppercase">เลขที่เอกสาร
+                                                        / ชื่อบิล</label>
+                                                    <input type="text" id="acc-bill-name"
+                                                        class="form-input-theme w-full"
+                                                        placeholder="ระบุเลขที่บิล หรือชื่อ..." required>
+                                                </div>
+
                                                 <!-- Date & Supplier -->
                                                 <div>
                                                     <label
@@ -1070,22 +1080,6 @@
                             </div>
                         </div>
                     </div>
-
-                    <!-- List -->
-                    <div class="lg:col-span-2">
-                        <div
-                            class="bg-white rounded-3xl shadow-sm border border-slate-100 overflow-hidden h-full flex flex-col">
-                            <div class="p-6 border-b border-slate-100 flex justify-between items-center bg-slate-50/50">
-                                <h4 class="text-lg font-bold text-slate-800">รายการ Accessories ล่าสุด</h4>
-                            </div>
-                            <div class="p-6 grid grid-cols-1 sm:grid-cols-2 gap-4 flex-grow overflow-y-auto max-h-[600px] custom-scrollbar"
-                                id="accessory-import-list">
-                                <!-- Accessor Cards Injected Here -->
-                                <div class="col-span-full py-12 text-center text-slate-400">กำลังโหลดข้อมูล...
-                                </div>
-                            </div>
-                        </div>
-                    </div>
                 </div>
             </div>
             <div id="stock-import-view" class="hidden space-y-8 mt-8 animate-fade-in pb-20">
@@ -1118,7 +1112,7 @@
                         </div>
 
                         <!-- Stats Cards Group -->
-                        <div class="grid grid-cols-3 gap-4 w-full lg:w-auto">
+                        <div class="grid grid-cols-4 gap-4 w-full lg:w-auto">
                             <!-- All -->
                             <div
                                 class="bg-slate-50 border border-slate-100 p-4 rounded-2xl text-center min-w-[100px] hover:bg-white hover:shadow-md transition-all group">
@@ -1143,6 +1137,14 @@
                                 <p class="text-xs font-bold text-blue-600 uppercase tracking-wider mb-1">กำลังนำเข้า</p>
                                 <p id="stat-stock-importing"
                                     class="text-2xl font-black text-blue-600 group-hover:scale-110 transition-transform">
+                                    0</p>
+                            </div>
+                            <!-- Received (New) -->
+                            <div class="bg-green-50 border border-green-100 p-4 rounded-2xl text-center min-w-[100px] hover:bg-green-100 hover:shadow-md transition-all group cursor-pointer"
+                                onclick="filterStockImports('received')">
+                                <p class="text-xs font-bold text-green-600 uppercase tracking-wider mb-1">นำเข้าแล้ว</p>
+                                <p id="stat-stock-received"
+                                    class="text-2xl font-black text-green-600 group-hover:scale-110 transition-transform">
                                     0</p>
                             </div>
                         </div>
@@ -1249,7 +1251,7 @@
                                             🏪 สาขา / ผู้แจ้ง</th>
                                         <th
                                             class="px-6 py-5 text-left text-xs font-bold text-slate-500 uppercase tracking-wider">
-                                            📦 ข้อมูลสินค้า</th>
+                                            📦 Supplier</th>
                                         <th
                                             class="px-6 py-5 text-left text-xs font-bold text-slate-500 uppercase tracking-wider">
                                             📎 ไฟล์แนบ</th>
@@ -4126,7 +4128,8 @@
                         // Image
                         let imgUrl = 'image/placeholder.jpg'; // Path placeholder
                         if (item.files && item.files.length > 0) {
-                            imgUrl = `${SERVER_URL.replace('/api', '')}/${item.files[0]}`;
+                            const rawPath = item.files[0];
+                            imgUrl = rawPath.startsWith('http') ? rawPath : `${SERVER_URL.replace('/api', '')}/${rawPath}`;
                         } else {
                             // Fallback icon
                         }
@@ -4191,6 +4194,7 @@
                 const all = data.length;
                 const pending = data.filter(i => i.status === 'pending').length;
                 const importing = data.filter(i => i.status === 'importing').length;
+                const received = data.filter(i => i.status === 'received').length;
 
                 const anim = (id, val) => {
                     const el = document.getElementById(id);
@@ -4200,6 +4204,7 @@
                 anim('stat-stock-all', all);
                 anim('stat-stock-pending', pending);
                 anim('stat-stock-importing', importing);
+                anim('stat-stock-received', received); // (*** New ***)
             }
 
             window.changeStockPage = function (delta) {
@@ -4352,6 +4357,8 @@
             window.fetchStockImports = fetchStockImports;
             window.openStatusModal = openStatusModal;
             window.filterStockType = filterStockType;
+            window.updateStockStatusFromModal = updateStockStatusFromModal;
+            window.openImportDetailModal = openImportDetailModal;
 
             // [New] Branch Filter Listener
             const stockBranchSelect = document.getElementById('stock-import-branch-filter');
@@ -4401,7 +4408,8 @@
                 const imgEl = document.getElementById('detail-bill-image');
                 const linkEl = document.getElementById('detail-bill-link');
                 if (item.files && item.files.length > 0) {
-                    const path = `${SERVER_URL.replace('/api', '')}/${item.files[0]}`;
+                    const rawPath = item.files[0];
+                    const path = rawPath.startsWith('http') ? rawPath : `${SERVER_URL.replace('/api', '')}/${rawPath}`;
                     imgEl.src = path;
                     linkEl.href = path;
                 } else {
@@ -4415,26 +4423,37 @@
 
                 if (d.items && d.items.length > 0) {
                     d.items.forEach((subItem, index) => {
+                        // Fix: Support both productName/quantity and legacy name/qty
+                        const pName = subItem.productName || subItem.name || 'สินค้า';
+                        const pQty = subItem.quantity || subItem.qty || 0;
+                        const pNote = subItem.note || '';
+
                         const div = document.createElement('div');
                         div.className = "flex justify-between items-center p-3 rounded-xl bg-slate-50 border border-slate-100";
                         div.innerHTML = `
                              <div class="flex items-center gap-3">
                                  <span class="w-6 h-6 rounded-full bg-indigo-100 text-indigo-600 flex items-center justify-center text-xs font-bold">${index + 1}</span>
-                                 <span class="font-bold text-slate-700">${subItem.name}</span>
+                                 <div>
+                                     <span class="font-bold text-slate-700 block">${pName}</span>
+                                     ${pNote ? `<span class="text-xs text-slate-400 font-normal">${pNote}</span>` : ''}
+                                 </div>
                              </div>
-                             <span class="font-bold text-slate-900">x${subItem.qty}</span>
+                             <span class="font-bold text-slate-900 bg-white px-2 py-1 rounded border border-slate-100 shadow-sm">x${pQty}</span>
                          `;
                         listContainer.appendChild(div);
                     });
                 } else {
                     // Single Item Fallback
+                    const pName = d.productName || 'สินค้า';
+                    const pQty = d.quantity || 1;
+
                     listContainer.innerHTML = `
                          <div class="flex justify-between items-center p-3 rounded-xl bg-slate-50 border border-slate-100">
                              <div class="flex items-center gap-3">
                                  <span class="w-6 h-6 rounded-full bg-indigo-100 text-indigo-600 flex items-center justify-center text-xs font-bold">1</span>
-                                 <span class="font-bold text-slate-700">${d.productName || '-'}</span>
+                                 <span class="font-bold text-slate-700">${pName}</span>
                              </div>
-                             <span class="font-bold text-slate-900">x${d.quantity || 1}</span>
+                             <span class="font-bold text-slate-900 bg-white px-2 py-1 rounded border border-slate-100 shadow-sm">x${pQty}</span>
                          </div>
                      `;
                 }
@@ -4648,6 +4667,9 @@
 
                 if (imageInput.files.length > 0) {
                     formData.append('files', imageInput.files[0]);
+                } else {
+                    // (Optional) Warning if no image
+                    // if (!confirm('คุณไม่ได้แนบรูปภาพ ต้องการบันทึกหรือไม่?')) return;
                 }
 
                 try {
@@ -4924,21 +4946,82 @@
             }
         }
 
-        let allImportsData = []; // Store data locally
+        // ประกาศตัวแปรนี้ไว้ข้างบนสุด (ถ้ายังไม่มี)
+        let allImportsData = [];
 
         async function fetchImportRequests() {
+            console.log("--- เริ่มโหลดข้อมูล Import ---");
+
+            // 1. ตรวจสอบ Element ที่แสดงคำว่า "กำลังโหลด" (ถ้ามี)
+            // ลองหา ID ของ loading spinner ถ้าทราบ ให้ใส่ตรงนี้
+
             try {
                 const token = localStorage.getItem('token');
-                if (!token) return;
+                if (!token) {
+                    alert('ไม่พบ Token! กรุณา Login ใหม่');
+                    window.location.href = 'login.html';
+                    return;
+                }
 
-                const res = await fetch(`${SERVER_URL}/imports?limit=100`, {
-                    headers: { 'Authorization': `Bearer ${token}` }
+                // *** จุดสังเกตที่ 1: URL ต้องมี /api/imports ***
+                // เช็คว่า SERVER_URL ของคุณมี /api ต่อท้ายหรือไม่ ถ้ามีอยู่แล้วให้ลบ /api ในบรรทัดนี้ออก
+                const targetUrl = `${SERVER_URL}/imports?limit=100`;
+                console.log("กำลังเรียก URL:", targetUrl);
+
+                const res = await fetch(targetUrl, {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    }
                 });
-                if (!res.ok) return;
-                allImportsData = await res.json();
-                renderImportLists();
+
+                console.log("Status Code:", res.status);
+
+                if (!res.ok) {
+                    const errText = await res.text();
+                    console.error("Server Error:", errText);
+
+                    if (res.status === 401) {
+                        alert('Session หมดอายุ กรุณาเข้าสู่ระบบใหม่');
+                        window.location.href = 'login.html';
+                    } else if (res.status === 404) {
+                        alert(`หาไฟล์ไม่เจอ (404) กรุณาเช็ค URL: ${targetUrl}`);
+                    } else {
+                        alert(`เกิดข้อผิดพลาดจาก Server (${res.status}): ${errText}`);
+                    }
+                    return;
+                }
+
+                const responseData = await res.json();
+                console.log("ข้อมูลที่ได้:", responseData);
+
+                // 2. จัดการข้อมูลให้เป็น Array เสมอ
+                if (Array.isArray(responseData)) {
+                    allImportsData = responseData;
+                } else if (responseData.data && Array.isArray(responseData.data)) {
+                    allImportsData = responseData.data;
+                } else {
+                    console.warn("รูปแบบข้อมูลไม่ถูกต้อง:", responseData);
+                    allImportsData = [];
+                }
+
+                // 3. เรียกฟังก์ชันแสดงผล (ใส่ Try-Catch กันเหนียวไว้)
+                try {
+                    if (typeof renderImportLists === 'function') {
+                        renderImportLists();
+                        console.log("แสดงผลข้อมูลสำเร็จ");
+                    } else {
+                        alert("ไม่พบฟังก์ชัน 'renderImportLists' ในโค้ดของคุณ!");
+                    }
+                } catch (renderError) {
+                    console.error("Error ในการแสดงผล (renderImportLists):", renderError);
+                    alert("โหลดข้อมูลมาได้แล้ว แต่ฟังก์ชันแสดงผลมีปัญหา: " + renderError.message);
+                }
+
             } catch (e) {
-                console.error(e);
+                console.error("Fetch Error:", e);
+                alert('เกิดข้อผิดพลาดในการเชื่อมต่อ: ' + e.message);
             }
         }
 
@@ -5030,7 +5113,16 @@
                 } else {
                     accItems.forEach(item => {
                         const details = item.details || {};
-                        const imgUrl = (item.files && item.files.length > 0) ? `${SERVER_URL.replace('/api', '')}/${item.files[0]}` : null;
+                        // (*** Fix: Handle Absolute Cloudinary URLs ***)
+                        let imgUrl = null;
+                        if (item.files && item.files.length > 0) {
+                            const rawPath = item.files[0];
+                            if (rawPath.startsWith('http')) {
+                                imgUrl = rawPath; // Use absolute URL (Cloudinary)
+                            } else {
+                                imgUrl = `${SERVER_URL.replace('/api', '')}/${rawPath}`; // Use local path
+                            }
+                        }
 
                         let statusBadge = `bg-slate-100 text-slate-400`;
                         let statusText = item.status;
@@ -5039,10 +5131,14 @@
                         else if (item.status === 'received') { statusBadge = `bg-green-100 text-green-700 ring-1 ring-green-200`; statusText = 'สำเร็จ'; }
 
                         let nameDisplay = details.productName || 'สินค้า';
-                        let qtyDisplay = details.quantity || 0;
-                        let descDisplay = details.description || '-';
 
-                        if (details.items && details.items.length > 0) {
+                        // (*** New: Use Bill Name if available ***)
+                        if (details.billName) {
+                            nameDisplay = details.billName;
+                        }
+
+                        // Only construct from items if billName is missing
+                        if (!details.billName && details.items && details.items.length > 0) {
                             if (details.items.length === 1) {
                                 nameDisplay = details.items[0].productName;
                                 qtyDisplay = details.items[0].quantity;
@@ -5053,6 +5149,11 @@
                                 qtyDisplay = totalQty;
                                 descDisplay = details.items.map(i => `${i.productName} (x${i.quantity})`).join(', ');
                             }
+                        } else if (details.items && details.items.length > 0) {
+                            // Correct calculation for Qty/Desc even if Bill Name is used
+                            const totalQty = details.items.reduce((sum, i) => sum + (Number(i.quantity) || 0), 0);
+                            qtyDisplay = totalQty;
+                            descDisplay = details.items.map(i => `${i.productName} (x${i.quantity})`).join(', ');
                         }
 
                         const card = document.createElement('div');
@@ -5209,8 +5310,10 @@
             const fileInput = document.getElementById('acc-bill-image');
             const date = document.getElementById('acc-bill-date').value;
             const supplier = document.getElementById('acc-bill-supplier').value;
+            const billName = document.getElementById('acc-bill-name')?.value || ''; // (*** New: Bill Name ***)
 
             if (!date) return alert('กรุณาระบุวันที่');
+            if (!billName) return alert('กรุณาระบุเลขที่เอกสาร/ชื่อบิล');
 
             // Collect Items
             const rows = document.getElementById('acc-items-container').children;
@@ -5233,11 +5336,19 @@
             const formData = new FormData();
             formData.append('type', 'accessory');
             formData.append('companyId', document.getElementById('company-select').value);
-            formData.append('importDate', date);
+            formData.append('importDate', date); // (*** Fix: Mapped to Model 'importDate' ***)
             if (supplier) formData.append('supplier', supplier);
 
-            // Send Items as JSON String
-            formData.append('items', JSON.stringify(items));
+            const details = {
+                supplier,
+                billName, // (*** New ***)
+                items
+            };
+
+            // (*** DEBUG: CHECK PAYLOAD ***)
+            alert("Sending Details: " + JSON.stringify(details, null, 2));
+
+            formData.append('details', JSON.stringify(details));
 
             if (fileInput.files.length > 0) {
                 formData.append('files', fileInput.files[0]);

@@ -1,0 +1,38 @@
+[
+  {
+    "details": {
+      "supplier": "sumsung",
+      "items": [
+        {
+          "productName": "เคส",
+          "quantity": 58,
+          "note": "",
+          "_id": "69424a1a87d03fa1a35495cf"
+        },
+        {
+          "productName": "หูฟัง",
+          "quantity": 5,
+          "note": "",
+          "_id": "69424a1a87d03fa1a35495d0"
+        },
+        {
+          "productName": "สายชาร์จ",
+          "quantity": 45,
+          "note": "",
+          "_id": "69424a1a87d03fa1a35495d1"
+        }
+      ]
+    },
+    "_id": "69424a1a87d03fa1a35495ce",
+    "type": "accessory",
+    "branch": "ADMIN",
+    "companyId": "company_1_id",
+    "status": "pending",
+    "createdBy": "6917064f4704d5a9f4724f20",
+    "files": [
+      "https://res.cloudinary.com/ddyozwh8v/image/upload/v1765952025/status_tracking_uploads/file.png"
+    ],
+    "createdAt": "2025-12-17T06:13:46.517Z",
+    "__v": 0
+  }
+]

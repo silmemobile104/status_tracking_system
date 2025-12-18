@@ -4,12 +4,26 @@ const ImportRequest = require('../models/importRequest');
 exports.createImport = async (req, res) => {
     try {
         const { type, details } = req.body;
+        console.log('DEBUG: Received Create Import:', { type, detailsRaw: details }); // (*** DEBUG ***)
+
         const files = req.files ? req.files.map(file => file.path) : [];
         let parsedDetails = {};
         if (details) {
             try {
                 parsedDetails = JSON.parse(details);
+                console.log('DEBUG: Parsed Details:', JSON.stringify(parsedDetails, null, 2));
+
+                // (*** Robustness Fix: Ensure items are structured correctly ***)
+                if (parsedDetails.items && Array.isArray(parsedDetails.items)) {
+                    parsedDetails.items = parsedDetails.items.map(item => ({
+                        productName: item.productName || item.name || 'Unknown Item',
+                        quantity: Number(item.quantity || item.qty || 1),
+                        note: item.note || item.desc || ''
+                    }));
+                }
+
             } catch (e) {
+                console.error('DEBUG: Parse Error:', e);
                 parsedDetails = details;
             }
         } else {
@@ -22,9 +36,10 @@ exports.createImport = async (req, res) => {
             };
         }
 
-        // (*** เพิ่ม: รับ description สำหรับ Phone Import ***)
-        if (type === 'phone' && req.body.description) {
-            parsedDetails.description = req.body.description;
+        // (*** เพิ่ม: รับ description และ supplier สำหรับ Phone Import ***)
+        if (type === 'phone') {
+            if (req.body.description) parsedDetails.description = req.body.description;
+            if (req.body.supplier) parsedDetails.supplier = req.body.supplier; // (*** Fix: Save Supplier ***)
         }
 
         const newImport = new ImportRequest({
