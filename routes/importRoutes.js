@@ -53,7 +53,7 @@ router.get('/', verifyToken, importController.getImports);
 // อัปเดตสถานะ (เฉพาะ role ที่ระบุ)
 router.put('/:id/status', verifyToken, checkRole(['admin', 'manager', 'executive', 'staff']), importController.updateImportStatus);
 
-// ลบรายการ (เฉพาะ admin/manager)
-router.delete('/:id', verifyToken, checkRole(['admin', 'manager']), importController.deleteImport);
+// ลบรายการ (เฉพาะ admin/manager/executive)
+router.delete('/:id', verifyToken, checkRole(['admin', 'manager', 'executive']), importController.deleteImport);
 
 module.exports = router;

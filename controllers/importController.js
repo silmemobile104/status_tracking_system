@@ -156,6 +156,7 @@ exports.updateImportStatus = async (req, res) => {
 // @desc    Delete import request
 exports.deleteImport = async (req, res) => {
     try {
+        console.log(`DEBUG: Attempting to delete import: ${req.params.id} by user: ${req.user.username} (${req.user.role})`);
         const importRequest = await ImportRequest.findById(req.params.id);
 
         if (!importRequest) {
