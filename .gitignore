@@ -3,14 +3,31 @@
 
 # Files created by the application (DO NOT COMMIT)
 /uploads
+*.log
 
 # Utility/Setup/Debug Scripts
 create_admin_script.js
 fix_password.js
 inspect_imports.js
-debug_data.js
-debug_data_v2.js
-debug_server.js
+debug_*.js
+test_*.js
+check_user.js
+
+# Data/Temp files
+*.json
+!package.json
+!package-lock.json
+!vercel.json
 
 # Environment variables
 .env
+
+# OS metadata
+.DS_Store
+Thumbs.db
+
+# IDE/Editor settings
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace

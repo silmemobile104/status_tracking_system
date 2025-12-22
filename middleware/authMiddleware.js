@@ -24,8 +24,11 @@ exports.protect = async (req, res, next) => {
             req.user = await User.findById(decoded.user.id).select('-password');
 
             if (!req.user) {
+                console.warn(`[AuthMiddleware] User not found for ID: ${decoded.user.id}`);
                 return res.status(401).json({ message: 'ไม่พบผู้ใช้' });
             }
+
+            console.log(`[AuthMiddleware] Authenticated: ${req.user.username} (${req.user.role})`);
 
             // 5. ไปยังขั้นตอนต่อไป (เช่น taskController.createTask)
             next();

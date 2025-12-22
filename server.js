@@ -35,6 +35,7 @@ app.use('/api/users', userRoutes);
 app.use('/api/notifications', notificationRoutes);
 app.use('/api/deposits', depositRoutes);
 app.use('/api/imports', require('./routes/importRoutes'));
+app.use('/api/stock-requests', require('./routes/stockRequestRoutes'));
 
 // Serve Uploads
 app.use('/uploads', express.static(path.join(process.cwd(), 'uploads')));

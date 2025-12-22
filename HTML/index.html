@@ -264,6 +264,18 @@
                             class="w-5 h-5 mr-3 text-slate-400 group-hover:text-yellow-500 transition-colors"></ion-icon>
                         <span class="font-medium">จัดการผู้ใช้</span>
                     </a>
+                    <a href="#" onclick="updateNavActiveState('stock-request')" id="nav-stock-request"
+                        class="flex items-center px-4 py-3 text-slate-600 hover:bg-slate-50 hover:text-slate-900 rounded-xl transition-all group">
+                        <ion-icon name="clipboard-outline"
+                            class="w-5 h-5 mr-3 text-slate-400 group-hover:text-yellow-500 transition-colors"></ion-icon>
+                        <span class="font-medium">แจ้งเบิกสินค้า</span>
+                    </a>
+                    <a href="#" onclick="updateNavActiveState('stock-request-manage')" id="nav-stock-request-manage"
+                        class="flex items-center px-4 py-3 text-slate-600 hover:bg-slate-50 hover:text-slate-900 rounded-xl transition-all group hidden">
+                        <ion-icon name="settings-outline"
+                            class="w-5 h-5 mr-3 text-slate-400 group-hover:text-yellow-500 transition-colors"></ion-icon>
+                        <span class="font-medium">จัดการคำขอเบิก</span>
+                    </a>
                 </nav>
 
                 <!-- User Profile -->
@@ -689,6 +701,71 @@
                     </div>
                 </div>
 
+                <!-- Stock Request View (For Sales) -->
+                <div id="stock-request-view" class="hidden space-y-6 mt-6">
+                    <div
+                        class="bg-white rounded-2xl p-6 shadow-sm border border-slate-100 flex flex-col md:flex-row justify-between items-center gap-4">
+                        <div class="flex items-center gap-4">
+                            <div class="p-3 bg-indigo-600 text-white rounded-xl shadow-lg">
+                                <ion-icon name="cart-outline" class="text-2xl"></ion-icon>
+                            </div>
+                            <div>
+                                <h3 class="text-xl font-bold text-slate-800">แจ้งเบิกสินค้า</h3>
+                                <p class="text-sm text-slate-500">แจ้งเบิกสินค้าที่หมดสต็อกเพื่อให้ฝ่ายจัดซื้อดำเนินการ
+                                </p>
+                            </div>
+                        </div>
+                        <div class="flex flex-wrap items-center gap-3 w-full md:w-auto">
+                            <!-- Status Filter -->
+                            <div class="relative group flex-1 md:flex-none min-w-[160px]">
+                                <ion-icon name="funnel-outline"
+                                    class="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-hover:text-indigo-500 transition-colors z-10"></ion-icon>
+                                <select id="stock-request-status-filter" onchange="fetchStockRequests()"
+                                    class="pl-11 pr-10 py-2.5 rounded-xl border border-slate-200 bg-white text-sm font-bold text-slate-700 focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 outline-none cursor-pointer hover:border-indigo-300 transition-all shadow-sm appearance-none w-full">
+                                    <option value="pending">⏳ รอสั่ง</option>
+                                    <option value="processing">📦 กำลังสั่ง</option>
+                                    <option value="received">✅ ได้รับแล้ว</option>
+                                    <option value="canceled">❌ ยกเลิก</option>
+                                    <option value="">ทุกสถานะ</option>
+                                </select>
+                                <ion-icon name="chevron-down-outline"
+                                    class="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none text-xs"></ion-icon>
+                            </div>
+
+                            <button onclick="openStockRequestModal()"
+                                class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2.5 px-6 rounded-xl shadow-lg transition-all flex items-center shrink-0">
+                                <ion-icon name="add-circle" class="mr-2 text-xl"></ion-icon> แจ้งเบิกสินค้าใหม่
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
+                        <div class="overflow-x-auto">
+                            <table class="w-full">
+                                <thead class="bg-slate-50 border-b border-slate-100">
+                                    <tr>
+                                        <th class="px-6 py-4 text-left text-xs font-semibold text-slate-500 uppercase">
+                                            วันที่สั่ง</th>
+                                        <th class="px-6 py-4 text-left text-xs font-semibold text-slate-500 uppercase">
+                                            รายการ</th>
+                                        <th
+                                            class="px-6 py-4 text-center text-xs font-semibold text-slate-500 uppercase">
+                                            สถานะ</th>
+                                        <th class="px-6 py-4 text-left text-xs font-semibold text-slate-500 uppercase">
+                                            วันคาดการถึง</th>
+                                        <th class="px-6 py-4 text-right text-xs font-semibold text-slate-500 uppercase">
+                                            จัดการ</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="stock-request-table-body" class="divide-y divide-slate-100 text-sm">
+                                    <!-- Dynamic Content -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+
                 <!-- Import Notification View (Theme: Yellow / Black) -->
                 <div id="import-view" class="hidden space-y-6 mt-6">
                     <!-- Header -->
@@ -755,8 +832,8 @@
                                 class="p-1 bg-yellow-400 text-slate-900 rounded-lg group-hover:scale-110 transition-transform">
                                 <ion-icon name="add"></ion-icon>
                             </div>
-                                <span>เพิ่มรายการนำเข้า</span>
-                            </button>
+                            <span>เพิ่มรายการนำเข้า</span>
+                        </button>
 
                         <!-- (*** New: Phone Import Modal ***) -->
                         <div id="phoneImportModal" class="modal fixed inset-0 z-50 items-center justify-center p-4">
@@ -902,13 +979,13 @@
 
                     <!-- Accessory Import Section -->
                     <div id="tab-import-accessory" class="hidden space-y-6 animate-fade-in">
-                            <button onclick="openAccessoryImportModal()"
-                                class="bg-slate-900 hover:bg-black text-white px-6 py-3 rounded-xl font-bold shadow-lg hover:shadow-xl hover:-translate-y-0.5 transition-all flex items-center gap-2 group">
-                                <div class="p-1 bg-white/20 rounded-lg group-hover:scale-110 transition-transform">
-                                    <ion-icon name="add"></ion-icon>
-                                </div>
-                                <span>เพิ่มรายการ (บิล)</span>
-                            </button>
+                        <button onclick="openAccessoryImportModal()"
+                            class="bg-slate-900 hover:bg-black text-white px-6 py-3 rounded-xl font-bold shadow-lg hover:shadow-xl hover:-translate-y-0.5 transition-all flex items-center gap-2 group">
+                            <div class="p-1 bg-white/20 rounded-lg group-hover:scale-110 transition-transform">
+                                <ion-icon name="add"></ion-icon>
+                            </div>
+                            <span>เพิ่มรายการ (บิล)</span>
+                        </button>
 
                         <!-- Full Width List -->
                         <div class="col-span-full">
@@ -1244,7 +1321,8 @@
                 </div>
             </div>
             <!-- Admin View -->
-            <div id="admin-view-content" class="hidden bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
+            <div id="admin-view-content"
+                class="hidden bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
                 <div id="loading-users" class="text-center p-12 hidden">
                     <div class="animate-spin rounded-full h-10 w-10 border-b-2 border-yellow-500 mx-auto mb-4">
                     </div>
@@ -1271,17 +1349,23 @@
                     <table class="w-full min-w-lg">
                         <thead class="bg-slate-50 border-b border-slate-100">
                             <tr>
-                                <th class="px-6 py-4 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">
+                                <th
+                                    class="px-6 py-4 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">
                                     ชื่อ-สกุล</th>
-                                <th class="px-6 py-4 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">
+                                <th
+                                    class="px-6 py-4 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">
                                     Username</th>
-                                <th class="px-6 py-4 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">
+                                <th
+                                    class="px-6 py-4 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">
                                     ตำแหน่ง</th>
-                                <th class="px-6 py-4 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">
+                                <th
+                                    class="px-6 py-4 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">
                                     แผนก / สาขา</th>
-                                <th class="px-6 py-4 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">
+                                <th
+                                    class="px-6 py-4 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">
                                     หัวหน้า</th>
-                                <th class="px-6 py-4 text-right text-xs font-semibold text-slate-500 uppercase tracking-wider">
+                                <th
+                                    class="px-6 py-4 text-right text-xs font-semibold text-slate-500 uppercase tracking-wider">
                                     จัดการ</th>
                             </tr>
                         </thead>
@@ -1292,7 +1376,143 @@
                         </tbody>
                     </table>
                 </div>
-            </div>  
+            </div>
+
+            <!-- View: Stock Request (Sales) -->
+            <div id="stock-request-view" class="hidden animate-fade-in space-y-6">
+                <div
+                    class="flex flex-col md:flex-row justify-between items-center bg-white p-6 rounded-2xl shadow-sm border border-slate-100 gap-4">
+                    <div>
+                        <h3 class="text-xl font-bold text-slate-800">รายการแจ้งเบิกสินค้า</h3>
+                        <p class="text-sm text-slate-500 mt-1">รายการสินค้าที่สาขาแจ้งเบิกจากสต๊อกกลาง</p>
+                    </div>
+                    <div class="flex flex-col sm:flex-row items-center gap-3 w-full md:w-auto">
+                        <select id="stock-request-branch-filter"
+                            class="form-select-theme py-2.5 min-w-[160px] shadow-sm">
+                            <option value="">สาขาของฉัน</option>
+                            <!-- Branches populated by JS -->
+                        </select>
+                        <button onclick="openStockRequestModal()"
+                            class="w-full sm:w-auto bg-yellow-500 hover:bg-yellow-600 text-white font-bold py-2.5 px-6 rounded-xl shadow-lg shadow-yellow-500/30 transition-all flex items-center justify-center gap-2">
+                            <ion-icon name="add-circle" class="text-xl"></ion-icon>
+                            <span>แจ้งเบิกสินค้าใหม่</span>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
+                    <div class="overflow-x-auto">
+                        <table class="w-full">
+                            <thead class="bg-slate-50 border-b border-slate-100">
+                                <tr>
+                                    <th class="px-6 py-4 text-left text-xs font-bold text-slate-500 uppercase">
+                                        วันที่แจ้ง</th>
+                                    <th class="px-6 py-4 text-left text-xs font-bold text-slate-500 uppercase">
+                                        รายการสินค้า</th>
+                                    <th class="px-6 py-4 text-left text-xs font-bold text-slate-500 uppercase">สถานะ
+                                    </th>
+                                    <th class="px-6 py-4 text-left text-xs font-bold text-slate-500 uppercase">
+                                        วันที่คาดว่าจะถึง</th>
+                                    <th class="px-6 py-4 text-left text-xs font-bold text-slate-500 uppercase">หมายเหตุ
+                                    </th>
+                                    <th class="px-6 py-4 text-right text-xs font-bold text-slate-500 uppercase">จัดการ
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody id="stock-request-table-body" class="divide-y divide-slate-100">
+                                <!-- JS Injected Rows -->
+                                <tr>
+                                    <td colspan="6" class="px-6 py-10 text-center text-slate-400">กำลังโหลดข้อมูล...
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <div id="stock-request-manage-view" class="hidden animate-fade-in space-y-6">
+                <div
+                    class="bg-white/80 backdrop-blur-xl p-6 rounded-[2.5rem] shadow-sm border border-slate-200/60 flex flex-col lg:flex-row justify-between items-center gap-6">
+                    <div class="flex items-center gap-4">
+                        <div
+                            class="w-14 h-14 bg-indigo-600 rounded-2xl flex items-center justify-center shadow-lg shadow-indigo-200 shrink-0">
+                            <ion-icon name="clipboard-outline" class="text-2xl text-white"></ion-icon>
+                        </div>
+                        <div>
+                            <h3 class="text-xl font-black text-slate-800 tracking-tight">จัดการรายการแจ้งเบิก</h3>
+                            <p class="text-sm font-medium text-slate-500">คัดกรองและบริหารจัดการคำขอเบิกสินค้าจากทุกสาขา
+                            </p>
+                        </div>
+                    </div>
+                    <div class="flex flex-wrap items-center gap-3 w-full lg:w-auto">
+                        <!-- Status Filter -->
+                        <div class="relative group flex-1 md:flex-none min-w-[160px]">
+                            <ion-icon name="funnel-outline"
+                                class="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-hover:text-indigo-500 transition-colors z-10"></ion-icon>
+                            <select id="manage-request-status-filter" onchange="fetchManageStockRequests()"
+                                class="pl-11 pr-10 py-3 rounded-2xl border border-slate-200 bg-white text-sm font-bold text-slate-700 focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 outline-none cursor-pointer hover:border-indigo-300 transition-all shadow-sm appearance-none w-full">
+                                <option value="pending">⏳ รอดำเนินการ</option>
+                                <option value="processing">📦 กำลังเตรียมของ</option>
+                                <option value="received">✅ สำเร็จ</option>
+                                <option value="canceled">❌ ยกเลิก</option>
+                                <option value="">ทุกสถานะ</option>
+                            </select>
+                            <ion-icon name="chevron-down-outline"
+                                class="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none text-xs"></ion-icon>
+                        </div>
+
+                        <!-- Branch Filter -->
+                        <div class="relative group flex-1 md:flex-none min-w-[200px]">
+                            <ion-icon name="business-outline"
+                                class="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-hover:text-indigo-500 transition-colors z-10"></ion-icon>
+                            <select id="manage-request-branch-filter" onchange="fetchManageStockRequests()"
+                                class="pl-11 pr-10 py-3 rounded-2xl border border-slate-200 bg-white text-sm font-bold text-slate-700 focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 outline-none cursor-pointer hover:border-indigo-300 transition-all shadow-sm appearance-none w-full">
+                                <option value="">ทุกสาขา</option>
+                                <!-- Branches will be populated by JS -->
+                            </select>
+                            <ion-icon name="chevron-down-outline"
+                                class="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none text-xs"></ion-icon>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-white rounded-[2.5rem] shadow-sm border border-slate-200 overflow-hidden">
+                    <div class="overflow-x-auto">
+                        <table class="w-full">
+                            <thead class="bg-slate-50/50 border-b border-slate-100">
+                                <tr>
+                                    <th
+                                        class="px-8 py-5 text-left text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">
+                                        วันที่แจ้ง</th>
+                                    <th
+                                        class="px-8 py-5 text-left text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">
+                                        สาขา / ผู้แจ้ง</th>
+                                    <th
+                                        class="px-8 py-5 text-left text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">
+                                        รายการสินค้า</th>
+                                    <th
+                                        class="px-8 py-5 text-left text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">
+                                        สถานะ</th>
+                                    <th
+                                        class="px-8 py-5 text-left text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">
+                                        สินค้าถึงเมื่อ</th>
+                                    <th
+                                        class="px-8 py-5 text-right text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">
+                                        จัดการ</th>
+                                </tr>
+                            </thead>
+                            <tbody id="stock-request-manage-table-body" class="divide-y divide-slate-100">
+                                <!-- JS Injected Rows -->
+                                <tr>
+                                    <td colspan="6" class="px-6 py-10 text-center text-slate-400">กำลังโหลดข้อมูล...
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
         </main>
     </div>
     <!-- New Task Modal -->
@@ -1976,6 +2196,131 @@
             </div>
         </div>
     </div>
+
+    <!-- Modal: Stock Request (Create) -->
+    <div id="stockRequestModal" class="modal fixed inset-0 z-50 items-center justify-center p-4">
+        <div class="modal-content relative w-full max-w-2xl bg-white rounded-2xl shadow-2xl overflow-hidden">
+            <div class="px-8 py-6 border-b border-slate-100 bg-slate-50/50 flex justify-between items-center">
+                <h3 class="text-xl font-bold text-slate-800">แจ้งเบิกสินค้าใหม่</h3>
+                <button onclick="closeModal('stockRequestModal')" class="text-slate-400 hover:text-slate-600">
+                    <ion-icon name="close" class="text-2xl"></ion-icon>
+                </button>
+            </div>
+            <div class="p-8 space-y-6">
+                <div>
+                    <label for="stock-request-title" class="block text-sm font-bold text-slate-700 mb-2">ชื่อรายการ
+                        (เช่น เบิกเคส iPhone 15, เบิกสายชาร์จ)</label>
+                    <input type="text" id="stock-request-title" class="form-input-theme w-full"
+                        placeholder="ระบุชื่อรายการแจ้งเบิก..." required>
+                </div>
+                <div class="flex justify-between items-center mb-2">
+                    <label class="block text-sm font-semibold text-slate-700">รายการสินค้าที่ต้องการเบิก</label>
+                    <button type="button" onclick="addStockRequestItemRow()"
+                        class="text-sm font-bold text-yellow-600 bg-yellow-50 hover:bg-yellow-100 px-3 py-1.5 rounded-lg transition-all flex items-center gap-1">
+                        <ion-icon name="add-circle"></ion-icon> เพิ่มแถว
+                    </button>
+                </div>
+
+                <div id="stock-request-items-container"
+                    class="space-y-3 max-h-60 overflow-y-auto pr-2 custom-scrollbar">
+                    <!-- Dynamic rows added by JS -->
+                </div>
+
+                <div>
+                    <label for="stock-request-note"
+                        class="block text-sm font-semibold text-slate-700 mb-2">หมายเหตุเพิ่มเติม</label>
+                    <textarea id="stock-request-note" rows="3" class="form-input-theme"
+                        placeholder="ระบุรายละเอียด เช่น สี, ขนาด, หรือเหตุผลการเบิก..."></textarea>
+                </div>
+
+                <div class="flex justify-end gap-3 pt-4 border-t border-slate-50">
+                    <button type="button" onclick="closeModal('stockRequestModal')"
+                        class="px-6 py-2.5 rounded-xl text-slate-500 font-medium hover:bg-slate-50 transition-colors">ยกเลิก</button>
+                    <button type="button" onclick="submitStockRequest()"
+                        class="px-8 py-2.5 rounded-xl bg-yellow-500 hover:bg-yellow-600 text-white font-bold shadow-lg shadow-yellow-500/30 transition-all">ส่งรายการแจ้งเบิก</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal: Manage Stock Request (Purchasing) -->
+    <div id="manageRequestModal" class="modal fixed inset-0 z-50 items-center justify-center p-4">
+        <div
+            class="modal-content relative w-full max-w-lg bg-white rounded-[2.5rem] shadow-2xl overflow-hidden ring-1 ring-slate-200">
+            <!-- Header -->
+            <div
+                class="bg-gradient-to-r from-slate-900 to-indigo-950 px-8 py-8 flex justify-between items-center text-white relative overflow-hidden">
+                <div class="absolute top-0 right-0 w-48 h-48 bg-indigo-500/10 rounded-full blur-3xl -mr-20 -mt-20">
+                </div>
+                <div class="relative z-10">
+                    <h3 class="text-2xl font-black tracking-tight flex items-center gap-3">
+                        <div class="p-2.5 bg-white/10 rounded-xl backdrop-blur-md">
+                            <ion-icon name="build-outline" class="text-xl"></ion-icon>
+                        </div>
+                        จัดการคำขอเบิก
+                    </h3>
+                    <p class="text-indigo-200/70 text-sm font-medium mt-1">อัปเดตสถานะและข้อมูลการส่งมวลสาร</p>
+                </div>
+                <button onclick="closeModal('manageRequestModal')"
+                    class="hover:bg-white/10 p-2.5 rounded-2xl transition-all text-indigo-300 hover:text-white relative z-10 active:scale-90">
+                    <ion-icon name="close" class="text-2xl"></ion-icon>
+                </button>
+            </div>
+
+            <!-- Body -->
+            <div class="p-8 space-y-8 bg-slate-50/30">
+                <!-- Items Summary Section -->
+                <div id="manage-request-items-list">
+                    <!-- Items will be injected here -->
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <!-- Status Selection -->
+                    <div class="space-y-2">
+                        <label for="manage-request-status"
+                            class="block text-xs font-black text-slate-500 uppercase tracking-widest ml-1">สถานะใหม่</label>
+                        <div class="relative group">
+                            <ion-icon name="swap-horizontal-outline"
+                                class="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-hover:text-indigo-500 transition-colors z-10"></ion-icon>
+                            <select id="manage-request-status"
+                                class="w-full pl-11 pr-10 py-3.5 rounded-2xl border border-slate-200 bg-white text-sm font-bold text-slate-700 focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 outline-none cursor-pointer hover:border-indigo-300 transition-all shadow-sm appearance-none">
+                                <option value="pending">⏳ รอสั่ง</option>
+                                <option value="processing">📦 กำลังสั่ง</option>
+                                <option value="received">✅ สินค้าถึงสาขาแล้ว</option>
+                                <option value="canceled">❌ ยกเลิก</option>
+                            </select>
+                            <ion-icon name="chevron-down"
+                                class="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none text-xs"></ion-icon>
+                        </div>
+                    </div>
+
+                    <!-- Arrival Date -->
+                    <div class="space-y-2">
+                        <label for="manage-request-arrival"
+                            class="block text-xs font-black text-slate-500 uppercase tracking-widest ml-1">วันที่ของถึง</label>
+                        <div class="relative group">
+                            <ion-icon name="calendar-clear-outline"
+                                class="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-hover:text-indigo-500 transition-colors z-10"></ion-icon>
+                            <input type="date" id="manage-request-arrival"
+                                class="w-full pl-11 pr-4 py-3.5 rounded-2xl border border-slate-200 bg-white text-sm font-bold text-slate-700 focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 outline-none transition-all shadow-sm">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Footer Actions -->
+                <div class="flex gap-3 pt-2">
+                    <button type="button" onclick="closeModal('manageRequestModal')"
+                        class="flex-1 py-4 rounded-2xl text-slate-500 font-bold hover:bg-slate-100 transition-all border border-transparent hover:border-slate-200">ยกเลิก</button>
+                    <button type="button" onclick="updateRequestStatus()"
+                        class="flex-[2] py-4 rounded-2xl bg-slate-900 hover:bg-indigo-950 text-white font-black shadow-xl shadow-slate-900/20 transition-all flex items-center justify-center gap-2 active:scale-[0.98]">
+                        <ion-icon name="save-outline" class="text-xl"></ion-icon>
+                        <span>ยืนยันการบันทึก</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <script>
         const SERVER_URL = '/api';
         let currentUser = null;
@@ -2098,6 +2443,32 @@
                 } else {
                     stockImportNav.classList.add('hidden');
                     stockImportNav.style.display = 'none';
+                }
+            }
+
+            // =======================================================
+            // 2.3 [ใหม่] ควบคุมเมนู "แจ้งเบิกสินค้า" และ "จัดการคำขอเบิก"
+            // =======================================================
+            const stockRequestNav = document.getElementById('nav-stock-request');
+            const stockRequestManageNav = document.getElementById('nav-stock-request-manage');
+
+            if (stockRequestNav) {
+                const isSales = userDept.includes('ขาย') || userDept.includes('Sales');
+                if (isSales || ['admin', 'executive', 'manager'].includes(currentUser.role)) {
+                    stockRequestNav.style.display = 'flex';
+                } else {
+                    stockRequestNav.style.display = 'none';
+                }
+            }
+
+            if (stockRequestManageNav) {
+                const isPurchasing = userDept.includes('จัดซื้อ') || userDept.includes('Purchase');
+                if (isPurchasing || ['admin', 'executive', 'manager'].includes(currentUser.role)) {
+                    stockRequestManageNav.style.display = 'flex';
+                    stockRequestManageNav.classList.remove('hidden');
+                } else {
+                    stockRequestManageNav.style.display = 'none';
+                    stockRequestManageNav.classList.add('hidden');
                 }
             }
 
@@ -3676,7 +4047,7 @@
 
         const populateBranchSelects = () => {
             const branches = ['ยะลา', 'นราธิวาส', 'ปัตตานี', 'หาดใหญ่', 'หาดใหญ่2', 'โคลีเซียม', 'สุราษฎร์ธานี', 'ปากแมว', 'ภูเก็ต', 'นครศรีธรรมราช', 'กระบี่', 'กะทู้', 'ตรัง', 'คุรุ', 'ชุมพร', 'สตูล', 'พัทลุง', 'สงขลา'];
-            const selects = ['deposit-filter-branch', 'purchasing-filter-branch'];
+            const selects = ['deposit-filter-branch', 'purchasing-filter-branch', 'manage-request-branch-filter', 'stock-request-branch-filter'];
 
             selects.forEach(id => {
                 const select = document.getElementById(id);
@@ -3877,8 +4248,13 @@
             const navStockImport = document.getElementById('nav-stock-import'); // [Stock Import]
             const stockImportView = document.getElementById('stock-import-view'); // [Stock Import]
 
+            const navStockRequest = document.getElementById('nav-stock-request');
+            const stockRequestView = document.getElementById('stock-request-view');
+            const navStockRequestManage = document.getElementById('nav-stock-request-manage');
+            const stockRequestManageView = document.getElementById('stock-request-manage-view');
+
             // Reset Nav Styles
-            [navDashboard, navMyTasks, navAdmin, navDeposit, navPurchasing, navImport, navStockImport].forEach(el => {
+            [navDashboard, navMyTasks, navAdmin, navDeposit, navPurchasing, navImport, navStockImport, navStockRequest, navStockRequestManage].forEach(el => {
                 if (el) {
                     el.classList.remove('bg-amber-500', 'text-white');
                     el.classList.add('text-slate-600', 'hover:bg-slate-50');
@@ -3893,6 +4269,8 @@
             safeHide(purchasingView);
             safeHide(importView);     // [New]
             safeHide(stockImportView); // [Stock Import]
+            safeHide(stockRequestView);
+            safeHide(stockRequestManageView);
 
             // Hide Buttons & Filters
             safeHide(newTaskBtn); safeHide(newUserBtn);
@@ -3971,6 +4349,26 @@
                 } else if (typeof fetchStockImports === 'function') {
                     fetchStockImports();
                 }
+            }
+            else if (activeView === 'stock-request') {
+                safeShow(stockRequestView);
+                mainHeader.textContent = "แจ้งเบิกสินค้า";
+                if (navStockRequest) {
+                    navStockRequest.classList.add('bg-amber-500', 'text-white');
+                    navStockRequest.classList.remove('text-slate-600', 'hover:bg-slate-50');
+                }
+                if (companySelectDiv) companySelectDiv.style.display = 'none';
+                fetchStockRequests();
+            }
+            else if (activeView === 'stock-request-manage') {
+                safeShow(stockRequestManageView);
+                mainHeader.textContent = "จัดการรายการแจ้งเบิกสินค้า";
+                if (navStockRequestManage) {
+                    navStockRequestManage.classList.add('bg-amber-500', 'text-white');
+                    navStockRequestManage.classList.remove('text-slate-600', 'hover:bg-slate-50');
+                }
+                if (companySelectDiv) companySelectDiv.style.display = 'none';
+                fetchManageStockRequests();
             }
 
             if (currentUser && currentUser.role === 'staff') {
@@ -4854,6 +5252,416 @@
                         }
                     });
                 });
+            }
+
+
+
+            function renderStockRequestList(requests) {
+                const container = document.getElementById('stock-request-table-body');
+                if (!container) return;
+                container.innerHTML = '';
+
+
+                if (requests.length === 0) {
+                    container.innerHTML = `<tr><td colspan="6" class="px-8 py-20 text-center">
+                        <div class="flex flex-col items-center gap-3">
+                            <div class="w-16 h-16 bg-slate-50 rounded-full flex items-center justify-center text-slate-200">
+                                <ion-icon name="file-tray-outline" class="text-4xl"></ion-icon>
+                            </div>
+                            <p class="text-slate-400 font-bold">ยังไม่มีรายการแจ้งเบิกสินค้า</p>
+                        </div>
+                    </td></tr>`;
+                    return;
+                }
+
+                requests.forEach(req => {
+                    const date = new Date(req.createdAt).toLocaleDateString('th-TH', {
+                        day: '2-digit', month: 'short', year: '2-digit'
+                    });
+                    const itemsText = req.items.map(i => `<div class="flex justify-between items-center gap-4 py-1.5 border-b border-slate-50 last:border-0"><span class="font-bold text-slate-700">${i.productName}</span><span class="text-indigo-600 font-black px-2 py-0.5 bg-indigo-50 rounded-lg text-[10px]">${i.quantity}</span></div>`).join('');
+
+                    const statusConfig = {
+                        'pending': { class: 'bg-amber-50 text-amber-700 ring-1 ring-amber-200', text: 'รอสั่ง', icon: 'time-outline' },
+                        'processing': { class: 'bg-blue-50 text-blue-700 ring-1 ring-blue-200', text: 'กำลังสั่ง', icon: 'cart-outline' },
+                        'received': { class: 'bg-emerald-50 text-emerald-700 ring-1 ring-emerald-200', text: 'ได้รับแล้ว', icon: 'checkmark-circle-outline' },
+                        'canceled': { class: 'bg-rose-50 text-rose-700 ring-1 ring-rose-200', text: 'ยกเลิก', icon: 'close-circle-outline' }
+                    };
+                    const config = statusConfig[req.status] || statusConfig['pending'];
+
+                    const tr = document.createElement('tr');
+                    tr.className = "group hover:bg-white hover:shadow-xl hover:shadow-indigo-500/5 transition-all duration-300 border-b border-slate-100 last:border-0 bg-slate-50/20";
+                    tr.innerHTML = `
+                        <td class="px-8 py-6 align-top">
+                            <div class="flex flex-col">
+                                <span class="text-sm font-black text-slate-800 font-mono">${date}</span>
+                                <span class="text-[10px] text-slate-400 font-bold uppercase tracking-wider mt-1">Order Date</span>
+                            </div>
+                        </td>
+                        <td class="px-8 py-6 align-top min-w-[300px]">
+                            <div class="mb-3">
+                                <span class="text-sm font-black text-indigo-700 flex items-center gap-2">
+                                    <ion-icon name="pricetag" class="text-indigo-400"></ion-icon>
+                                    ${req.title || 'รายการเบิกทั่วไป'}
+                                </span>
+                            </div>
+                            <div class="bg-white rounded-2xl p-4 border border-slate-100 shadow-sm leading-relaxed">
+                                ${itemsText}
+                            </div>
+                            <div class="flex items-center gap-2 text-[10px] font-black text-slate-400 bg-slate-100/50 w-fit px-3 py-1.5 rounded-xl mt-3">
+                                <ion-icon name="person-circle-outline" class="text-sm"></ion-icon>
+                                <span>CREATED BY: <span class="text-slate-800 underline underline-offset-2">${req.createdBy?.name || '-'}</span></span>
+                            </div>
+                        </td>
+                        <td class="px-8 py-6 align-top w-40">
+                             <span class="inline-flex items-center gap-1.5 px-4 py-2 rounded-2xl text-[11px] font-black shadow-sm ${config.class} transform group-hover:scale-105 transition-transform">
+                                <ion-icon name="${config.icon}" class="text-sm"></ion-icon>
+                                ${config.text}
+                            </span>
+                        </td>
+                        <td class="px-8 py-6 align-top w-48">
+                            ${req.expectedArrivalDate ? `
+                                <div class="flex flex-col">
+                                    <div class="flex items-center gap-2 text-sm font-black text-slate-800 font-mono">
+                                        <ion-icon name="flag" class="text-orange-500"></ion-icon>
+                                        ${new Date(req.expectedArrivalDate).toLocaleDateString('th-TH', { day: '2-digit', month: 'short' })}
+                                    </div>
+                                    <div class="text-[10px] text-orange-600 bg-orange-50 px-2.5 py-1 rounded-full w-fit mt-1.5 border border-orange-100 font-black tracking-widest uppercase">Expected</div>
+                                </div>
+                            ` : '<span class="text-slate-300 text-xs font-bold italic">Checking...</span>'}
+                        </td>
+                        <td class="px-8 py-6 align-top text-right w-20">
+                            ${req.status === 'pending' ? `
+                                <button onclick="deleteStockRequest('${req._id}')" class="p-3 text-slate-400 hover:text-rose-500 hover:bg-rose-50 rounded-2xl transition-all active:scale-90" title="ลบรายการ">
+                                    <ion-icon name="trash-outline" class="text-xl"></ion-icon>
+                                </button>
+                            ` : ''}
+                        </td>
+                    `;
+                    container.appendChild(tr);
+                });
+            }
+
+            // Global Set to store discovered branches
+
+
+            window.fetchStockRequests = async function () {
+                try {
+                    const branch = document.getElementById('stock-request-branch-filter')?.value || '';
+                    const status = document.getElementById('stock-request-status-filter')?.value || '';
+                    const url = new URL(`${window.location.origin}${SERVER_URL}/stock-requests`);
+                    if (branch) url.searchParams.append('branch', branch);
+                    if (status) url.searchParams.append('status', status);
+
+                    const res = await fetch(url.toString(), {
+                        headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
+                    });
+                    if (res.ok) {
+                        const requests = await res.json();
+                        renderStockRequestList(requests);
+                    }
+                } catch (err) { console.error(err); }
+            };
+
+            window.fetchManageStockRequests = async function () {
+                try {
+                    const status = document.getElementById('manage-request-status-filter')?.value || '';
+                    const branch = document.getElementById('manage-request-branch-filter')?.value || '';
+                    const url = new URL(`${window.location.origin}${SERVER_URL}/stock-requests/manage`);
+                    if (status) url.searchParams.append('status', status);
+                    if (branch) url.searchParams.append('branch', branch);
+
+                    const res = await fetch(url.toString(), {
+                        headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
+                    });
+                    if (res.ok) {
+                        const requests = await res.json();
+                        renderManageStockRequestList(requests);
+                    }
+                } catch (err) { console.error('Fetch manage requests error:', err); }
+            };
+
+            function renderManageStockRequestList(requests) {
+                const container = document.getElementById('stock-request-manage-table-body');
+                if (!container) return;
+                container.innerHTML = '';
+
+
+                if (requests.length === 0) {
+                    container.innerHTML = `<tr><td colspan="6" class="px-8 py-20 text-center">
+                        <div class="flex flex-col items-center gap-3">
+                            <div class="w-16 h-16 bg-slate-50 rounded-full flex items-center justify-center text-slate-200">
+                                <ion-icon name="file-tray-outline" class="text-4xl"></ion-icon>
+                            </div>
+                            <p class="text-slate-400 font-bold">ไม่พบรายการแจ้งเบิกในเงื่อนไขนี้</p>
+                        </div>
+                    </td></tr>`;
+                    return;
+                }
+
+                requests.forEach(req => {
+                    const date = new Date(req.createdAt).toLocaleDateString('th-TH', {
+                        day: '2-digit', month: 'short', year: '2-digit'
+                    });
+                    const itemsText = req.items.map(i => `<div class="flex justify-between items-center gap-4 py-1.5 border-b border-slate-50 last:border-0"><span class="font-bold text-slate-700">${i.productName}</span><span class="text-indigo-600 font-black px-2 py-0.5 bg-indigo-50 rounded-lg text-[10px]">${i.quantity}</span></div>`).join('');
+
+                    const statusConfig = {
+                        'pending': { class: 'bg-amber-50 text-amber-700 ring-1 ring-amber-200', text: 'รอสั่ง', icon: 'time-outline' },
+                        'processing': { class: 'bg-blue-50 text-blue-700 ring-1 ring-blue-200', text: 'กำลังเตรียมของ', icon: 'cart-outline' },
+                        'received': { class: 'bg-emerald-50 text-emerald-700 ring-1 ring-emerald-200', text: 'ส่งแล้ว', icon: 'checkmark-circle-outline' },
+                        'canceled': { class: 'bg-rose-50 text-rose-700 ring-1 ring-rose-200', text: 'ยกเลิก', icon: 'close-circle-outline' }
+                    };
+                    const config = statusConfig[req.status] || statusConfig['pending'];
+
+                    const tr = document.createElement('tr');
+                    tr.className = "hover:bg-indigo-50/20 transition-all duration-300 group border-b border-slate-100 last:border-0";
+                    tr.innerHTML = `
+                        <td class="px-8 py-6 align-top">
+                            <div class="flex flex-col">
+                                <span class="text-sm font-black text-slate-800 font-mono">${date}</span>
+                            </div>
+                        </td>
+                        <td class="px-8 py-6 align-top">
+                           <div class="flex items-center gap-4">
+                                <div class="w-10 h-10 rounded-2xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-white shadow-lg shadow-indigo-100 shrink-0">
+                                    <ion-icon name="person" class="text-lg"></ion-icon>
+                                </div>
+                                <div>
+                                    <div class="text-sm font-black text-slate-800">${req.createdBy?.name || 'Unknown'}</div>
+                                    <div class="flex items-center gap-1.5 text-xs text-slate-500 font-bold mt-1">
+                                        <div class="w-1.5 h-1.5 rounded-full bg-emerald-500"></div>
+                                        ${req.branch || 'สำนักงานใหญ่'}
+                                    </div>
+                                </div>
+                           </div>
+                        </td>
+                        <td class="px-8 py-6 align-top min-w-[300px]">
+                            <div class="mb-3">
+                                <span class="text-sm font-black text-indigo-700 flex items-center gap-2">
+                                    <ion-icon name="pricetag" class="text-indigo-400"></ion-icon>
+                                    ${req.title || 'รายการเบิกทั่วไป'}
+                                </span>
+                            </div>
+                            <div class="bg-slate-50/50 rounded-2xl p-4 border border-slate-100 shadow-inner group-hover:bg-white transition-colors">
+                                ${itemsText}
+                            </div>
+                            ${req.note ? `<div class="mt-3 text-[11px] text-slate-500 leading-relaxed italic bg-amber-50/50 p-2 rounded-lg border border-amber-100 flex gap-2"><ion-icon name="chatbox-outline" class="text-amber-400 mt-0.5 shrink-0"></ion-icon><span>${req.note}</span></div>` : ''}
+                        </td>
+                        <td class="px-8 py-6 align-top">
+                            <span class="inline-flex items-center gap-1.5 px-4 py-2 rounded-2xl text-[11px] font-black shadow-sm ${config.class} transform group-hover:scale-105 transition-transform">
+                                <ion-icon name="${config.icon}" class="text-sm"></ion-icon>
+                                ${config.text}
+                            </span>
+                        </td>
+                        <td class="px-8 py-6 align-top">
+                            ${req.expectedArrivalDate ? `
+                                <div class="flex flex-col">
+                                    <div class="flex items-center gap-2 text-sm font-black text-slate-800 font-mono">
+                                        <ion-icon name="airplane-outline" class="text-orange-500 rotate-45"></ion-icon>
+                                        ${new Date(req.expectedArrivalDate).toLocaleDateString('th-TH', { day: '2-digit', month: 'short' })}
+                                    </div>
+                                    <span class="text-[10px] text-orange-600 font-black uppercase tracking-wider mt-1">Expected</span>
+                                </div>
+                            ` : '<span class="text-slate-300 text-xs font-bold italic">N/A</span>'}
+                        </td>
+                        <td class="px-8 py-6 align-top text-right">
+                            <button onclick='openManageRequestModal(${JSON.stringify(req)})' 
+                                class="inline-flex items-center gap-2.5 px-5 py-3 bg-white border border-slate-200 hover:border-indigo-400 hover:bg-indigo-50 text-slate-600 hover:text-indigo-700 rounded-2xl text-xs font-black transition-all shadow-sm hover:shadow-xl active:scale-95 group/btn">
+                                <ion-icon name="options-outline" class="text-lg group-hover/btn:rotate-180 transition-transform duration-500"></ion-icon>
+                                <span>จัดการ</span>
+                            </button>
+                        </td>
+                    `;
+                    container.appendChild(tr);
+                });
+            }
+
+            window.openStockRequestModal = function () {
+                const titleInput = document.getElementById('stock-request-title');
+                const noteInput = document.getElementById('stock-request-note');
+                if (titleInput) titleInput.value = '';
+                if (noteInput) noteInput.value = '';
+
+                document.getElementById('stock-request-items-container').innerHTML = '';
+                addStockRequestItemRow();
+                openModal('stockRequestModal');
+            };
+
+            window.addStockRequestItemRow = function () {
+                const container = document.getElementById('stock-request-items-container');
+                const rowId = `request-row-${Date.now()}`;
+                const div = document.createElement('div');
+                div.id = rowId;
+                div.className = "grid grid-cols-12 gap-3 p-3 bg-slate-50 rounded-xl border border-slate-100 animate-fade-in";
+                div.innerHTML = `
+                    <div class="col-span-8">
+                        <input type="text" class="request-item-name form-input-theme w-full" placeholder="ชื่อสินค้า..." required>
+                    </div>
+                    <div class="col-span-3">
+                        <input type="number" class="request-item-qty form-input-theme w-full text-center" value="1" min="1" required>
+                    </div>
+                    <div class="col-span-1 flex items-center justify-center">
+                        <button type="button" onclick="removeStockRequestItemRow('${rowId}')" class="text-slate-300 hover:text-red-500 transition-colors">
+                            <ion-icon name="close-circle" class="text-xl"></ion-icon>
+                        </button>
+                    </div>
+                `;
+                container.appendChild(div);
+            };
+
+            window.removeStockRequestItemRow = function (id) {
+                const row = document.getElementById(id);
+                if (row) row.remove();
+                if (document.getElementById('stock-request-items-container').children.length === 0) {
+                    addStockRequestItemRow();
+                }
+            };
+
+            window.submitStockRequest = async function () {
+                const title = document.getElementById('stock-request-title').value;
+                const rows = document.querySelectorAll('#stock-request-items-container > div');
+                const items = Array.from(rows).map(row => ({
+                    name: row.querySelector('.request-item-name').value,
+                    quantity: parseInt(row.querySelector('.request-item-qty').value)
+                }));
+                const note = document.getElementById('stock-request-note').value;
+
+                if (!title) return alert('กรุณาระบุชื่อรายการ');
+
+                try {
+                    const res = await fetch(`${SERVER_URL}/stock-requests`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${localStorage.getItem('token')}`
+                        },
+                        body: JSON.stringify({ title, items, note })
+                    });
+                    if (res.ok) {
+                        alert('ส่งรายการแจ้งเบิกสำเร็จ');
+                        closeModal('stockRequestModal');
+                        fetchStockRequests();
+                    }
+                } catch (err) { alert('Error: ' + err.message); }
+            };
+
+            let currentManagingRequestId = null;
+            window.openManageRequestModal = function (req) {
+                currentManagingRequestId = req._id;
+                document.getElementById('manage-request-status').value = req.status;
+
+                const itemsContainer = document.getElementById('manage-request-items-list');
+                if (itemsContainer) {
+                    if (req.items && req.items.length > 0) {
+                        itemsContainer.innerHTML = `
+                            <div class="flex items-center gap-2 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mb-3 ml-1">
+                                <ion-icon name="list-outline" class="text-sm"></ion-icon>
+                                สรุปรายการสินค้า
+                            </div>
+                            <div class="bg-white/50 rounded-3xl border border-slate-200/60 overflow-hidden shadow-sm">
+                                ${req.items.map(item => `
+                                    <div class="flex justify-between items-center px-5 py-4 border-b border-slate-100 last:border-0 hover:bg-white transition-colors">
+                                        <div class="flex flex-col">
+                                            <span class="font-black text-slate-800 text-sm">${item.productName}</span>
+                                            <span class="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Product Name</span>
+                                        </div>
+                                        <div class="flex flex-col items-end">
+                                            <span class="font-black text-indigo-600 text-base">${item.quantity}</span>
+                                            <span class="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Qty</span>
+                                        </div>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        `;
+                    } else {
+                        itemsContainer.innerHTML = `
+                            <div class="text-center py-8 bg-slate-100/50 rounded-3xl border border-dashed border-slate-200">
+                                <ion-icon name="alert-circle-outline" class="text-3xl text-slate-300 mb-2"></ion-icon>
+                                <p class="text-slate-400 font-bold text-sm">ไม่มีรายการสินค้า</p>
+                            </div>
+                        `;
+                    }
+                }
+
+                if (req.expectedArrivalDate) {
+                    const date = new Date(req.expectedArrivalDate).toISOString().split('T')[0];
+                    document.getElementById('manage-request-arrival').value = date;
+                } else {
+                    document.getElementById('manage-request-arrival').value = '';
+                }
+                openModal('manageRequestModal');
+            };
+
+            window.updateRequestStatus = async function () {
+                const status = document.getElementById('manage-request-status').value;
+                const expectedArrival = document.getElementById('manage-request-arrival').value;
+
+                try {
+                    const res = await fetch(`${SERVER_URL}/stock-requests/${currentManagingRequestId}`, {
+                        method: 'PUT',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${localStorage.getItem('token')}`
+                        },
+                        body: JSON.stringify({ status, expectedArrival })
+                    });
+                    if (res.ok) {
+                        alert('อัปเดตสถานะสำเร็จ');
+                        closeModal('manageRequestModal');
+                        fetchManageStockRequests();
+                    }
+                } catch (err) { alert('Error: ' + err.message); }
+            };
+
+            window.deleteStockRequest = async function (id) {
+                if (!confirm('ยืนยันการลบรายการแจ้งเบิกนี้?')) return;
+                try {
+                    const res = await fetch(`${SERVER_URL}/stock-requests/${id}`, {
+                        method: 'DELETE',
+                        headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
+                    });
+                    if (res.ok) {
+                        fetchStockRequests();
+                    }
+                } catch (err) { alert('Error: ' + err.message); }
+            };
+
+            // --- Event Listeners for Stock Requests ---
+            const navStockRequest = document.getElementById('nav-stock-request');
+            if (navStockRequest) {
+                navStockRequest.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    updateNavActiveState('stock-request');
+                    fetchStockRequests();
+                });
+            }
+
+            const navStockRequestManage = document.getElementById('nav-stock-request-manage');
+            if (navStockRequestManage) {
+                navStockRequestManage.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    updateNavActiveState('stock-request-manage');
+                    fetchManageStockRequests();
+                });
+            }
+
+            const manageStatusFilter = document.getElementById('manage-request-status-filter');
+            if (manageStatusFilter) {
+                manageStatusFilter.addEventListener('change', fetchManageStockRequests);
+            }
+
+            const manageBranchFilter = document.getElementById('manage-request-branch-filter');
+            if (manageBranchFilter) {
+                manageBranchFilter.addEventListener('change', fetchManageStockRequests);
+            }
+
+            const stockStatusFilter = document.getElementById('stock-request-status-filter');
+            if (stockStatusFilter) {
+                stockStatusFilter.addEventListener('change', fetchStockRequests);
+            }
+
+            const stockBranchFilter = document.getElementById('stock-request-branch-filter');
+            if (stockBranchFilter) {
+                stockBranchFilter.addEventListener('change', fetchStockRequests);
             }
 
             const purForm = document.getElementById('purchasing-form');
