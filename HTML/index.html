@@ -109,6 +109,15 @@
             @apply bg-yellow-50 text-yellow-700 !important;
         }
         
+        /* Animations */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .animate-fade-in {
+            animation: fadeIn 0.5s ease-out forwards;
+        }
+        
         /* Sidebar & Layout */
         #sidebar {
             position: fixed;
@@ -258,12 +267,6 @@
                             class="w-5 h-5 mr-3 text-slate-400 group-hover:text-yellow-500 transition-colors"></ion-icon>
                         <span class="font-medium">จัดการรายการนำเข้า</span>
                     </a>
-                    <a href="#" onclick="updateNavActiveState('admin')" id="nav-admin"
-                        class="flex items-center px-4 py-3 text-slate-600 hover:bg-slate-50 hover:text-slate-900 rounded-xl transition-all group">
-                        <ion-icon name="people-outline"
-                            class="w-5 h-5 mr-3 text-slate-400 group-hover:text-yellow-500 transition-colors"></ion-icon>
-                        <span class="font-medium">จัดการผู้ใช้</span>
-                    </a>
                     <a href="#" onclick="updateNavActiveState('stock-request')" id="nav-stock-request"
                         class="flex items-center px-4 py-3 text-slate-600 hover:bg-slate-50 hover:text-slate-900 rounded-xl transition-all group">
                         <ion-icon name="clipboard-outline"
@@ -275,6 +278,24 @@
                         <ion-icon name="settings-outline"
                             class="w-5 h-5 mr-3 text-slate-400 group-hover:text-yellow-500 transition-colors"></ion-icon>
                         <span class="font-medium">จัดการคำขอเบิก</span>
+                    </a>
+                    <a href="#" onclick="updateNavActiveState('branch-order')" id="nav-branch-order"
+                        class="flex items-center px-4 py-3 text-slate-600 hover:bg-slate-50 hover:text-slate-900 rounded-xl transition-all group hidden">
+                        <ion-icon name="basket-outline"
+                            class="w-5 h-5 mr-3 text-slate-400 group-hover:text-yellow-500 transition-colors"></ion-icon>
+                        <span class="font-medium">สั่งของลงสาขา</span>
+                    </a>
+                    <a href="#" onclick="updateNavActiveState('branch-order-inventory')" id="nav-branch-order-inventory"
+                        class="flex items-center px-4 py-3 text-slate-600 hover:bg-slate-50 hover:text-slate-900 rounded-xl transition-all group hidden">
+                        <ion-icon name="basket-outline"
+                            class="w-5 h-5 mr-3 text-slate-400 group-hover:text-yellow-500 transition-colors"></ion-icon>
+                        <span class="font-medium">รายการของลงสาขา</span>
+                    </a>
+                    <a href="#" onclick="updateNavActiveState('admin')" id="nav-admin"
+                        class="flex items-center px-4 py-3 text-slate-600 hover:bg-slate-50 hover:text-slate-900 rounded-xl transition-all group">
+                        <ion-icon name="people-outline"
+                            class="w-5 h-5 mr-3 text-slate-400 group-hover:text-yellow-500 transition-colors"></ion-icon>
+                        <span class="font-medium">จัดการผู้ใช้</span>
                     </a>
                 </nav>
 
@@ -496,10 +517,9 @@
                             </div>
                             <div id="filter-status-container">
                                 <select id="deposit-filter-status" class="form-select-theme py-2 pl-3 pr-8 text-sm">
+                                    <option value="all-status">สถานะทั้งหมด</option>
                                     <option value="รอดำเนินการ" selected>รอดำเนินการ</option>
                                     <option value="สำเร็จ">สำเร็จ</option>
-                                    <option value="all-status">สถานะทั้งหมด</option>
-
                                 </select>
                             </div>
                             <div id="filter-date-container">
@@ -722,11 +742,11 @@
                                     class="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-hover:text-indigo-500 transition-colors z-10"></ion-icon>
                                 <select id="stock-request-status-filter" onchange="fetchStockRequests()"
                                     class="pl-11 pr-10 py-2.5 rounded-xl border border-slate-200 bg-white text-sm font-bold text-slate-700 focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 outline-none cursor-pointer hover:border-indigo-300 transition-all shadow-sm appearance-none w-full">
-                                    <option value="pending">⏳ รอสั่ง</option>
+                                    <option value="">ทุกสถานะ</option>
+                                    <option value="pending" selected>⏳ รอสั่ง</option>
                                     <option value="processing">📦 กำลังสั่ง</option>
                                     <option value="received">✅ ได้รับแล้ว</option>
                                     <option value="canceled">❌ ยกเลิก</option>
-                                    <option value="">ทุกสถานะ</option>
                                 </select>
                                 <ion-icon name="chevron-down-outline"
                                     class="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none text-xs"></ion-icon>
@@ -766,7 +786,511 @@
                 </div>
 
 
-                <!-- Import Notification View (Theme: Yellow / Black) -->
+                <!-- Branch Order View -->
+                <div id="branch-order-view" class="hidden space-y-6 mt-6">
+                    <!-- Modern Header & Filters -->
+                    <div
+                        class="bg-white/70 backdrop-blur-md rounded-3xl p-6 shadow-xl shadow-slate-200/50 border border-white flex flex-col lg:flex-row justify-between items-center gap-6">
+                        <div class="flex items-center gap-5">
+                            <div
+                                class="w-14 h-14 bg-gradient-to-br from-yellow-400 to-amber-600 text-white rounded-2xl shadow-lg shadow-yellow-500/30 flex items-center justify-center transform transition-transform hover:scale-110 active:scale-95">
+                                <ion-icon name="basket" class="text-3xl"></ion-icon>
+                            </div>
+                            <div>
+                                <h3 id="branch-order-title" class="text-2xl font-black text-slate-800 tracking-tight">
+                                    สั่งของลงสาขา</h3>
+                            </div>
+                        </div>
+
+                        <div class="flex flex-wrap items-center gap-4 w-full lg:w-auto">
+
+
+                            <!-- Modern Branch Filter -->
+                            <div id="branch-order-filter-branch-container" class="min-w-[180px]">
+                                <div class="relative group">
+                                    <div
+                                        class="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-yellow-500 transition-colors">
+                                        <ion-icon name="business-outline" class="text-lg"></ion-icon>
+                                    </div>
+                                    <select id="branch-order-filter-branch" onchange="fetchBranchOrders()"
+                                        class="w-full bg-slate-100/80 border border-slate-200/60 text-slate-700 text-sm font-bold rounded-2xl pl-10 pr-4 py-3.5 outline-none focus:ring-4 focus:ring-yellow-400/20 focus:border-yellow-400 transition-all appearance-none cursor-pointer">
+                                        <option value="all" selected>ทุกสาขา (All Branches)</option>
+                                        <option value="ยะลา">ยะลา</option>
+                                        <option value="นราธิวาส">นราธิวาส</option>
+                                        <option value="หาดใหญ่">หาดใหญ่</option>
+                                        <option value="หาดใหญ่2">หาดใหญ่2</option>
+                                        <option value="ปัตตานี">ปัตตานี</option>
+                                        <option value="โคลีเซียม">โคลีเซียม</option>
+                                        <option value="สุราษฎร์ธานี">สุราษฎร์ธานี</option>
+                                        <option value="ปากแมว">ปากแมว</option>
+                                        <option value="ภูเก็ต">ภูเก็ต</option>
+                                        <option value="นครศรีธรรมราช">นครศรีธรรมราช</option>
+                                        <option value="กระบี่">กระบี่</option>
+                                        <option value="กะทู้">กะทู้</option>
+                                        <option value="ตรัง">ตรัง</option>
+                                        <option value="คุรุ">คุรุ</option>
+                                        <option value="ชุมพร">ชุมพร</option>
+                                        <option value="สตูล">สตูล</option>
+                                        <option value="พัทลุง">พัทลุง</option>
+                                        <option value="สงขลา">สงขลา</option>
+                                    </select>
+                                    <div
+                                        class="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400">
+                                        <ion-icon name="chevron-down-outline"></ion-icon>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Status Filter -->
+                            <div id="branch-order-filter-status-container" class="min-w-[160px]">
+                                <div class="relative group">
+                                    <div
+                                        class="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-yellow-500 transition-colors">
+                                        <ion-icon name="filter-circle-outline" class="text-lg"></ion-icon>
+                                    </div>
+                                    <select id="branch-order-filter-status" onchange="fetchBranchOrders()"
+                                        class="w-full bg-slate-100/80 border border-slate-200/60 text-slate-700 text-sm font-bold rounded-2xl pl-10 pr-4 py-3.5 outline-none focus:ring-4 focus:ring-yellow-400/20 focus:border-yellow-400 transition-all appearance-none cursor-pointer">
+                                        <option value="all">ทุกสถานะ</option>
+                                        <option value="pending" selected>รอดำเนินการ</option>
+                                        <option value="shipped">รอของ</option>
+                                        <option value="arrived">ของถึงสาขาแล้ว</option>
+                                        <option value="canceled">ยกเลิก</option>
+                                    </select>
+                                    <div
+                                        class="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400">
+                                        <ion-icon name="chevron-down-outline"></ion-icon>
+                                    </div>
+                                </div>
+                            </div>
+                            <button id="btn-add-branch-order" onclick="openBranchOrderModal()"
+                                class="bg-slate-900 hover:bg-black text-white font-black py-3.5 px-8 rounded-2xl shadow-xl shadow-slate-900/20 transition-all hover:-translate-y-1 active:translate-y-0.5 flex items-center gap-2">
+                                <ion-icon name="add-circle" class="text-xl text-yellow-400"></ion-icon>
+                                <span>เพิ่มรายการ</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="bg-white rounded-3xl shadow-2xl shadow-slate-200/50 border border-slate-100 overflow-hidden animate-fade-in"
+                        style="animation-delay: 200ms;">
+                        <div class="overflow-x-auto">
+                            <table class="w-full border-collapse">
+                                <thead class="bg-slate-50/50 backdrop-blur-sm border-b border-slate-100">
+                                    <tr>
+                                        <th
+                                            class="px-6 py-5 text-left text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">
+                                            วันที่สั่ง</th>
+                                        <th
+                                            class="px-6 py-5 text-left text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">
+                                            วันที่คาดว่าจะส่ง</th>
+                                        <th
+                                            class="px-6 py-5 text-left text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">
+                                            รายละเอียดสั่ง</th>
+                                        <th
+                                            class="px-6 py-5 text-left text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">
+                                            รายละเอียดสินค้า</th>
+                                        <th
+                                            class="px-6 py-5 text-center text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">
+                                            สาขา</th>
+                                        <th
+                                            class="px-6 py-5 text-center text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">
+                                            สถานะ</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="branch-order-table-body"
+                                    class="divide-y divide-slate-50 text-sm italic-last-row">
+                                    <!-- Dynamic Content -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Branch Inventory View (Sales) -->
+                <div id="branch-inventory-view" class="hidden space-y-6 mt-6">
+                    <!-- Modern Header & Filters -->
+                    <div
+                        class="bg-white/70 backdrop-blur-md rounded-3xl p-6 shadow-xl shadow-slate-200/50 border border-white flex flex-col lg:flex-row justify-between items-center gap-6">
+                        <div class="flex items-center gap-5">
+                            <div
+                                class="w-14 h-14 bg-gradient-to-br from-emerald-400 to-teal-600 text-white rounded-2xl shadow-lg shadow-emerald-500/30 flex items-center justify-center transform transition-transform hover:scale-110 active:scale-95">
+                                <ion-icon name="list-box" class="text-3xl"></ion-icon>
+                            </div>
+                            <div>
+                                <h3 id="branch-inventory-title"
+                                    class="text-2xl font-black text-slate-800 tracking-tight">
+                                    รายการของลงสาขา</h3>
+                            </div>
+                        </div>
+
+                        <div class="flex flex-wrap items-center gap-4 w-full lg:w-auto">
+                            <!-- Status Filter -->
+                            <div class="relative group">
+                                <ion-icon name="filter"
+                                    class="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 group-hover:text-emerald-500 transition-colors"></ion-icon>
+                                <select id="branch-inventory-status-filter" onchange="fetchBranchInventory()"
+                                    class="pl-9 pr-8 py-2.5 rounded-xl border border-slate-200 bg-white text-sm font-bold text-slate-700 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none cursor-pointer hover:border-emerald-300 transition-colors shadow-sm appearance-none min-w-[160px]">
+                                    <option value="all">ทุกสถานะ</option>
+                                    <option value="pending" selected>⏳ รอดำเนินการ</option>
+                                    <option value="shipped">🚚 รอของ</option>
+                                    <option value="arrived">✅ ของถึงสาขาแล้ว</option>
+                                    <option value="canceled">❌ ยกเลิก</option>
+                                </select>
+                                <ion-icon name="chevron-down"
+                                    class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none text-xs"></ion-icon>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="bg-white rounded-3xl shadow-2xl shadow-slate-200/50 border border-slate-100 overflow-hidden animate-fade-in"
+                        style="animation-delay: 200ms;">
+                        <div class="overflow-x-auto">
+                            <table class="w-full border-collapse">
+                                <thead class="bg-slate-50/50 backdrop-blur-sm border-b border-slate-100">
+                                    <tr>
+                                        <th
+                                            class="px-6 py-5 text-left text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">
+                                            วันที่สั่ง</th>
+                                        <th
+                                            class="px-6 py-5 text-left text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">
+                                            วันที่คาดว่าจะส่ง</th>
+                                        <th
+                                            class="px-6 py-5 text-left text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">
+                                            รายละเอียดสั่ง</th>
+                                        <th
+                                            class="px-6 py-5 text-left text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">
+                                            รายละเอียดสินค้า</th>
+                                        <th
+                                            class="px-6 py-5 text-center text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">
+                                            สาขา</th>
+                                        <th
+                                            class="px-6 py-5 text-center text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">
+                                            สถานะ</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="branch-inventory-table-body"
+                                    class="divide-y divide-slate-50 text-sm italic-last-row">
+                                    <!-- Dynamic Content -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="admin-view-content"
+                    class="hidden bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
+                    <div id="loading-users" class="text-center p-12 hidden">
+                        <div class="animate-spin rounded-full h-10 w-10 border-b-2 border-yellow-500 mx-auto mb-4">
+                        </div>
+                        <p class="text-slate-500">กำลังดึงข้อมูลผู้ใช้...</p>
+                    </div>
+                    <div
+                        class="p-6 border-b border-slate-100 flex flex-col sm:flex-row justify-between items-center bg-slate-50/50 gap-4">
+                        <div class="flex items-center gap-4">
+                            <h3 class="text-lg font-bold text-slate-800">รายชื่อผู้ใช้ในระบบ</h3>
+                            <span id="user-count"
+                                class="text-xs font-semibold text-slate-500 bg-white border border-slate-200 px-3 py-1 rounded-full shadow-sm">0
+                                คน</span>
+                        </div>
+                        <div class="relative w-full sm:w-64">
+                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                <ion-icon name="search-outline" class="text-slate-400"></ion-icon>
+                            </div>
+                            <input type="text" id="user-search-input"
+                                class="block w-full pl-10 pr-3 py-2 border border-slate-200 rounded-xl leading-5 bg-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:border-yellow-400 sm:text-sm transition-shadow"
+                                placeholder="ค้นหาชื่อ หรือ Username...">
+                        </div>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="w-full min-w-lg">
+                            <thead class="bg-slate-50 border-b border-slate-100">
+                                <tr>
+                                    <th
+                                        class="px-6 py-4 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">
+                                        ชื่อ-สกุล</th>
+                                    <th
+                                        class="px-6 py-4 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">
+                                        Username</th>
+                                    <th
+                                        class="px-6 py-4 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">
+                                        ตำแหน่ง</th>
+                                    <th
+                                        class="px-6 py-4 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">
+                                        แผนก / สาขา</th>
+                                    <th
+                                        class="px-6 py-4 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">
+                                        หัวหน้า</th>
+                                    <th
+                                        class="px-6 py-4 text-right text-xs font-semibold text-slate-500 uppercase tracking-wider">
+                                        จัดการ</th>
+                                </tr>
+                            </thead>
+                            <tbody id="user-table-body" class="divide-y divide-slate-100">
+                                <tr id="no-user-row" class="text-center">
+                                    <td colspan="6" class="px-6 py-12 text-slate-400">ไม่มีผู้ใช้ในระบบ</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div id="stock-request-manage-view" class="hidden animate-fade-in space-y-6">
+                    <div
+                        class="bg-white/80 backdrop-blur-xl p-6 rounded-[2.5rem] shadow-sm border border-slate-200/60 flex flex-col lg:flex-row justify-between items-center gap-6">
+                        <div class="flex items-center gap-4">
+                            <div
+                                class="w-14 h-14 bg-indigo-600 rounded-2xl flex items-center justify-center shadow-lg shadow-indigo-200 shrink-0">
+                                <ion-icon name="clipboard-outline" class="text-2xl text-white"></ion-icon>
+                            </div>
+                            <div>
+                                <h3 class="text-xl font-black text-slate-800 tracking-tight">จัดการรายการแจ้งเบิก</h3>
+                                <p class="text-sm font-medium text-slate-500">
+                                    คัดกรองและบริหารจัดการคำขอเบิกสินค้าจากทุกสาขา
+                                </p>
+                            </div>
+                        </div>
+                        <div class="flex flex-wrap items-center gap-3 w-full lg:w-auto">
+                            <!-- Status Filter -->
+                            <div class="relative group flex-1 md:flex-none min-w-[160px]">
+                                <ion-icon name="funnel-outline"
+                                    class="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-hover:text-indigo-500 transition-colors z-10"></ion-icon>
+                                <select id="manage-request-status-filter" onchange="fetchManageStockRequests()"
+                                    class="pl-11 pr-10 py-3 rounded-2xl border border-slate-200 bg-white text-sm font-bold text-slate-700 focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 outline-none cursor-pointer hover:border-indigo-300 transition-all shadow-sm appearance-none w-full">
+                                    <option value="">ทุกสถานะ</option>
+                                    <option value="pending" selected>⏳ รอดำเนินการ</option>
+                                    <option value="processing">📦 กำลังเตรียมของ</option>
+                                    <option value="received">✅ สำเร็จ</option>
+                                    <option value="canceled">❌ ยกเลิก</option>
+                                </select>
+                                <ion-icon name="chevron-down-outline"
+                                    class="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none text-xs"></ion-icon>
+                            </div>
+
+                            <!-- Branch Filter -->
+                            <div class="relative group flex-1 md:flex-none min-w-[200px]">
+                                <ion-icon name="business-outline"
+                                    class="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-hover:text-indigo-500 transition-colors z-10"></ion-icon>
+                                <select id="manage-request-branch-filter" onchange="fetchManageStockRequests()"
+                                    class="pl-11 pr-10 py-3 rounded-2xl border border-slate-200 bg-white text-sm font-bold text-slate-700 focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 outline-none cursor-pointer hover:border-indigo-300 transition-all shadow-sm appearance-none w-full">
+                                    <option value="">ทุกสาขา</option>
+                                    <!-- Branches will be populated by JS -->
+                                </select>
+                                <ion-icon name="chevron-down-outline"
+                                    class="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none text-xs"></ion-icon>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="bg-white rounded-[2.5rem] shadow-sm border border-slate-200 overflow-hidden">
+                        <div class="overflow-x-auto">
+                            <table class="w-full">
+                                <thead class="bg-slate-50/50 border-b border-slate-100">
+                                    <tr>
+                                        <th
+                                            class="px-8 py-5 text-left text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">
+                                            วันที่แจ้ง</th>
+                                        <th
+                                            class="px-8 py-5 text-left text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">
+                                            สาขา / ผู้แจ้ง</th>
+                                        <th
+                                            class="px-8 py-5 text-left text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">
+                                            รายการสินค้า</th>
+                                        <th
+                                            class="px-8 py-5 text-left text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">
+                                            สถานะ</th>
+                                        <th
+                                            class="px-8 py-5 text-left text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">
+                                            สินค้าถึงเมื่อ</th>
+                                        <th
+                                            class="px-8 py-5 text-right text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">
+                                            จัดการ</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="stock-request-manage-table-body" class="divide-y divide-slate-100">
+                                    <!-- JS Injected Rows -->
+                                    <tr>
+                                        <td colspan="6" class="px-6 py-10 text-center text-slate-400">กำลังโหลดข้อมูล...
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                <div id="stock-import-view" class="hidden space-y-8 mt-8 animate-fade-in pb-20">
+                    <div
+                        class="sticky top-4 z-30 bg-white/80 backdrop-blur-xl p-2 rounded-2xl shadow-lg border border-slate-200/60 flex flex-col md:flex-row gap-4 items-center justify-between transition-all">
+                        <!-- Type Toggle Switch (Pill Shape) -->
+                        <div class="bg-slate-100 p-1.5 rounded-xl flex gap-1 w-full md:w-auto">
+                            <button onclick="filterStockType('phone')" id="tab-stock-phone"
+                                class="flex-1 md:flex-none px-6 py-2.5 rounded-lg text-sm font-bold flex items-center justify-center gap-2 transition-all shadow-sm bg-white text-indigo-600 ring-1 ring-black/5">
+                                <ion-icon name="phone-portrait" class="text-lg"></ion-icon> Phone (Excel)
+                            </button>
+                            <button onclick="filterStockType('accessory')" id="tab-stock-accessory"
+                                class="flex-1 md:flex-none px-6 py-2.5 rounded-lg text-sm font-bold flex items-center justify-center gap-2 transition-all text-slate-500 hover:text-slate-700 hover:bg-slate-200/50">
+                                <ion-icon name="headset" class="text-lg"></ion-icon> Accessories
+                            </button>
+                            <button onclick="filterStockType('all')" id="tab-stock-all"
+                                class="flex-1 md:flex-none px-4 py-2.5 rounded-lg text-sm font-bold flex items-center justify-center gap-2 transition-all text-slate-500 hover:text-slate-700 hover:bg-slate-200/50 hidden">
+                                รวม
+                            </button>
+                        </div>
+
+                        <!-- Filters Group -->
+                        <div class="flex items-center gap-3 w-full md:w-auto overflow-x-auto pb-1 md:pb-0 px-1">
+                            <!-- Branch Select -->
+                            <div class="relative group">
+                                <ion-icon name="storefront"
+                                    class="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 group-hover:text-indigo-500 transition-colors"></ion-icon>
+                                <select id="stock-import-branch-filter"
+                                    class="pl-9 pr-8 py-2.5 rounded-xl border border-slate-200 bg-white text-sm font-bold text-slate-700 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none cursor-pointer hover:border-indigo-300 transition-colors shadow-sm appearance-none min-w-[160px]">
+                                    <option value="all">ทุกสาขา</option>
+                                    <option value="ยะลา">ยะลา</option>
+                                    <option value="นราธิวาส">นราธิวาส</option>
+                                    <option value="หาดใหญ่">หาดใหญ่</option>
+                                    <option value="หาดใหญ่2">หาดใหญ่2</option>
+                                    <option value="ปัตตานี">ปัตตานี</option>
+                                    <option value="โคลีเซียม">โคลีเซียม</option>
+                                    <option value="สุราษฎร์ธานี">สุราษฎร์ธานี</option>
+                                    <option value="ปากแมว">ปากแมว</option>
+                                    <option value="ภูเก็ต">ภูเก็ต</option>
+                                    <option value="นครศรีธรรมราช">นครศรีธรรมราช</option>
+                                    <option value="กระบี่">กระบี่</option>
+                                    <option value="กะทู้">กะทู้</option>
+                                    <option value="ตรัง">ตรัง</option>
+                                    <option value="คุรุ">คุรุ</option>
+                                    <option value="ชุมพร">ชุมพร</option>
+                                    <option value="สตูล">สตูล</option>
+                                    <option value="พัทลุง">พัทลุง</option>
+                                    <option value="สงขลา">สงขลา</option>
+                                </select>
+                                <ion-icon name="chevron-down"
+                                    class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none text-xs"></ion-icon>
+                            </div>
+
+                            <!-- Status Filter (Dropdown Style) -->
+                            <div class="relative group">
+                                <ion-icon name="filter"
+                                    class="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 group-hover:text-indigo-500 transition-colors"></ion-icon>
+                                <select id="stock-import-status-filter" onchange="filterStockImports(this.value)"
+                                    class="pl-9 pr-8 py-2.5 rounded-xl border border-slate-200 bg-white text-sm font-bold text-slate-700 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none cursor-pointer hover:border-indigo-300 transition-colors shadow-sm appearance-none">
+                                    <option value="all">สถานะทั้งหมด</option>
+                                    <option value="pending">🟡 รอนำเข้า</option>
+                                    <option value="importing">🔵 กำลังนำเข้า</option>
+                                    <option value="received">🟢 สำเร็จ</option>
+                                    <option value="rejected">🔴 ยกเลิก</option>
+                                </select>
+                                <ion-icon name="chevron-down"
+                                    class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none text-xs"></ion-icon>
+                            </div>
+
+                            <!-- Date Range Filters -->
+                            <div class="h-8 w-px bg-slate-200 mx-1 hidden md:block"></div>
+                            <div class="flex items-center gap-2">
+                                <div class="relative group">
+                                    <ion-icon name="calendar-outline"
+                                        class="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"></ion-icon>
+                                    <input type="text" onfocus="(this.type='date')" onblur="(this.type='text')"
+                                        id="stock-filter-date-start" placeholder="วันเริ่มต้น"
+                                        class="pl-9 pr-2 py-2.5 rounded-xl border border-slate-200 bg-white text-sm font-bold text-slate-700 focus:ring-2 focus:ring-indigo-500 outline-none w-32 shadow-sm"
+                                        onchange="fetchStockImports()">
+                                </div>
+                                <span class="text-slate-300">-</span>
+                                <div class="relative group">
+                                    <ion-icon name="calendar-outline"
+                                        class="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"></ion-icon>
+                                    <input type="text" onfocus="(this.type='date')" onblur="(this.type='text')"
+                                        id="stock-filter-date-end" placeholder="วันสิ้นสุด"
+                                        class="pl-9 pr-2 py-2.5 rounded-xl border border-slate-200 bg-white text-sm font-bold text-slate-700 focus:ring-2 focus:ring-indigo-500 outline-none w-32 shadow-sm"
+                                        onchange="fetchStockImports()">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 3. Content Views Container -->
+                    <div
+                        class="bg-white rounded-[2rem] shadow-sm border border-slate-200 min-h-[500px] overflow-hidden relative">
+                        <!-- Loading Overlay -->
+                        <div id="stock-loading"
+                            class="absolute inset-0 bg-white/80 backdrop-blur-sm z-20 flex flex-col items-center justify-center hidden">
+                            <div
+                                class="w-12 h-12 border-4 border-indigo-100 border-t-indigo-500 rounded-full animate-spin mb-4">
+                            </div>
+                            <p class="text-indigo-900 font-bold animate-pulse">กำลังโหลดข้อมูล...</p>
+                        </div>
+
+                        <!-- PHONE VIEW (Table) -->
+                        <div id="stock-view-phone" class="hidden animate-fade-in relative z-10">
+                            <div class="overflow-x-auto">
+                                <table class="min-w-full divide-y divide-slate-100">
+                                    <thead class="bg-slate-50/80 backdrop-blur-sm sticky top-0 z-10">
+                                        <tr>
+                                            <th
+                                                class="px-6 py-5 text-left text-xs font-bold text-slate-500 uppercase tracking-wider">
+                                                🗓️ วันที่แจ้ง</th>
+                                            <th
+                                                class="px-6 py-5 text-left text-xs font-bold text-slate-500 uppercase tracking-wider">
+                                                🏪 สาขา / ผู้แจ้ง</th>
+                                            <th
+                                                class="px-6 py-5 text-left text-xs font-bold text-slate-500 uppercase tracking-wider">
+                                                📦 Supplier</th>
+                                            <th
+                                                class="px-6 py-5 text-left text-xs font-bold text-slate-500 uppercase tracking-wider">
+                                                📎 ไฟล์แนบ</th>
+                                            <th
+                                                class="px-6 py-5 text-center text-xs font-bold text-slate-500 uppercase tracking-wider">
+                                                สถานะ</th>
+                                            <th
+                                                class="px-6 py-5 text-right text-xs font-bold text-slate-500 uppercase tracking-wider">
+                                                จัดการ</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="stock-phone-tbody" class="divide-y divide-slate-100 bg-white">
+                                        <!-- JS Injected -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <!-- ACCESSORY VIEW (Grid) -->
+                        <div id="stock-view-accessory" class="p-6 hidden animate-fade-in relative z-10">
+                            <div id="stock-acc-grid"
+                                class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                                <!-- JS Injected Cards -->
+                            </div>
+                        </div>
+
+                        <!-- Empty State (Common) -->
+                        <div id="stock-empty-state"
+                            class="hidden absolute inset-0 flex flex-col items-center justify-center text-center p-8 z-0">
+                            <div class="w-24 h-24 bg-slate-50 rounded-full flex items-center justify-center mb-6">
+                                <ion-icon name="file-tray-outline" class="text-5xl text-slate-300"></ion-icon>
+                            </div>
+                            <h4 class="text-xl font-bold text-slate-700">ไม่พบรายการนำเข้า</h4>
+                            <p class="text-slate-400 mt-2">ยังไม่มีการแจ้งนำเข้าในหมวดหมู่นี้ หรือสถานะที่เลือก</p>
+                        </div>
+                    </div>
+                    <div id="stock-pagination"
+                        class="hidden border-t border-slate-100 bg-slate-50 p-4 flex flex-col md:flex-row justify-between items-center gap-4 relative z-20">
+                        <div class="text-xs font-bold text-slate-500">
+                            แสดง <span id="pagination-info-start">0</span> - <span id="pagination-info-end">0</span> จาก
+                            <span id="pagination-info-total">0</span> รายการ
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <button id="btn-prev-page" onclick="changeStockPage(-1)" disabled
+                                class="p-2 rounded-lg bg-white border border-slate-200 text-slate-400 hover:text-indigo-600 hover:border-indigo-200 disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-sm">
+                                <ion-icon name="chevron-back"></ion-icon>
+                            </button>
+                            <span id="pagination-page-display"
+                                class="px-4 py-2 bg-white border border-slate-200 rounded-lg text-sm font-bold text-slate-700 shadow-sm">
+                                หน้า 1 / 1
+                            </span>
+                            <button id="btn-next-page" onclick="changeStockPage(1)" disabled
+                                class="p-2 rounded-lg bg-white border border-slate-200 text-slate-400 hover:text-indigo-600 hover:border-indigo-200 disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-sm">
+                                <ion-icon name="chevron-forward"></ion-icon>
+                            </button>
+                        </div>
+                    </div>
+                </div>
                 <div id="import-view" class="hidden space-y-6 mt-6">
                     <!-- Header -->
                     <div
@@ -815,7 +1339,7 @@
                                 <select id="import-filter-status" onchange="renderImportLists()"
                                     class="pl-2 pr-8 py-2 rounded-xl border border-slate-200 focus:border-yellow-400 focus:ring-2 focus:ring-yellow-100 outline-none text-sm font-bold text-slate-700 bg-white cursor-pointer">
                                     <option value="all">สถานะทั้งหมด</option>
-                                    <option value="pending">รอนำเข้า</option>
+                                    <option value="pending" selected>รอนำเข้า</option>
                                     <option value="importing">กำลังนำเข้า</option>
                                     <option value="received">สำเร็จ</option>
                                 </select>
@@ -1143,377 +1667,58 @@
                     </div>
                 </div>
             </div>
-            <div id="stock-import-view" class="hidden space-y-8 mt-8 animate-fade-in pb-20">
-                <!-- 2. Controls & Filters Toolbar -->
-                <div
-                    class="sticky top-4 z-30 bg-white/80 backdrop-blur-xl p-2 rounded-2xl shadow-lg border border-slate-200/60 flex flex-col md:flex-row gap-4 items-center justify-between transition-all">
-                    <!-- Type Toggle Switch (Pill Shape) -->
-                    <div class="bg-slate-100 p-1.5 rounded-xl flex gap-1 w-full md:w-auto">
-                        <button onclick="filterStockType('phone')" id="tab-stock-phone"
-                            class="flex-1 md:flex-none px-6 py-2.5 rounded-lg text-sm font-bold flex items-center justify-center gap-2 transition-all shadow-sm bg-white text-indigo-600 ring-1 ring-black/5">
-                            <ion-icon name="phone-portrait" class="text-lg"></ion-icon> Phone (Excel)
-                        </button>
-                        <button onclick="filterStockType('accessory')" id="tab-stock-accessory"
-                            class="flex-1 md:flex-none px-6 py-2.5 rounded-lg text-sm font-bold flex items-center justify-center gap-2 transition-all text-slate-500 hover:text-slate-700 hover:bg-slate-200/50">
-                            <ion-icon name="headset" class="text-lg"></ion-icon> Accessories
-                        </button>
-                        <button onclick="filterStockType('all')" id="tab-stock-all"
-                            class="flex-1 md:flex-none px-4 py-2.5 rounded-lg text-sm font-bold flex items-center justify-center gap-2 transition-all text-slate-500 hover:text-slate-700 hover:bg-slate-200/50 hidden">
-                            รวม
-                        </button>
-                    </div>
-
-                    <!-- Filters Group -->
-                    <div class="flex items-center gap-3 w-full md:w-auto overflow-x-auto pb-1 md:pb-0 px-1">
-                        <!-- Branch Select -->
-                        <div class="relative group">
-                            <ion-icon name="storefront"
-                                class="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 group-hover:text-indigo-500 transition-colors"></ion-icon>
-                            <select id="stock-import-branch-filter"
-                                class="pl-9 pr-8 py-2.5 rounded-xl border border-slate-200 bg-white text-sm font-bold text-slate-700 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none cursor-pointer hover:border-indigo-300 transition-colors shadow-sm appearance-none min-w-[160px]">
-                                <option value="all">ทุกสาขา</option>
-                                <option value="ยะลา">ยะลา</option>
-                                <option value="นราธิวาส">นราธิวาส</option>
-                                <option value="หาดใหญ่">หาดใหญ่</option>
-                                <option value="หาดใหญ่2">หาดใหญ่2</option>
-                                <option value="ปัตตานี">ปัตตานี</option>
-                                <option value="โคลีเซียม">โคลีเซียม</option>
-                                <option value="สุราษฎร์ธานี">สุราษฎร์ธานี</option>
-                                <option value="ปากแมว">ปากแมว</option>
-                                <option value="ภูเก็ต">ภูเก็ต</option>
-                                <option value="นครศรีธรรมราช">นครศรีธรรมราช</option>
-                                <option value="กระบี่">กระบี่</option>
-                                <option value="กะทู้">กะทู้</option>
-                                <option value="ตรัง">ตรัง</option>
-                                <option value="คุรุ">คุรุ</option>
-                                <option value="ชุมพร">ชุมพร</option>
-                                <option value="สตูล">สตูล</option>
-                                <option value="พัทลุง">พัทลุง</option>
-                                <option value="สงขลา">สงขลา</option>
-                            </select>
-                            <ion-icon name="chevron-down"
-                                class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none text-xs"></ion-icon>
-                        </div>
-
-                        <!-- Status Filter (Dropdown Style) -->
-                        <div class="relative group">
-                            <ion-icon name="filter"
-                                class="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 group-hover:text-indigo-500 transition-colors"></ion-icon>
-                            <select id="stock-import-status-filter" onchange="filterStockImports(this.value)"
-                                class="pl-9 pr-8 py-2.5 rounded-xl border border-slate-200 bg-white text-sm font-bold text-slate-700 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none cursor-pointer hover:border-indigo-300 transition-colors shadow-sm appearance-none">
-                                <option value="all">สถานะทั้งหมด</option>
-                                <option value="pending">🟡 รอนำเข้า</option>
-                                <option value="importing">🔵 กำลังนำเข้า</option>
-                                <option value="received">🟢 สำเร็จ</option>
-                                <option value="rejected">🔴 ยกเลิก</option>
-                            </select>
-                            <ion-icon name="chevron-down"
-                                class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none text-xs"></ion-icon>
-                        </div>
-
-                        <!-- Date Range Filters -->
-                        <div class="h-8 w-px bg-slate-200 mx-1 hidden md:block"></div>
-                        <div class="flex items-center gap-2">
-                            <div class="relative group">
-                                <ion-icon name="calendar-outline"
-                                    class="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"></ion-icon>
-                                <input type="text" onfocus="(this.type='date')" onblur="(this.type='text')"
-                                    id="stock-filter-date-start" placeholder="วันเริ่มต้น"
-                                    class="pl-9 pr-2 py-2.5 rounded-xl border border-slate-200 bg-white text-sm font-bold text-slate-700 focus:ring-2 focus:ring-indigo-500 outline-none w-32 shadow-sm"
-                                    onchange="fetchStockImports()">
-                            </div>
-                            <span class="text-slate-300">-</span>
-                            <div class="relative group">
-                                <ion-icon name="calendar-outline"
-                                    class="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"></ion-icon>
-                                <input type="text" onfocus="(this.type='date')" onblur="(this.type='text')"
-                                    id="stock-filter-date-end" placeholder="วันสิ้นสุด"
-                                    class="pl-9 pr-2 py-2.5 rounded-xl border border-slate-200 bg-white text-sm font-bold text-slate-700 focus:ring-2 focus:ring-indigo-500 outline-none w-32 shadow-sm"
-                                    onchange="fetchStockImports()">
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- 3. Content Views Container -->
-                <div
-                    class="bg-white rounded-[2rem] shadow-sm border border-slate-200 min-h-[500px] overflow-hidden relative">
-                    <!-- Loading Overlay -->
-                    <div id="stock-loading"
-                        class="absolute inset-0 bg-white/80 backdrop-blur-sm z-20 flex flex-col items-center justify-center hidden">
-                        <div
-                            class="w-12 h-12 border-4 border-indigo-100 border-t-indigo-500 rounded-full animate-spin mb-4">
-                        </div>
-                        <p class="text-indigo-900 font-bold animate-pulse">กำลังโหลดข้อมูล...</p>
-                    </div>
-
-                    <!-- PHONE VIEW (Table) -->
-                    <div id="stock-view-phone" class="hidden animate-fade-in relative z-10">
-                        <div class="overflow-x-auto">
-                            <table class="min-w-full divide-y divide-slate-100">
-                                <thead class="bg-slate-50/80 backdrop-blur-sm sticky top-0 z-10">
-                                    <tr>
-                                        <th
-                                            class="px-6 py-5 text-left text-xs font-bold text-slate-500 uppercase tracking-wider">
-                                            🗓️ วันที่แจ้ง</th>
-                                        <th
-                                            class="px-6 py-5 text-left text-xs font-bold text-slate-500 uppercase tracking-wider">
-                                            🏪 สาขา / ผู้แจ้ง</th>
-                                        <th
-                                            class="px-6 py-5 text-left text-xs font-bold text-slate-500 uppercase tracking-wider">
-                                            📦 Supplier</th>
-                                        <th
-                                            class="px-6 py-5 text-left text-xs font-bold text-slate-500 uppercase tracking-wider">
-                                            📎 ไฟล์แนบ</th>
-                                        <th
-                                            class="px-6 py-5 text-center text-xs font-bold text-slate-500 uppercase tracking-wider">
-                                            สถานะ</th>
-                                        <th
-                                            class="px-6 py-5 text-right text-xs font-bold text-slate-500 uppercase tracking-wider">
-                                            จัดการ</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="stock-phone-tbody" class="divide-y divide-slate-100 bg-white">
-                                    <!-- JS Injected -->
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-
-                    <!-- ACCESSORY VIEW (Grid) -->
-                    <div id="stock-view-accessory" class="p-6 hidden animate-fade-in relative z-10">
-                        <div id="stock-acc-grid"
-                            class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                            <!-- JS Injected Cards -->
-                        </div>
-                    </div>
-
-                    <!-- Empty State (Common) -->
-                    <div id="stock-empty-state"
-                        class="hidden absolute inset-0 flex flex-col items-center justify-center text-center p-8 z-0">
-                        <div class="w-24 h-24 bg-slate-50 rounded-full flex items-center justify-center mb-6">
-                            <ion-icon name="file-tray-outline" class="text-5xl text-slate-300"></ion-icon>
-                        </div>
-                        <h4 class="text-xl font-bold text-slate-700">ไม่พบรายการนำเข้า</h4>
-                        <p class="text-slate-400 mt-2">ยังไม่มีการแจ้งนำเข้าในหมวดหมู่นี้ หรือสถานะที่เลือก</p>
-                    </div>
-                </div>
-                <div id="stock-pagination"
-                    class="hidden border-t border-slate-100 bg-slate-50 p-4 flex flex-col md:flex-row justify-between items-center gap-4 relative z-20">
-                    <div class="text-xs font-bold text-slate-500">
-                        แสดง <span id="pagination-info-start">0</span> - <span id="pagination-info-end">0</span> จาก
-                        <span id="pagination-info-total">0</span> รายการ
-                    </div>
-                    <div class="flex items-center gap-2">
-                        <button id="btn-prev-page" onclick="changeStockPage(-1)" disabled
-                            class="p-2 rounded-lg bg-white border border-slate-200 text-slate-400 hover:text-indigo-600 hover:border-indigo-200 disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-sm">
-                            <ion-icon name="chevron-back"></ion-icon>
-                        </button>
-                        <span id="pagination-page-display"
-                            class="px-4 py-2 bg-white border border-slate-200 rounded-lg text-sm font-bold text-slate-700 shadow-sm">
-                            หน้า 1 / 1
-                        </span>
-                        <button id="btn-next-page" onclick="changeStockPage(1)" disabled
-                            class="p-2 rounded-lg bg-white border border-slate-200 text-slate-400 hover:text-indigo-600 hover:border-indigo-200 disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-sm">
-                            <ion-icon name="chevron-forward"></ion-icon>
-                        </button>
-                    </div>
-                </div>
-            </div>
-            <!-- Admin View -->
-            <div id="admin-view-content"
-                class="hidden bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
-                <div id="loading-users" class="text-center p-12 hidden">
-                    <div class="animate-spin rounded-full h-10 w-10 border-b-2 border-yellow-500 mx-auto mb-4">
-                    </div>
-                    <p class="text-slate-500">กำลังดึงข้อมูลผู้ใช้...</p>
-                </div>
-                <div
-                    class="p-6 border-b border-slate-100 flex flex-col sm:flex-row justify-between items-center bg-slate-50/50 gap-4">
-                    <div class="flex items-center gap-4">
-                        <h3 class="text-lg font-bold text-slate-800">รายชื่อผู้ใช้ในระบบ</h3>
-                        <span id="user-count"
-                            class="text-xs font-semibold text-slate-500 bg-white border border-slate-200 px-3 py-1 rounded-full shadow-sm">0
-                            คน</span>
-                    </div>
-                    <div class="relative w-full sm:w-64">
-                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                            <ion-icon name="search-outline" class="text-slate-400"></ion-icon>
-                        </div>
-                        <input type="text" id="user-search-input"
-                            class="block w-full pl-10 pr-3 py-2 border border-slate-200 rounded-xl leading-5 bg-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:border-yellow-400 sm:text-sm transition-shadow"
-                            placeholder="ค้นหาชื่อ หรือ Username...">
-                    </div>
-                </div>
-                <div class="overflow-x-auto">
-                    <table class="w-full min-w-lg">
-                        <thead class="bg-slate-50 border-b border-slate-100">
-                            <tr>
-                                <th
-                                    class="px-6 py-4 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">
-                                    ชื่อ-สกุล</th>
-                                <th
-                                    class="px-6 py-4 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">
-                                    Username</th>
-                                <th
-                                    class="px-6 py-4 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">
-                                    ตำแหน่ง</th>
-                                <th
-                                    class="px-6 py-4 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">
-                                    แผนก / สาขา</th>
-                                <th
-                                    class="px-6 py-4 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">
-                                    หัวหน้า</th>
-                                <th
-                                    class="px-6 py-4 text-right text-xs font-semibold text-slate-500 uppercase tracking-wider">
-                                    จัดการ</th>
-                            </tr>
-                        </thead>
-                        <tbody id="user-table-body" class="divide-y divide-slate-100">
-                            <tr id="no-user-row" class="text-center">
-                                <td colspan="6" class="px-6 py-12 text-slate-400">ไม่มีผู้ใช้ในระบบ</td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-
-            <!-- View: Stock Request (Sales) -->
-            <div id="stock-request-view" class="hidden animate-fade-in space-y-6">
-                <div
-                    class="flex flex-col md:flex-row justify-between items-center bg-white p-6 rounded-2xl shadow-sm border border-slate-100 gap-4">
-                    <div>
-                        <h3 class="text-xl font-bold text-slate-800">รายการแจ้งเบิกสินค้า</h3>
-                        <p class="text-sm text-slate-500 mt-1">รายการสินค้าที่สาขาแจ้งเบิกจากสต๊อกกลาง</p>
-                    </div>
-                    <div class="flex flex-col sm:flex-row items-center gap-3 w-full md:w-auto">
-                        <select id="stock-request-branch-filter"
-                            class="form-select-theme py-2.5 min-w-[160px] shadow-sm">
-                            <option value="">สาขาของฉัน</option>
-                            <!-- Branches populated by JS -->
-                        </select>
-                        <button onclick="openStockRequestModal()"
-                            class="w-full sm:w-auto bg-yellow-500 hover:bg-yellow-600 text-white font-bold py-2.5 px-6 rounded-xl shadow-lg shadow-yellow-500/30 transition-all flex items-center justify-center gap-2">
-                            <ion-icon name="add-circle" class="text-xl"></ion-icon>
-                            <span>แจ้งเบิกสินค้าใหม่</span>
-                        </button>
-                    </div>
-                </div>
-
-                <div class="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
-                    <div class="overflow-x-auto">
-                        <table class="w-full">
-                            <thead class="bg-slate-50 border-b border-slate-100">
-                                <tr>
-                                    <th class="px-6 py-4 text-left text-xs font-bold text-slate-500 uppercase">
-                                        วันที่แจ้ง</th>
-                                    <th class="px-6 py-4 text-left text-xs font-bold text-slate-500 uppercase">
-                                        รายการสินค้า</th>
-                                    <th class="px-6 py-4 text-left text-xs font-bold text-slate-500 uppercase">สถานะ
-                                    </th>
-                                    <th class="px-6 py-4 text-left text-xs font-bold text-slate-500 uppercase">
-                                        วันที่คาดว่าจะถึง</th>
-                                    <th class="px-6 py-4 text-left text-xs font-bold text-slate-500 uppercase">หมายเหตุ
-                                    </th>
-                                    <th class="px-6 py-4 text-right text-xs font-bold text-slate-500 uppercase">จัดการ
-                                    </th>
-                                </tr>
-                            </thead>
-                            <tbody id="stock-request-table-body" class="divide-y divide-slate-100">
-                                <!-- JS Injected Rows -->
-                                <tr>
-                                    <td colspan="6" class="px-6 py-10 text-center text-slate-400">กำลังโหลดข้อมูล...
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-
-            <div id="stock-request-manage-view" class="hidden animate-fade-in space-y-6">
-                <div
-                    class="bg-white/80 backdrop-blur-xl p-6 rounded-[2.5rem] shadow-sm border border-slate-200/60 flex flex-col lg:flex-row justify-between items-center gap-6">
-                    <div class="flex items-center gap-4">
-                        <div
-                            class="w-14 h-14 bg-indigo-600 rounded-2xl flex items-center justify-center shadow-lg shadow-indigo-200 shrink-0">
-                            <ion-icon name="clipboard-outline" class="text-2xl text-white"></ion-icon>
-                        </div>
-                        <div>
-                            <h3 class="text-xl font-black text-slate-800 tracking-tight">จัดการรายการแจ้งเบิก</h3>
-                            <p class="text-sm font-medium text-slate-500">คัดกรองและบริหารจัดการคำขอเบิกสินค้าจากทุกสาขา
-                            </p>
-                        </div>
-                    </div>
-                    <div class="flex flex-wrap items-center gap-3 w-full lg:w-auto">
-                        <!-- Status Filter -->
-                        <div class="relative group flex-1 md:flex-none min-w-[160px]">
-                            <ion-icon name="funnel-outline"
-                                class="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-hover:text-indigo-500 transition-colors z-10"></ion-icon>
-                            <select id="manage-request-status-filter" onchange="fetchManageStockRequests()"
-                                class="pl-11 pr-10 py-3 rounded-2xl border border-slate-200 bg-white text-sm font-bold text-slate-700 focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 outline-none cursor-pointer hover:border-indigo-300 transition-all shadow-sm appearance-none w-full">
-                                <option value="pending">⏳ รอดำเนินการ</option>
-                                <option value="processing">📦 กำลังเตรียมของ</option>
-                                <option value="received">✅ สำเร็จ</option>
-                                <option value="canceled">❌ ยกเลิก</option>
-                                <option value="">ทุกสถานะ</option>
-                            </select>
-                            <ion-icon name="chevron-down-outline"
-                                class="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none text-xs"></ion-icon>
-                        </div>
-
-                        <!-- Branch Filter -->
-                        <div class="relative group flex-1 md:flex-none min-w-[200px]">
-                            <ion-icon name="business-outline"
-                                class="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-hover:text-indigo-500 transition-colors z-10"></ion-icon>
-                            <select id="manage-request-branch-filter" onchange="fetchManageStockRequests()"
-                                class="pl-11 pr-10 py-3 rounded-2xl border border-slate-200 bg-white text-sm font-bold text-slate-700 focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 outline-none cursor-pointer hover:border-indigo-300 transition-all shadow-sm appearance-none w-full">
-                                <option value="">ทุกสาขา</option>
-                                <!-- Branches will be populated by JS -->
-                            </select>
-                            <ion-icon name="chevron-down-outline"
-                                class="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none text-xs"></ion-icon>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="bg-white rounded-[2.5rem] shadow-sm border border-slate-200 overflow-hidden">
-                    <div class="overflow-x-auto">
-                        <table class="w-full">
-                            <thead class="bg-slate-50/50 border-b border-slate-100">
-                                <tr>
-                                    <th
-                                        class="px-8 py-5 text-left text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">
-                                        วันที่แจ้ง</th>
-                                    <th
-                                        class="px-8 py-5 text-left text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">
-                                        สาขา / ผู้แจ้ง</th>
-                                    <th
-                                        class="px-8 py-5 text-left text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">
-                                        รายการสินค้า</th>
-                                    <th
-                                        class="px-8 py-5 text-left text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">
-                                        สถานะ</th>
-                                    <th
-                                        class="px-8 py-5 text-left text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">
-                                        สินค้าถึงเมื่อ</th>
-                                    <th
-                                        class="px-8 py-5 text-right text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">
-                                        จัดการ</th>
-                                </tr>
-                            </thead>
-                            <tbody id="stock-request-manage-table-body" class="divide-y divide-slate-100">
-                                <!-- JS Injected Rows -->
-                                <tr>
-                                    <td colspan="6" class="px-6 py-10 text-center text-slate-400">กำลังโหลดข้อมูล...
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
         </main>
+    </div>
+    <!-- View: Stock Request (Sales) -->
+    <div id="stock-request-view" class="hidden animate-fade-in space-y-6">
+        <div
+            class="flex flex-col md:flex-row justify-between items-center bg-white p-6 rounded-2xl shadow-sm border border-slate-100 gap-4">
+            <div>
+                <h3 class="text-xl font-bold text-slate-800">รายการแจ้งเบิกสินค้า</h3>
+                <p class="text-sm text-slate-500 mt-1">รายการสินค้าที่สาขาแจ้งเบิกจากสต๊อกกลาง</p>
+            </div>
+            <div class="flex flex-col sm:flex-row items-center gap-3 w-full md:w-auto">
+                <select id="stock-request-branch-filter" class="form-select-theme py-2.5 min-w-[160px] shadow-sm">
+                    <option value="">สาขาของฉัน</option>
+                    <!-- Branches populated by JS -->
+                </select>
+                <button onclick="openStockRequestModal()"
+                    class="w-full sm:w-auto bg-yellow-500 hover:bg-yellow-600 text-white font-bold py-2.5 px-6 rounded-xl shadow-lg shadow-yellow-500/30 transition-all flex items-center justify-center gap-2">
+                    <ion-icon name="add-circle" class="text-xl"></ion-icon>
+                    <span>แจ้งเบิกสินค้าใหม่</span>
+                </button>
+            </div>
+        </div>
+
+        <div class="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
+            <div class="overflow-x-auto">
+                <table class="w-full">
+                    <thead class="bg-slate-50 border-b border-slate-100">
+                        <tr>
+                            <th class="px-6 py-4 text-left text-xs font-bold text-slate-500 uppercase">
+                                วันที่แจ้ง</th>
+                            <th class="px-6 py-4 text-left text-xs font-bold text-slate-500 uppercase">
+                                รายการสินค้า</th>
+                            <th class="px-6 py-4 text-left text-xs font-bold text-slate-500 uppercase">สถานะ
+                            </th>
+                            <th class="px-6 py-4 text-left text-xs font-bold text-slate-500 uppercase">
+                                วันที่คาดว่าจะถึง</th>
+                            <th class="px-6 py-4 text-left text-xs font-bold text-slate-500 uppercase">หมายเหตุ
+                            </th>
+                            <th class="px-6 py-4 text-right text-xs font-bold text-slate-500 uppercase">จัดการ
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody id="stock-request-table-body" class="divide-y divide-slate-100">
+                        <!-- JS Injected Rows -->
+                        <tr>
+                            <td colspan="6" class="px-6 py-10 text-center text-slate-400">กำลังโหลดข้อมูล...
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
     </div>
     <!-- New Task Modal -->
     <div id="newTaskModal" class="modal fixed inset-0 z-50 items-center justify-center p-4">
@@ -1761,6 +1966,92 @@
         </div>
     </div>
 
+    <div id="branchOrderModal" class="modal fixed inset-0 z-50 overflow-y-auto" aria-labelledby="modal-title"
+        role="dialog" aria-modal="true">
+        <div class="fixed inset-0 bg-slate-900/40 transition-opacity" aria-hidden="true"
+            onclick="closeModal('branchOrderModal')"></div>
+        <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
+        <div
+            class="modal-content inline-block align-bottom bg-white rounded-2xl text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg w-full">
+            <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+                <div class="sm:flex sm:items-start">
+                    <div
+                        class="mx-auto flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-full bg-pink-100 sm:mx-0 sm:h-10 sm:w-10">
+                        <ion-icon name="basket" class="text-pink-600 text-xl"></ion-icon>
+                    </div>
+                    <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left w-full">
+                        <h3 class="text-lg leading-6 font-medium text-slate-900" id="modal-title">
+                            เพิ่มรายการสั่งของลงสาขา</h3>
+                        <div class="mt-4 space-y-4">
+                            <div>
+                                <label class="block text-sm font-medium text-slate-700 mb-1">ชื่อรายการ (เช่น
+                                    สั่งของรอบเดือน มี.ค.)</label>
+                                <input type="text" id="bo-order-name" class="form-input-theme" required>
+                            </div>
+                            <div class="grid grid-cols-2 gap-4">
+                                <div>
+                                    <label class="block text-sm font-medium text-slate-700 mb-1">วันที่สั่ง</label>
+                                    <input type="date" id="bo-order-date" class="form-input-theme" required>
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-slate-700 mb-1">วันที่ของจะถึง</label>
+                                    <input type="date" id="bo-expected-date" class="form-input-theme">
+                                </div>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-slate-700 mb-1">สาขาปลายทาง</label>
+                                <select id="bo-branch" class="form-select-theme">
+                                    <option value="ยะลา">ยะลา</option>
+                                    <option value="นราธิวาส">นราธิวาส</option>
+                                    <option value="หาดใหญ่">หาดใหญ่</option>
+                                    <option value="หาดใหญ่2">หาดใหญ่2</option>
+                                    <option value="ปัตตานี">ปัตตานี</option>
+                                    <option value="โคลีเซียม">โคลีเซียม</option>
+                                    <option value="สุราษฎร์ธานี">สุราษฎร์ธานี</option>
+                                    <option value="ปากแมว">ปากแมว</option>
+                                    <option value="ภูเก็ต">ภูเก็ต</option>
+                                    <option value="นครศรีธรรมราช">นครศรีธรรมราช</option>
+                                    <option value="กระบี่">กระบี่</option>
+                                    <option value="กะทู้">กะทู้</option>
+                                    <option value="ตรัง">ตรัง</option>
+                                    <option value="คุรุ">คุรุ</option>
+                                    <option value="ชุมพร">ชุมพร</option>
+                                    <option value="สตูล">สตูล</option>
+                                    <option value="พัทลุง">พัทลุง</option>
+                                    <option value="สงขลา">สงขลา</option>
+                                </select>
+                            </div>
+
+                            <!-- Dynamic Items Section -->
+                            <div class="border-t border-slate-100 pt-4">
+                                <div class="flex justify-between items-center mb-2">
+                                    <label class="block text-sm font-medium text-slate-700">รายการสินค้า</label>
+                                    <button type="button" onclick="addBranchOrderItemRow()"
+                                        class="text-xs bg-slate-100 hover:bg-slate-200 text-slate-600 font-bold px-2 py-1 rounded-lg transition-colors">
+                                        + เพิ่มสินค้า
+                                    </button>
+                                </div>
+                                <div id="bo-items-container" class="space-y-3 max-h-60 overflow-y-auto pr-1">
+                                    <!-- Items will be added here -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="bg-slate-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
+                <button type="button" onclick="submitBranchOrder()"
+                    class="w-full inline-flex justify-center rounded-xl border border-transparent shadow-sm px-4 py-2 bg-pink-600 text-base font-medium text-white hover:bg-pink-700 focus:outline-none sm:ml-3 sm:w-auto sm:text-sm">
+                    บันทึกรายการ
+                </button>
+                <button type="button" onclick="closeModal('branchOrderModal')"
+                    class="mt-3 w-full inline-flex justify-center rounded-xl border border-slate-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-slate-700 hover:bg-slate-50 focus:outline-none sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm">
+                    ยกเลิก
+                </button>
+            </div>
+        </div>
+    </div>
+    </div>
 
 
     <!-- Confirm Modal for Status Change -->
@@ -2469,6 +2760,38 @@
                 } else {
                     stockRequestManageNav.style.display = 'none';
                     stockRequestManageNav.classList.add('hidden');
+                }
+            }
+
+            // =======================================================
+            // 2.4 [ใหม่] ควบคุมเมนู "สั่งของลงสาขา" และ "รายการของลงสาขา"
+            // =======================================================
+            const branchOrderNav = document.getElementById('nav-branch-order');
+            const branchOrderInvNav = document.getElementById('nav-branch-order-inventory');
+
+            if (branchOrderNav && branchOrderInvNav) {
+                const isPurchasing = userDept.includes('จัดซื้อ') || userDept.includes('Purchase');
+                const isSales = userDept.includes('ขาย') || userDept.includes('Sales');
+
+                // Logic for "สั่งของลงสาขา" (Management/Purchasing/HR)
+                const canManageOrders = isPurchasing || ['admin', 'executive', 'manager', 'hr'].includes(currentUser.role);
+                // Logic for "รายการของลงสาขา" (Sales/Management/HR)
+                const canViewInventory = isSales || ['executive', 'manager', 'hr', 'admin'].includes(currentUser.role);
+
+                if (canManageOrders) {
+                    branchOrderNav.style.display = 'flex';
+                    branchOrderNav.classList.remove('hidden');
+                } else {
+                    branchOrderNav.style.display = 'none';
+                    branchOrderNav.classList.add('hidden');
+                }
+
+                if (canViewInventory) {
+                    branchOrderInvNav.style.display = 'flex';
+                    branchOrderInvNav.classList.remove('hidden');
+                } else {
+                    branchOrderInvNav.style.display = 'none';
+                    branchOrderInvNav.classList.add('hidden');
                 }
             }
 
@@ -4253,24 +4576,37 @@
             const navStockRequestManage = document.getElementById('nav-stock-request-manage');
             const stockRequestManageView = document.getElementById('stock-request-manage-view');
 
-            // Reset Nav Styles
-            [navDashboard, navMyTasks, navAdmin, navDeposit, navPurchasing, navImport, navStockImport, navStockRequest, navStockRequestManage].forEach(el => {
-                if (el) {
-                    el.classList.remove('bg-amber-500', 'text-white');
-                    el.classList.add('text-slate-600', 'hover:bg-slate-50');
-                }
-            });
+            const navBranchOrder = document.getElementById('nav-branch-order'); // [Branch Order - Purchasing]
+            const navBranchOrderInventory = document.getElementById('nav-branch-order-inventory'); // [Branch Order - Sales]
+            const branchOrderView = document.getElementById('branch-order-view'); // [Order Management View]
+            const branchInventoryView = document.getElementById('branch-inventory-view'); // [Inventory View]
 
-            // Hide All Views
-            safeHide(statsCards);
-            safeHide(taskView);
-            safeHide(adminView);
-            safeHide(depositView); // Hide Deposit View
-            safeHide(purchasingView);
-            safeHide(importView);     // [New]
-            safeHide(stockImportView); // [Stock Import]
-            safeHide(stockRequestView);
-            safeHide(stockRequestManageView);
+            // Only toggle visibility if changing views (prevents flicker on refresh)
+            if (activeView !== currentView) {
+                // Reset Nav Styles
+                [navDashboard, navMyTasks, navAdmin, navDeposit, navPurchasing, navImport, navStockImport, navStockRequest, navStockRequestManage, navBranchOrder, navBranchOrderInventory].forEach(el => {
+                    if (el) {
+                        el.classList.remove('bg-amber-500', 'text-white');
+                        el.classList.add('text-slate-600', 'hover:bg-slate-50');
+                    }
+                });
+
+                // Hide All Views
+                safeHide(statsCards);
+                safeHide(taskView);
+                safeHide(adminView);
+                safeHide(depositView); // Hide Deposit View
+                safeHide(purchasingView);
+                safeHide(importView);     // [New]
+                safeHide(stockImportView); // [Stock Import]
+                safeHide(stockRequestView);
+                safeHide(stockRequestManageView);
+                safeHide(branchOrderView);
+                safeHide(branchInventoryView);
+            }
+
+            // Update state
+            currentView = activeView;
 
             // Hide Buttons & Filters
             safeHide(newTaskBtn); safeHide(newUserBtn);
@@ -4369,6 +4705,26 @@
                 }
                 if (companySelectDiv) companySelectDiv.style.display = 'none';
                 fetchManageStockRequests();
+            }
+            else if (activeView === 'branch-order') {
+                if (typeof fetchBranchOrders === 'function') fetchBranchOrders();
+                safeShow(branchOrderView);
+                mainHeader.textContent = "สั่งของลงสาขา";
+                if (navBranchOrder) {
+                    navBranchOrder.classList.add('bg-amber-500', 'text-white');
+                    navBranchOrder.classList.remove('text-slate-600', 'hover:bg-slate-50');
+                }
+                if (companySelectDiv) companySelectDiv.style.display = 'none';
+            }
+            else if (activeView === 'branch-order-inventory') {
+                if (typeof fetchBranchInventory === 'function') fetchBranchInventory();
+                safeShow(branchInventoryView);
+                mainHeader.textContent = "รายการของลงสาขา";
+                if (navBranchOrderInventory) {
+                    navBranchOrderInventory.classList.add('bg-amber-500', 'text-white');
+                    navBranchOrderInventory.classList.remove('text-slate-600', 'hover:bg-slate-50');
+                }
+                if (companySelectDiv) companySelectDiv.style.display = 'none';
             }
 
             if (currentUser && currentUser.role === 'staff') {
@@ -6243,6 +6599,439 @@
                 event.target.classList.remove('active');
             }
         });
+        window.addBranchOrderItemRow = function () {
+            const container = document.getElementById('bo-items-container');
+            const rowId = 'bo-item-' + Date.now() + Math.random().toString(36).substr(2, 5);
+
+            const div = document.createElement('div');
+            div.className = "flex gap-2 items-start animate-fade-in";
+            div.id = rowId;
+            div.innerHTML = `
+                <div class="flex-1">
+                    <input type="text" name="bo-product-name" placeholder="ชื่อสินค้า" class="form-input-theme text-sm" required>
+                </div>
+                <div class="w-24">
+                    <input type="number" name="bo-quantity" value="1" min="1" class="form-input-theme text-sm text-center" placeholder="จำนวน" required>
+                </div>
+                <button type="button" onclick="removeBranchOrderItemRow('${rowId}')" class="p-2 text-slate-300 hover:text-red-500 transition-colors">
+                    <ion-icon name="trash"></ion-icon>
+                </button>
+            `;
+            container.appendChild(div);
+        };
+
+        window.removeBranchOrderItemRow = function (id) {
+            const row = document.getElementById(id);
+            if (row) row.remove();
+        };
+
+        window.openBranchOrderModal = function () {
+            document.getElementById('bo-order-name').value = '';
+            document.getElementById('bo-order-date').valueAsDate = new Date();
+            document.getElementById('bo-expected-date').value = '';
+
+            // Reset Items
+            const container = document.getElementById('bo-items-container');
+            container.innerHTML = '';
+            addBranchOrderItemRow(); // Add first row
+
+            openModal('branchOrderModal');
+        };
+
+        window.submitBranchOrder = async function () {
+            const orderName = document.getElementById('bo-order-name').value;
+            const orderDate = document.getElementById('bo-order-date').value;
+            const expectedDate = document.getElementById('bo-expected-date').value;
+            const branch = document.getElementById('bo-branch').value;
+
+            const itemRows = document.querySelectorAll('#bo-items-container > div');
+            const items = [];
+            let isValid = true;
+
+            itemRows.forEach(row => {
+                const name = row.querySelector('input[name="bo-product-name"]').value;
+                const qty = row.querySelector('input[name="bo-quantity"]').value;
+                if (!name || !qty) isValid = false;
+                items.push({ productName: name, quantity: Number(qty) });
+            });
+
+            if (!orderName || !orderDate || items.length === 0 || !isValid) {
+                return alert('กรุณากรอกข้อมูลให้ครบถ้วน');
+            }
+
+            try {
+                const res = await fetch(`${SERVER_URL}/branch-stock-orders`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${localStorage.getItem('token')}`
+                    },
+                    body: JSON.stringify({ orderName, orderDate, expectedDate, branch, items })
+                });
+
+                if (res.ok) {
+                    alert('บันทึกสำเร็จ');
+                    closeModal('branchOrderModal');
+                    fetchBranchOrders();
+                } else {
+                    alert('บันทึกไม่สำเร็จ');
+                }
+            } catch (err) { alert('Error: ' + err.message); }
+        };
+
+        window.fetchBranchOrders = async function () {
+            const branchFilter = document.getElementById('branch-order-filter-branch').value;
+            const statusFilter = document.getElementById('branch-order-filter-status').value;
+
+            let url = `${SERVER_URL}/branch-stock-orders?`;
+            if (branchFilter && branchFilter !== 'all') url += `&branch=${branchFilter}`;
+            if (statusFilter && statusFilter !== 'all') url += `&status=${statusFilter}`;
+
+            // Add Loading State
+            const tbody = document.getElementById('branch-order-table-body');
+            if (tbody) tbody.innerHTML = `<tr><td colspan="6" class="px-6 py-12 text-center"><div class="animate-spin rounded-full h-8 w-8 border-b-2 border-yellow-500 mx-auto"></div></td></tr>`;
+
+            try {
+                const res = await fetch(url, {
+                    headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
+                });
+                if (res.ok) {
+                    const data = await res.json();
+                    renderBranchOrders(data);
+                }
+            } catch (err) { console.error(err); }
+        };
+
+        window.renderBranchOrders = function (orders) {
+            const tbody = document.getElementById('branch-order-table-body');
+            if (!tbody) return;
+            tbody.innerHTML = '';
+
+            if (orders.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="6" class="px-6 py-20 text-center">
+                            <div class="flex flex-col items-center justify-center space-y-4 animate-fade-in">
+                                <div class="w-20 h-20 bg-slate-50 rounded-full flex items-center justify-center text-slate-300 shadow-inner">
+                                    <ion-icon name="search-outline" class="text-5xl"></ion-icon>
+                                </div>
+                                <div class="space-y-1">
+                                    <p class="text-lg font-bold text-slate-600">ไม่พบรายการสั่งของในช่วงเวลานี้</p>
+                                    <p class="text-sm text-slate-400">ลองเปลี่ยนช่วงวันที่ หรือเลือกสาขาอื่นดูนะครับ</p>
+                                </div>
+                            </div>
+                        </td>
+                    </tr>`;
+                return;
+            }
+
+            const canUpdateStatus = (currentUser.department && (currentUser.department.includes('จัดซื้อ') || currentUser.department.includes('Purchase'))) ||
+                ['admin', 'executive', 'manager', 'hr'].includes(currentUser.role);
+
+            orders.forEach((order, index) => {
+                const tr = document.createElement('tr');
+                tr.className = "group hover:bg-yellow-50/30 transition-all duration-300 border-b border-slate-50 last:border-0 animate-fade-in";
+
+                // Add staggered animation delay
+                tr.style.animationDelay = `${index * 50}ms`;
+
+                const dateStr = new Date(order.orderDate).toLocaleDateString('th-TH', { day: '2-digit', month: '2-digit', year: 'numeric' });
+                const expectStr = order.expectedDate ? new Date(order.expectedDate).toLocaleDateString('th-TH', { day: '2-digit', month: '2-digit', year: 'numeric' }) : '-';
+
+                let statusHTML = '';
+                if (canUpdateStatus) {
+                    statusHTML = `
+                        <div class="relative inline-block text-left">
+                            <select onchange="updateBranchOrderStatus('${order._id}', this.value)" 
+                                class="appearance-none font-black text-[10px] uppercase tracking-wider px-4 py-1.5 rounded-full border-2 transition-all outline-none cursor-pointer pr-8
+                                ${(!order.status || order.status === 'pending') ? 'bg-slate-50 text-slate-500 border-slate-200 hover:border-slate-300' : ''}
+                                ${order.status === 'shipped' ? 'bg-amber-50 text-amber-600 border-amber-200 hover:border-amber-300' : ''}
+                                ${order.status === 'arrived' ? 'bg-emerald-50 text-emerald-600 border-emerald-200 hover:border-emerald-300' : ''}
+                                ${order.status === 'canceled' ? 'bg-red-50 text-red-600 border-red-200 hover:border-red-300' : ''}
+                                ">
+                                <option value="pending" ${(!order.status || order.status === 'pending') ? 'selected' : ''}>รอดำเนินการ</option>
+                                <option value="shipped" ${order.status === 'shipped' ? 'selected' : ''}>รอของ</option>
+                                <option value="arrived" ${order.status === 'arrived' ? 'selected' : ''}>ของถึงสาขาแล้ว</option>
+                                <option value="canceled" ${order.status === 'canceled' ? 'selected' : ''}>ยกเลิก</option>
+                            </select>
+                            <div class="absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400">
+                                <ion-icon name="chevron-down" class="text-[10px]"></ion-icon>
+                            </div>
+                        </div>`;
+                } else {
+                    if (!order.status || order.status === 'pending') {
+                        statusHTML = `
+                            <div class="inline-flex items-center px-4 py-1.5 rounded-full bg-slate-50 text-slate-500 text-xs font-black border border-slate-200/50 shadow-sm">
+                                <span>รอดำเนินการ</span>
+                            </div>`;
+                    } else if (order.status === 'shipped') {
+                        statusHTML = `
+                            <div class="inline-flex items-center px-4 py-1.5 rounded-full bg-amber-50 text-amber-600 text-xs font-black border border-amber-200/50 shadow-sm">
+                                <ion-icon name="time-outline" class="mr-1.5 text-sm animate-pulse"></ion-icon>
+                                <span>รอของ</span>
+                            </div>`;
+                    } else if (order.status === 'arrived') {
+                        statusHTML = `
+                            <div class="inline-flex items-center px-4 py-1.5 rounded-full bg-emerald-50 text-emerald-600 text-xs font-black border border-emerald-200/50 shadow-sm">
+                                <ion-icon name="checkmark-circle" class="mr-1.5 text-sm"></ion-icon>
+                                <span>ของถึงสาขาแล้ว</span>
+                            </div>`;
+                    } else if (order.status === 'canceled') {
+                        statusHTML = `
+                            <div class="inline-flex items-center px-4 py-1.5 rounded-full bg-red-50 text-red-700 text-xs font-black border border-red-200/50 shadow-sm">
+                                <ion-icon name="close-circle-outline" class="mr-1.5 text-sm"></ion-icon>
+                                <span>ยกเลิกแลัว</span>
+                            </div>`;
+                    }
+                }
+
+                // Handle items display (support both old single-item and new multi-items)
+                let productsHTML = '';
+                if (order.items && order.items.length > 0) {
+                    productsHTML = order.items.map(i => `
+                        <div class="flex items-center gap-1.5 mt-1">
+                            <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
+                            <span class="text-xs font-bold text-slate-700">${i.productName}</span>
+                            <span class="text-[10px] bg-slate-100 px-1.5 py-0.5 rounded text-slate-500 ml-1 font-bold">x${i.quantity}</span>
+                        </div>
+                    `).join('');
+                } else if (order.productName) {
+                    // Fallback for old data
+                    productsHTML = `
+                        <div class="flex items-center gap-1.5 mt-1">
+                            <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
+                            <span class="text-xs font-bold text-slate-700">${order.productName}</span>
+                            <span class="text-[10px] bg-slate-100 px-1.5 py-0.5 rounded text-slate-500 ml-1 font-bold">x${order.quantity}</span>
+                        </div>`;
+                } else {
+                    productsHTML = '<div class="text-xs text-slate-400 italic">No items</div>';
+                }
+
+                tr.innerHTML = `
+                    <td class="px-6 py-5 whitespace-nowrap">
+                        <div class="flex flex-col">
+                            <span class="text-xs font-bold text-slate-400 uppercase tracking-tighter mb-0.5">Order Date</span>
+                            <span class="text-sm font-bold text-slate-600">${dateStr}</span>
+                        </div>
+                    </td>
+                    <td class="px-6 py-5 whitespace-nowrap">
+                        <div class="flex flex-col">
+                            <span class="text-xs font-bold text-slate-400 uppercase tracking-tighter mb-0.5">Expected</span>
+                            <span class="text-sm font-bold text-slate-700 flex items-center gap-1.5">
+                                <ion-icon name="time-outline" class="text-slate-400"></ion-icon>
+                                ${expectStr}
+                            </span>
+                        </div>
+                    </td>
+                    <td class="px-6 py-5">
+                        <div class="text-base font-black text-slate-800 group-hover:text-yellow-600 transition-colors uppercase tracking-tight">${order.orderName}</div>
+                    </td>
+                    <td class="px-6 py-5">
+                        <div class="flex items-start gap-3">
+                            <div class="w-10 h-10 bg-slate-50 text-slate-400 rounded-xl flex items-center justify-center border border-slate-100 group-hover:border-yellow-200 group-hover:bg-white transition-all shrink-0">
+                                <ion-icon name="cube-outline" class="text-xl"></ion-icon>
+                            </div>
+                            <div class="flex flex-col">
+                                ${productsHTML}
+                            </div>
+                        </div>
+                    </td>
+                    <td class="px-6 py-5 text-center">
+                        <span class="inline-block px-3 py-1 bg-slate-100 text-slate-600 rounded-lg text-[10px] font-black uppercase tracking-widest border border-slate-200/50 group-hover:border-indigo-200 group-hover:bg-indigo-50 group-hover:text-indigo-600 transition-all">
+                            ${order.branch}
+                        </span>
+                    </td>
+                    <td class="px-6 py-5 text-center whitespace-nowrap">
+                        ${statusHTML}
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        };
+        window.updateBranchOrderStatus = async function (id, newStatus) {
+            console.log(`[DEBUG] Updating Branch Order ${id} to status: ${newStatus}`);
+            try {
+                const res = await fetch(`${SERVER_URL}/branch-stock-orders/${id}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${localStorage.getItem('token')}`
+                    },
+                    body: JSON.stringify({ status: newStatus })
+                });
+
+                if (res.ok) {
+                    console.log(`[DEBUG] Update successful`);
+                    fetchBranchOrders();
+                } else {
+                    const errBody = await res.json();
+                    console.error(`[DEBUG] Update failed:`, errBody);
+                    alert('ไม่สามารถอัปเดตสถานะได้: ' + (errBody.message || 'Unknown error'));
+                }
+            } catch (err) {
+                console.error(`[DEBUG] Update error:`, err);
+                alert('เกิดข้อผิดพลาด: ' + err.message);
+            }
+        };
+
+        window.fetchBranchInventory = async function () {
+            const statusFilter = document.getElementById('branch-inventory-status-filter').value;
+
+            let url = `${SERVER_URL}/branch-stock-orders?`;
+            if (statusFilter && statusFilter !== 'all') url += `&status=${statusFilter}`;
+
+            // Add Loading State
+            const tbody = document.getElementById('branch-inventory-table-body');
+            if (tbody) tbody.innerHTML = `<tr><td colspan="6" class="px-6 py-12 text-center"><div class="animate-spin rounded-full h-8 w-8 border-emerald-500 mx-auto"></div></td></tr>`;
+
+            try {
+                const res = await fetch(url, {
+                    headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
+                });
+                if (res.ok) {
+                    const data = await res.json();
+                    renderBranchInventory(data);
+                }
+            } catch (err) { console.error(err); }
+        };
+
+        window.renderBranchInventory = function (orders) {
+            const tbody = document.getElementById('branch-inventory-table-body');
+            if (!tbody) return;
+            tbody.innerHTML = '';
+
+            if (orders.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="6" class="px-6 py-20 text-center">
+                            <div class="flex flex-col items-center justify-center space-y-4 animate-fade-in">
+                                <div class="w-16 h-16 bg-slate-50 rounded-full flex items-center justify-center text-slate-300 shadow-inner">
+                                    <ion-icon name="search-outline" class="text-4xl"></ion-icon>
+                                </div>
+                                <div class="space-y-1">
+                                    <p class="text-base font-bold text-slate-600">ไม่พบรายการของลงสาขา</p>
+                                    <p class="text-xs text-slate-400">ลองเปลี่ยนช่วงวันที่ดูนะครับ</p>
+                                </div>
+                            </div>
+                        </td>
+                    </tr>`;
+                return;
+            }
+
+            orders.forEach((order, index) => {
+                const tr = document.createElement('tr');
+                tr.className = "group hover:bg-emerald-50/20 transition-all duration-300 border-b border-slate-50 last:border-0 animate-fade-in";
+                tr.style.animationDelay = `${index * 50}ms`;
+
+                const dateStr = new Date(order.orderDate).toLocaleDateString('th-TH', { day: '2-digit', month: '2-digit', year: 'numeric' });
+                const expectStr = order.expectedDate ? new Date(order.expectedDate).toLocaleDateString('th-TH', { day: '2-digit', month: '2-digit', year: 'numeric' }) : '-';
+
+                let statusHTML = '';
+                if (!order.status || order.status === 'pending') {
+                    statusHTML = `
+                        <div class="inline-flex items-center px-4 py-1.5 rounded-full bg-slate-50 text-slate-500 text-[10px] font-black border border-slate-200/50 shadow-sm uppercase tracking-wider">
+                            <ion-icon name="ellipsis-horizontal-circle" class="mr-1.5 text-sm"></ion-icon>
+                            <span>รอดำเนินการ</span>
+                        </div>`;
+                } else if (order.status === 'shipped') {
+                    statusHTML = `
+                        <div class="inline-flex items-center px-4 py-1.5 rounded-full bg-amber-50 text-amber-600 text-[10px] font-black border border-amber-200/50 shadow-sm uppercase tracking-wider">
+                            <ion-icon name="airplane-outline" class="mr-1.5 text-sm animate-bounce"></ion-icon>
+                            <span>รอของ</span>
+                        </div>`;
+                } else if (order.status === 'arrived') {
+                    statusHTML = `
+                        <div class="inline-flex items-center px-4 py-1.5 rounded-full bg-emerald-50 text-emerald-600 text-[10px] font-black border border-emerald-200/50 shadow-sm uppercase tracking-wider">
+                            <ion-icon name="checkmark-circle" class="mr-1.5 text-sm"></ion-icon>
+                            <span>ของถึงสาขาแล้ว</span>
+                        </div>`;
+                } else if (order.status === 'canceled') {
+                    statusHTML = `
+                        <div class="inline-flex items-center px-4 py-1.5 rounded-full bg-red-50 text-red-600 text-[10px] font-black border border-red-200/50 shadow-sm uppercase tracking-wider">
+                            <ion-icon name="close-circle" class="mr-1.5 text-sm"></ion-icon>
+                            <span>ยกเลิกแลัว</span>
+                        </div>`;
+                }
+
+                // Handle items display (support both old single-item and new multi-items)
+                let productsHTML = '';
+                if (order.items && order.items.length > 0) {
+                    productsHTML = `
+                        <div class="flex flex-wrap gap-2 mt-2">
+                            ${order.items.map(i => `
+                                <div class="flex items-center gap-2 bg-white border border-slate-100 px-3 py-1.5 rounded-xl shadow-sm hover:border-emerald-200 hover:shadow-md transition-all group/item">
+                                    <div class="w-6 h-6 rounded-lg bg-emerald-50 text-emerald-500 flex items-center justify-center shrink-0 group-hover/item:bg-emerald-500 group-hover/item:text-white transition-colors">
+                                        <ion-icon name="cube" class="text-xs"></ion-icon>
+                                    </div>
+                                    <div class="flex flex-col">
+                                        <span class="text-[11px] font-black text-slate-700 leading-none">${i.productName}</span>
+                                        <span class="text-[9px] font-bold text-slate-400 mt-1 uppercase">จำนวน: ${i.quantity}</span>
+                                    </div>
+                                </div>
+                            `).join('')}
+                        </div>`;
+                } else if (order.productName) {
+                    // Fallback for old data
+                    productsHTML = `
+                        <div class="flex flex-wrap gap-2 mt-2">
+                            <div class="flex items-center gap-2 bg-white border border-slate-100 px-3 py-1.5 rounded-xl shadow-sm hover:border-emerald-200 hover:shadow-md transition-all group/item">
+                                <div class="w-6 h-6 rounded-lg bg-emerald-50 text-emerald-500 flex items-center justify-center shrink-0 group-hover/item:bg-emerald-500 group-hover/item:text-white transition-colors">
+                                    <ion-icon name="cube" class="text-xs"></ion-icon>
+                                </div>
+                                <div class="flex flex-col">
+                                    <span class="text-[11px] font-black text-slate-700 leading-none">${order.productName}</span>
+                                    <span class="text-[9px] font-bold text-slate-400 mt-1 uppercase">จำนวน: ${order.quantity}</span>
+                                </div>
+                            </div>
+                        </div>`;
+                } else {
+                    productsHTML = '<div class="text-xs text-slate-400 italic mt-2">ไม่มีข้อมูลสินค้า</div>';
+                }
+
+                tr.innerHTML = `
+                    <td class="px-6 py-5 whitespace-nowrap">
+                        <div class="flex flex-col">
+                            <div class="flex items-center gap-1.5 mb-1">
+                                <ion-icon name="calendar-clear" class="text-slate-400 text-xs"></ion-icon>
+                                <span class="text-[10px] font-black text-slate-400 uppercase tracking-tighter">Order Date</span>
+                            </div>
+                            <span class="text-sm font-black text-slate-700">${dateStr}</span>
+                        </div>
+                    </td>
+                    <td class="px-6 py-5 whitespace-nowrap">
+                        <div class="flex flex-col">
+                            <div class="flex items-center gap-1.5 mb-1">
+                                <ion-icon name="calendar-clear" class="text-slate-400 text-xs"></ion-icon>
+                                <span class="text-[10px] font-black text-slate-400 uppercase tracking-tighter">Expected</span>
+                            </div>
+                            <span class="text-sm font-black text-slate-700">${expectStr}</span>
+                        </div>
+                    </td>
+                    <td class="px-6 py-5">
+                        <div class="flex flex-col">
+                            <div class="flex items-center gap-2">
+                                <span class="text-base font-black text-slate-800 tracking-tight group-hover:text-emerald-600 transition-colors uppercase">${order.orderName}</span>
+                            </div>
+                        </div>
+                    </td>
+                    <td class="px-6 py-5">
+                        <div class="flex flex-col">
+                            ${productsHTML}
+                        </div>
+                    </td>
+                    <td class="px-6 py-5 text-center">
+                        <div class="inline-flex items-center justify-center gap-2 bg-emerald-50 border border-emerald-100 px-4 py-2 rounded-2xl shadow-sm group-hover:bg-emerald-500 group-hover:text-white transition-all duration-300">
+                            <ion-icon name="business" class="text-lg text-emerald-500 group-hover:text-white transition-colors"></ion-icon>
+                            <span class="text-xs font-black uppercase tracking-widest">${order.branch}</span>
+                        </div>
+                    </td>
+                    <td class="px-6 py-5 text-center">
+                        ${statusHTML}
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        };
     </script>
 </body>
 
