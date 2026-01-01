@@ -178,6 +178,24 @@
             from { opacity: 0; transform: translateY(10px); }
             to { opacity: 1; transform: translateY(0); }
         }
+        /* Toast Notifications */
+        @keyframes toast-in {
+            from { transform: translateX(100%) scale(0.9); opacity: 0; }
+            to { transform: translateX(0) scale(1); opacity: 1; }
+        }
+        @keyframes toast-out {
+            from { transform: translateX(0) scale(1); opacity: 1; }
+            to { transform: translateX(100%) scale(0.9); opacity: 0; }
+        }
+        .toast-animate-in { animation: toast-in 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; }
+        .toast-animate-out { animation: toast-out 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; }
+
+        .glass-toast {
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
     </style>
 </head>
 
@@ -870,8 +888,8 @@
                         </div>
                     </div>
 
-                    <div class="bg-white rounded-3xl shadow-2xl shadow-slate-200/50 border border-slate-100 overflow-hidden animate-fade-in"
-                        style="animation-delay: 200ms;">
+                    <div
+                        class="bg-white rounded-3xl shadow-2xl shadow-slate-200/50 border border-slate-100 overflow-hidden">
                         <div class="overflow-x-auto">
                             <table class="w-full border-collapse">
                                 <thead class="bg-slate-50/50 backdrop-blur-sm border-b border-slate-100">
@@ -941,8 +959,8 @@
                         </div>
                     </div>
 
-                    <div class="bg-white rounded-3xl shadow-2xl shadow-slate-200/50 border border-slate-100 overflow-hidden animate-fade-in"
-                        style="animation-delay: 200ms;">
+                    <div
+                        class="bg-white rounded-3xl shadow-2xl shadow-slate-200/50 border border-slate-100 overflow-hidden">
                         <div class="overflow-x-auto">
                             <table class="w-full border-collapse">
                                 <thead class="bg-slate-50/50 backdrop-blur-sm border-b border-slate-100">
@@ -1385,6 +1403,7 @@
                                 <!-- Form Body -->
                                 <div class="p-8">
                                     <form id="phone-import-form" class="space-y-6">
+                                        <input type="hidden" id="phone-import-id" value="">
                                         <!-- Files Container -->
                                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                                             <!-- Excel File Input -->
@@ -1394,6 +1413,7 @@
                                                 <div
                                                     class="border-2 border-dashed border-slate-200 rounded-2xl p-4 text-center hover:bg-slate-50 hover:border-yellow-400 transition-all cursor-pointer relative group bg-slate-50/30 h-32 flex flex-col items-center justify-center">
                                                     <input type="file" id="phone-import-file" accept=".xlsx, .xls"
+                                                        multiple
                                                         class="absolute inset-0 w-full h-full opacity-0 cursor-pointer text-sm">
                                                     <ion-icon name="document-text-outline"
                                                         class="text-2xl text-slate-300 mb-1 group-hover:text-yellow-500 transition-colors"></ion-icon>
@@ -1410,7 +1430,7 @@
                                                     รูปภาพประกอบ (ถ้ามี)</label>
                                                 <div
                                                     class="border-2 border-dashed border-slate-200 rounded-2xl p-4 text-center hover:bg-slate-50 hover:border-blue-400 transition-all cursor-pointer relative group bg-slate-50/30 h-32 flex flex-col items-center justify-center overflow-hidden">
-                                                    <input type="file" id="phone-import-image" accept="image/*"
+                                                    <input type="file" id="phone-import-image" accept="image/*" multiple
                                                         class="absolute inset-0 w-full h-full opacity-0 cursor-pointer text-sm">
 
                                                     <div id="phone-image-placeholder"
@@ -1553,6 +1573,7 @@
                             <!-- Body (Scrollable) -->
                             <div class="flex-1 overflow-y-auto custom-scrollbar p-8 bg-slate-50">
                                 <form id="accessory-import-form-multi" class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+                                    <input type="hidden" id="acc-import-id" value="">
                                     <!-- Left Column: Bill Image & Info -->
                                     <div class="lg:col-span-4 space-y-6">
                                         <div
@@ -1569,7 +1590,7 @@
                                                         class="block text-xs font-bold text-slate-500 mb-2 uppercase">รูปถ่ายบิลสินค้า</label>
                                                     <div
                                                         class="border-2 border-dashed border-slate-200 rounded-xl p-2 text-center hover:bg-slate-50 hover:border-yellow-400 transition-all cursor-pointer relative bg-slate-50/50 group h-48 flex items-center justify-center">
-                                                        <input type="file" id="acc-bill-image" accept="image/*"
+                                                        <input type="file" id="acc-bill-image" accept="image/*" multiple
                                                             class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
                                                             onchange="previewImage(this)">
                                                         <div id="image-preview-placeholder"
@@ -3457,11 +3478,11 @@
                 if (response.ok) {
                     fetchNotifications();
                 } else {
-                    alert('ลบการแจ้งเตือนไม่สำเร็จ');
+                    showToast('ลบการแจ้งเตือนไม่สำเร็จ', 'error');
                 }
             } catch (error) {
                 console.error('Delete Notification Error:', error);
-                alert('เกิดข้อผิดพลาดในการลบการแจ้งเตือน');
+                showToast('เกิดข้อผิดพลาดในการลบการแจ้งเตือน', 'error');
             }
         };
 
@@ -3478,11 +3499,11 @@
                 if (response.ok) {
                     fetchNotifications();
                 } else {
-                    alert('ลบการแจ้งเตือนทั้งหมดไม่สำเร็จ');
+                    showToast('ลบการแจ้งเตือนทั้งหมดไม่สำเร็จ', 'error');
                 }
             } catch (error) {
                 console.error('Delete All Notifications Error:', error);
-                alert('เกิดข้อผิดพลาดในการลบการแจ้งเตือนทั้งหมด');
+                showToast('เกิดข้อผิดพลาดในการลบการแจ้งเตือนทั้งหมด', 'error');
             }
         };
 
@@ -4277,6 +4298,11 @@
                                 <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-600">${item.branch}</td>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm">${getStatusTag(item.status)}</td>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-600">${item.createdBy ? item.createdBy.name : '-'}</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-right text-sm">
+                                    <button onclick="openEditPhoneModal('${item._id}')" class="text-indigo-600 hover:text-indigo-900 bg-indigo-50 hover:bg-indigo-100 p-2 rounded-lg transition-colors" title="แก้ไข">
+                                        <ion-icon name="create-outline" class="text-lg"></ion-icon>
+                                    </button>
+                                </td>
                             `;
                             phoneList.appendChild(tr);
                         });
@@ -4327,8 +4353,13 @@
                                     </div>
                                     <p class="text-xs text-slate-500 mt-1">จำนวน: <span class="font-semibold text-slate-700">${accQty}</span> ชิ้น</p>
                                     <p class="text-xs text-slate-500">วันที่: ${accDate}</p>
-                                    <div class="mt-2 flex items-center text-xs text-slate-400">
-                                        <ion-icon name="person" class="mr-1"></ion-icon> ${item.createdBy ? item.createdBy.name : '-'} (${item.branch})
+                                    <div class="mt-2 flex items-center justify-between text-xs text-slate-400">
+                                        <div class="flex items-center">
+                                            <ion-icon name="person" class="mr-1"></ion-icon> ${item.createdBy ? item.createdBy.name : '-'} (${item.branch})
+                                        </div>
+                                        <button onclick="openEditAccModal('${item._id}')" class="text-pink-600 hover:text-pink-900 bg-pink-50 hover:bg-pink-100 p-1.5 rounded-lg transition-colors" title="แก้ไข">
+                                            <ion-icon name="create-outline" class="text-sm"></ion-icon>
+                                        </button>
                                     </div>
                                  </div>
                             `;
@@ -5234,13 +5265,14 @@
                     });
 
                     if (res.ok) {
+                        showToast('อัปเดตสถานะนำเข้าเรียบร้อยแล้ว');
                         fetchStockImports(); // Refresh Grid
                     } else {
-                        alert('Failed to update status');
+                        showToast('ไม่สามารถอัปเดตสถานะได้', 'error');
                     }
                 } catch (err) {
                     console.error(err);
-                    alert('Error updating status');
+                    showToast('เกิดข้อผิดพลาดในการอัปเดตสถานะ', 'error');
                 }
             }
 
@@ -5255,23 +5287,30 @@
             if (phoneImportForm) {
                 phoneImportForm.addEventListener('submit', async (e) => {
                     e.preventDefault();
+                    const editId = document.getElementById('phone-import-id').value;
                     const fileInput = document.getElementById('phone-import-file');
-                    const imageInput = document.getElementById('phone-import-image'); // (*** New: Image Input ***)
+                    const imageInput = document.getElementById('phone-import-image');
 
-                    if (fileInput.files.length === 0) return alert('กรุณาเลือกไฟล์ Excel');
+                    if (!editId && fileInput.files.length === 0) return showToast('กรุณาเลือกไฟล์ Excel', 'warning');
 
                     const supplier = document.getElementById('phone-import-supplier').value;
-                    if (!supplier) return alert('กรุณาระบุ Supplier');
+                    if (!supplier) return showToast('กรุณาระบุ Supplier', 'warning');
 
                     const formData = new FormData();
                     formData.append('type', 'phone');
 
-                    // Add Excel
-                    formData.append('files', fileInput.files[0]);
+                    // Add Excel files
+                    if (fileInput.files.length > 0) {
+                        for (let i = 0; i < fileInput.files.length; i++) {
+                            formData.append('files', fileInput.files[i]);
+                        }
+                    }
 
-                    // Add Image (if any)
+                    // Add Image files
                     if (imageInput.files.length > 0) {
-                        formData.append('files', imageInput.files[0]);
+                        for (let i = 0; i < imageInput.files.length; i++) {
+                            formData.append('files', imageInput.files[i]);
+                        }
                     }
 
                     formData.append('companyId', document.getElementById('company-select').value);
@@ -5281,20 +5320,23 @@
                     if (desc) formData.append('description', desc);
 
                     try {
-                        const res = await fetch(`${SERVER_URL}/imports`, {
-                            method: 'POST',
+                        const url = editId ? `${SERVER_URL}/imports/${editId}` : `${SERVER_URL}/imports`;
+                        const method = editId ? 'PUT' : 'POST';
+
+                        const res = await fetch(url, {
+                            method: method,
                             headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` },
                             body: formData
                         });
                         if (res.ok) {
-                            alert('แจ้งนำเข้าสำเร็จ');
+                            showToast(editId ? 'อัปเดตข้อมูลสำเร็จแล้ว!' : 'แจ้งนำเข้าไฟล์ Excel สำเร็จแล้ว!');
                             closeModal('phoneImportModal');
                             fetchImportRequests();
                         } else {
                             const err = await res.json();
-                            alert('Error: ' + err.message);
+                            showToast('Error: ' + err.message, 'error');
                         }
-                    } catch (err) { alert('Error: ' + err.message); }
+                    } catch (err) { showToast('Error: ' + err.message, 'error'); }
                 });
 
                 document.getElementById('phone-import-file').addEventListener('change', (e) => {
@@ -5397,9 +5439,10 @@
                 const rows = document.querySelectorAll('#acc-items-container > div');
                 if (rows.length === 0) return alert('กรุณาเพิ่มรายการสินค้าอย่างน้อย 1 รายการ');
 
+                const editId = document.getElementById('acc-import-id').value;
                 const supplier = document.getElementById('acc-bill-supplier').value;
                 const billDate = document.getElementById('acc-bill-date').value;
-                const billName = document.getElementById('acc-bill-name').value; // (*** New: Get Bill Name ***)
+                const billName = document.getElementById('acc-bill-name').value;
                 const imageInput = document.getElementById('acc-bill-image');
 
                 if (!supplier || !billDate) return alert('กรุณาระบุวันที่และชื่อร้านค้า (Supplier)');
@@ -5410,7 +5453,7 @@
                     const name = row.querySelector('.acc-item-name').value;
                     const qty = row.querySelector('.acc-item-qty').value;
                     if (!name || parseInt(qty) <= 0) isValid = false;
-                    items.push({ name, qty: parseInt(qty) });
+                    items.push({ productName: name, quantity: parseInt(qty) });
                 });
 
                 if (!isValid) return alert('กรุณากรอกข้อมูลสินค้าให้ครบถ้วน');
@@ -5421,29 +5464,32 @@
 
                 const details = {
                     supplier,
-                    billDate,
-                    billName, // (*** New: Include Bill Name ***)
+                    importDate: billDate,
+                    billName,
                     items
                 };
                 formData.append('details', JSON.stringify(details));
 
                 if (imageInput.files.length > 0) {
-                    formData.append('files', imageInput.files[0]);
-                } else {
-                    // (Optional) Warning if no image
-                    // if (!confirm('คุณไม่ได้แนบรูปภาพ ต้องการบันทึกหรือไม่?')) return;
+                    for (let i = 0; i < imageInput.files.length; i++) {
+                        formData.append('files', imageInput.files[i]);
+                    }
                 }
 
                 try {
-                    const res = await fetch(`${SERVER_URL}/imports`, {
-                        method: 'POST',
+                    const url = editId ? `${SERVER_URL}/imports/${editId}` : `${SERVER_URL}/imports`;
+                    const method = editId ? 'PUT' : 'POST';
+
+                    const res = await fetch(url, {
+                        method: method,
                         headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` },
                         body: formData
                     });
                     if (res.ok) {
-                        alert('บันทึกแจ้งนำเข้าสำเร็จ');
+                        alert(editId ? 'อัปเดตแจ้งนำเข้าสำเร็จ' : 'บันทึกแจ้งนำเข้าสำเร็จ');
                         // Reset Form
                         document.getElementById('accessory-import-form-multi').reset();
+                        document.getElementById('acc-import-id').value = '';
                         document.getElementById('acc-items-container').innerHTML = '';
                         document.getElementById('acc-items-empty').classList.remove('hidden');
                         document.getElementById('image-preview').classList.add('hidden');
@@ -5457,6 +5503,158 @@
                         alert('Error: ' + err.message);
                     }
                 } catch (err) { alert('Error: ' + err.message); }
+            };
+
+            window.openEditPhoneModal = async function (id) {
+                const token = localStorage.getItem('token');
+                try {
+                    const res = await fetch(`${SERVER_URL}/imports`, { headers: { 'Authorization': `Bearer ${token}` } });
+                    const data = await res.json();
+                    const allImports = Array.isArray(data) ? data : (data.data || []);
+                    const item = allImports.find(i => i._id === id);
+
+                    if (!item) return showToast('ไม่พบข้อมูล', 'error');
+
+                    // Populate
+                    document.getElementById('phone-import-id').value = id;
+                    document.getElementById('phone-import-supplier').value = item.details?.supplier || '';
+                    document.getElementById('phone-import-description').value = item.details?.description || '';
+
+                    // Reset inputs & previews
+                    document.getElementById('phone-import-file').value = '';
+                    document.getElementById('phone-import-image').value = '';
+                    document.getElementById('file-name-display').classList.add('hidden');
+                    document.getElementById('phone-image-preview').classList.add('hidden');
+                    document.getElementById('phone-image-placeholder').classList.remove('hidden');
+
+                    // (*** New: Show Existing Files ***)
+                    const existingContainer = document.getElementById('phone-existing-files');
+                    if (existingContainer) existingContainer.remove(); // Clear previous
+
+                    if (item.files && item.files.length > 0) {
+                        const container = document.createElement('div');
+                        container.id = 'phone-existing-files';
+                        container.className = "mt-4 p-3 bg-slate-50 rounded-lg border border-slate-200";
+                        container.innerHTML = `<p class="text-xs font-bold text-slate-500 mb-2">ไฟล์เดิมที่แนบไว้ (${item.files.length}):</p>`;
+
+                        const grid = document.createElement('div');
+                        grid.className = "flex flex-wrap gap-2";
+
+                        item.files.forEach(f => {
+                            const url = f.startsWith('http') ? f : `${SERVER_URL.replace('/api', '')}/${f}`;
+                            const isImg = f.match(/\.(jpeg|jpg|gif|png|webp)$/i);
+                            if (isImg) {
+                                grid.innerHTML += `<a href="${url}" target="_blank"><img src="${url}" class="w-16 h-16 object-cover rounded shadow-sm border border-slate-300 hover:scale-110 transition-transform"></a>`;
+                            } else {
+                                grid.innerHTML += `<a href="${url}" target="_blank" class="flex items-center gap-1 px-3 py-2 bg-white rounded border border-slate-300 text-xs font-bold text-slate-600 hover:bg-slate-50"><ion-icon name="document-text"></ion-icon> ไฟล์แนบ</a>`;
+                            }
+                        });
+                        container.appendChild(grid);
+
+                        // Insert after file input area (adjust selector as needed)
+                        const target = document.getElementById('phone-import-image').closest('.grid');
+                        if (target) target.parentNode.insertBefore(container, target.nextSibling);
+                    }
+
+                    openModal('phoneImportModal');
+                } catch (err) { console.error(err); }
+            };
+
+            window.openEditAccModal = async function (id) {
+                const token = localStorage.getItem('token');
+                try {
+                    const res = await fetch(`${SERVER_URL}/imports`, {
+                        headers: {
+                            'Authorization': `Bearer ${token}`
+                        }
+                    });
+                    const data = await res.json();
+                    const allImports = Array.isArray(data) ? data : (data.data || []);
+                    const item = allImports.find(i => i._id === id);
+
+                    if (!item) return alert('ไม่พบข้อมูล');
+
+                    // Reset Form
+                    document.getElementById('accessory-import-form-multi').reset();
+                    document.getElementById('acc-items-container').innerHTML = '';
+                    document.getElementById('acc-import-id').value = id;
+
+                    // Populate fields
+                    document.getElementById('acc-bill-supplier').value = item.details?.supplier || '';
+                    if (item.details?.importDate) {
+                        document.getElementById('acc-bill-date').value = item.details.importDate.split('T')[0];
+                    }
+                    document.getElementById('acc-bill-name').value = item.details?.billName || '';
+
+                    // Populate items
+                    if (item.details?.items && item.details.items.length > 0) {
+                        const emptyState = document.getElementById('acc-items-empty');
+                        if (emptyState) emptyState.classList.add('hidden');
+
+                        item.details.items.forEach(it => {
+                            const container = document.getElementById('acc-items-container');
+                            const rowId = `acc-row-${Date.now() + Math.random()}`;
+                            const div = document.createElement('div');
+                            div.className = "grid grid-cols-12 gap-3 p-4 bg-white rounded-xl border border-slate-100 shadow-sm relative group";
+                            div.id = rowId;
+                            div.innerHTML = `
+                                <div class="col-span-1 flex items-center justify-center">
+                                    <span class="w-8 h-8 rounded-full bg-slate-100 text-slate-500 flex items-center justify-center text-sm font-bold row-index">#</span>
+                                </div>
+                                <div class="col-span-7">
+                                    <label class="block text-xs font-bold text-slate-400 mb-1">ชื่อสินค้า</label>
+                                    <input type="text" class="acc-item-name form-input-theme w-full" value="${it.productName || it.name || ''}" placeholder="ระบุชื่อสินค้า..." required>
+                                </div>
+                                <div class="col-span-3">
+                                    <label class="block text-xs font-bold text-slate-400 mb-1">จำนวน</label>
+                                    <input type="number" class="acc-item-qty form-input-theme w-full text-center font-bold text-indigo-600" value="${it.quantity || it.qty || 1}" min="1" required>
+                                </div>
+                                <div class="col-span-1 flex items-center justify-center pt-5">
+                                    <button type="button" onclick="removeAccessoryRow('${rowId}')" class="text-slate-300 hover:text-red-500 transition-colors p-2">
+                                        <ion-icon name="trash" class="text-xl"></ion-icon>
+                                    </button>
+                                </div>
+                            `;
+                            container.appendChild(div);
+                        });
+                    } else {
+                        addAccessoryItemRow();
+                    }
+
+                    // Previews
+                    document.getElementById('image-preview').classList.add('hidden');
+                    document.getElementById('image-preview-placeholder').classList.remove('hidden');
+                    updateAccTotalCount();
+
+                    // (*** New: Show Existing Files for Accessory ***)
+                    const existingContainer = document.getElementById('acc-existing-files');
+                    if (existingContainer) existingContainer.remove();
+
+                    if (item.files && item.files.length > 0) {
+                        const container = document.createElement('div');
+                        container.id = 'acc-existing-files';
+                        container.className = "col-span-12 mt-4 p-3 bg-slate-50 rounded-lg border border-slate-200";
+                        container.innerHTML = `<p class="text-xs font-bold text-slate-500 mb-2">รูปภาพบิลเดิม:</p>`;
+
+                        const grid = document.createElement('div');
+                        grid.className = "flex flex-wrap gap-2";
+
+                        item.files.forEach(f => {
+                            const url = f.startsWith('http') ? f : `${SERVER_URL.replace('/api', '')}/${f}`;
+                            grid.innerHTML += `<a href="${url}" target="_blank"><img src="${url}" class="w-20 h-20 object-cover rounded shadow-sm border border-slate-300 hover:scale-110 transition-transform"></a>`;
+                        });
+                        container.appendChild(grid);
+
+                        // Insert before form actions
+                        const form = document.getElementById('accessory-import-form-multi');
+                        if (form) {
+                            const lastDiv = form.querySelector('.flex.justify-end'); // The footer buttons
+                            if (lastDiv) form.insertBefore(container, lastDiv);
+                        }
+                    }
+
+                    openModal('accImportModal');
+                } catch (err) { console.error(err); }
             };
 
             // Buttons
@@ -5647,12 +5845,12 @@
                     const tr = document.createElement('tr');
                     tr.className = "group hover:bg-white hover:shadow-xl hover:shadow-indigo-500/5 transition-all duration-300 border-b border-slate-100 last:border-0 bg-slate-50/20";
                     tr.innerHTML = `
-                        <td class="px-8 py-6 align-top">
-                            <div class="flex flex-col">
-                                <span class="text-sm font-black text-slate-800 font-mono">${date}</span>
-                                <span class="text-[10px] text-slate-400 font-bold uppercase tracking-wider mt-1">Order Date</span>
-                            </div>
-                        </td>
+                    <td class="px-8 py-6 align-top">
+                        <div class="flex flex-col">
+                            <span class="text-sm font-black text-slate-800 font-mono">${date}</span>
+                            <span class="text-[10px] text-slate-400 font-bold uppercase tracking-wider mt-1">Order Date</span>
+                        </div>
+                    </td>
                         <td class="px-8 py-6 align-top min-w-[300px]">
                             <div class="mb-3">
                                 <span class="text-sm font-black text-indigo-700 flex items-center gap-2">
@@ -5692,7 +5890,7 @@
                                 </button>
                             ` : ''}
                         </td>
-                    `;
+                `;
                     container.appendChild(tr);
                 });
             }
@@ -5881,7 +6079,7 @@
                 }));
                 const note = document.getElementById('stock-request-note').value;
 
-                if (!title) return alert('กรุณาระบุชื่อรายการ');
+                if (!title) return showToast('กรุณาระบุชื่อรายการ', 'warning');
 
                 try {
                     const res = await fetch(`${SERVER_URL}/stock-requests`, {
@@ -5893,11 +6091,11 @@
                         body: JSON.stringify({ title, items, note })
                     });
                     if (res.ok) {
-                        alert('ส่งรายการแจ้งเบิกสำเร็จ');
+                        showToast('ส่งรายการแจ้งเบิกสำเร็จแล้ว!');
                         closeModal('stockRequestModal');
                         fetchStockRequests();
                     }
-                } catch (err) { alert('Error: ' + err.message); }
+                } catch (err) { showToast('Error: ' + err.message, 'error'); }
             };
 
             let currentManagingRequestId = null;
@@ -5961,11 +6159,11 @@
                         body: JSON.stringify({ status, expectedArrival })
                     });
                     if (res.ok) {
-                        alert('อัปเดตสถานะสำเร็จ');
+                        showToast('อัปเดตสถานะสำเร็จแล้ว!');
                         closeModal('manageRequestModal');
                         fetchManageStockRequests();
                     }
-                } catch (err) { alert('Error: ' + err.message); }
+                } catch (err) { showToast('Error: ' + err.message, 'error'); }
             };
 
             window.deleteStockRequest = async function (id) {
@@ -5976,9 +6174,10 @@
                         headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
                     });
                     if (res.ok) {
+                        showToast('ลบรายการแจ้งเบิกเรียบร้อยแล้ว');
                         fetchStockRequests();
                     }
-                } catch (err) { alert('Error: ' + err.message); }
+                } catch (err) { showToast('Error: ' + err.message, 'error'); }
             };
 
             // --- Event Listeners for Stock Requests ---
@@ -6390,9 +6589,10 @@
                         const updated = await res.json();
                         const index = allImportsData.findIndex(i => i._id === id);
                         if (index !== -1) allImportsData[index].status = updated.status;
+                        showToast('เปลี่ยนสถานะสำเร็จแล้ว');
                         renderImportLists();
-                    } else { alert('Update Failed'); }
-                } catch (e) { alert('Error: ' + e.message); }
+                    } else { showToast('อัปเดตสถานะไม่สำเร็จ', 'error'); }
+                } catch (e) { showToast('Error: ' + e.message, 'error'); }
             }
         }
 
@@ -6404,6 +6604,7 @@
                         headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
                     });
                     if (res.ok) {
+                        showToast('ลบรายการนำเข้าสำเร็จแล้ว');
                         // If it exists in Notification view cache
                         if (typeof allImportsData !== 'undefined') {
                             allImportsData = allImportsData.filter(i => i._id !== id);
@@ -6413,9 +6614,9 @@
                         if (typeof fetchStockImports === 'function') fetchStockImports();
                     } else {
                         const errData = await res.json().catch(() => ({}));
-                        alert('Delete Failed: ' + (errData.message || res.statusText));
+                        showToast('ไม่สามารถลบรายการได้: ' + (errData.message || res.statusText), 'error');
                     }
-                } catch (e) { alert('Error: ' + e.message); }
+                } catch (e) { showToast('เกิดข้อผิดพลาด: ' + e.message, 'error'); }
             }
         }
 
@@ -6506,14 +6707,14 @@
             const fileInput = document.getElementById('acc-bill-image');
             const date = document.getElementById('acc-bill-date').value;
             const supplier = document.getElementById('acc-bill-supplier').value;
-            const billName = document.getElementById('acc-bill-name')?.value || ''; // (*** New: Bill Name ***)
+            const billName = document.getElementById('acc-bill-name')?.value || '';
 
-            if (!date) return alert('กรุณาระบุวันที่');
-            if (!billName) return alert('กรุณาระบุเลขที่เอกสาร/ชื่อบิล');
+            if (!date) return showToast('กรุณาระบุวันที่', 'warning');
+            if (!billName) return showToast('กรุณาระบุเลขที่เอกสาร/ชื่อบิล', 'warning');
 
             // Collect Items
             const rows = document.getElementById('acc-items-container').children;
-            if (rows.length === 0) return alert('กรุณาเพิ่มรายการสินค้าอย่างน้อย 1 รายการ');
+            if (rows.length === 0) return showToast('กรุณาเพิ่มรายการสินค้าอย่างน้อย 1 รายการ', 'warning');
 
             let items = [];
             for (let row of rows) {
@@ -6521,7 +6722,7 @@
                 const qty = row.querySelector('[name="acc-item-qty"]').value;
                 const desc = row.querySelector('[name="acc-item-desc"]').value;
 
-                if (!name || !qty) return alert('กรุณากรอกชื่อสินค้าและจำนวนให้ครบถ้วน');
+                if (!name || !qty) return showToast('กรุณากรอกชื่อสินค้าและจำนวนให้ครบถ้วน', 'warning');
                 items.push({
                     productName: name,
                     quantity: Number(qty),
@@ -6532,17 +6733,14 @@
             const formData = new FormData();
             formData.append('type', 'accessory');
             formData.append('companyId', document.getElementById('company-select').value);
-            formData.append('importDate', date); // (*** Fix: Mapped to Model 'importDate' ***)
+            formData.append('importDate', date);
             if (supplier) formData.append('supplier', supplier);
 
             const details = {
                 supplier,
-                billName, // (*** New ***)
+                billName,
                 items
             };
-
-            // (*** DEBUG: CHECK PAYLOAD ***)
-            alert("Sending Details: " + JSON.stringify(details, null, 2));
 
             formData.append('details', JSON.stringify(details));
 
@@ -6558,14 +6756,14 @@
                 });
 
                 if (res.ok) {
-                    alert('บันทึกนำเข้าสำเร็จ!');
+                    showToast('บันทึกบิลนำเข้าสำเร็จแล้ว!');
                     closeModal('accImportModal');
                     fetchImportRequests();
                 } else {
                     const err = await res.json();
-                    alert('Error: ' + err.message);
+                    showToast('Error: ' + err.message, 'error');
                 }
-            } catch (err) { alert('Error: ' + err.message); }
+            } catch (err) { showToast('Error: ' + err.message, 'error'); }
         }
 
         // Expose Functions
@@ -6656,10 +6854,13 @@
             });
 
             if (!orderName || !orderDate || items.length === 0 || !isValid) {
-                return alert('กรุณากรอกข้อมูลให้ครบถ้วน');
+                return showToast('กรุณากรอกข้อมูลให้ครบถ้วน', 'warning');
             }
 
             try {
+                // Show loading state if needed
+                const btn = document.getElementById('btn-submit-branch-order'); // Add ID to button later if needed
+
                 const res = await fetch(`${SERVER_URL}/branch-stock-orders`, {
                     method: 'POST',
                     headers: {
@@ -6670,13 +6871,15 @@
                 });
 
                 if (res.ok) {
-                    alert('บันทึกสำเร็จ');
+                    showToast('บันทึกรายการสั่งของลงสาขาสำเร็จแล้ว!');
                     closeModal('branchOrderModal');
                     fetchBranchOrders();
                 } else {
-                    alert('บันทึกไม่สำเร็จ');
+                    showToast('ไม่สามารถบันทึกข้อมูลได้ กรุณาลองใหม่อีกครั้ง', 'error');
                 }
-            } catch (err) { alert('Error: ' + err.message); }
+            } catch (err) {
+                showToast('Error: ' + err.message, 'error');
+            }
         };
 
         window.fetchBranchOrders = async function () {
@@ -6705,13 +6908,12 @@
         window.renderBranchOrders = function (orders) {
             const tbody = document.getElementById('branch-order-table-body');
             if (!tbody) return;
-            tbody.innerHTML = '';
 
             if (orders.length === 0) {
                 tbody.innerHTML = `
                     <tr>
                         <td colspan="6" class="px-6 py-20 text-center">
-                            <div class="flex flex-col items-center justify-center space-y-4 animate-fade-in">
+                            <div class="flex flex-col items-center justify-center space-y-4">
                                 <div class="w-20 h-20 bg-slate-50 rounded-full flex items-center justify-center text-slate-300 shadow-inner">
                                     <ion-icon name="search-outline" class="text-5xl"></ion-icon>
                                 </div>
@@ -6728,13 +6930,7 @@
             const canUpdateStatus = (currentUser.department && (currentUser.department.includes('จัดซื้อ') || currentUser.department.includes('Purchase'))) ||
                 ['admin', 'executive', 'manager', 'hr'].includes(currentUser.role);
 
-            orders.forEach((order, index) => {
-                const tr = document.createElement('tr');
-                tr.className = "group hover:bg-yellow-50/30 transition-all duration-300 border-b border-slate-50 last:border-0 animate-fade-in";
-
-                // Add staggered animation delay
-                tr.style.animationDelay = `${index * 50}ms`;
-
+            const rowsHTML = orders.map((order) => {
                 const dateStr = new Date(order.orderDate).toLocaleDateString('th-TH', { day: '2-digit', month: '2-digit', year: 'numeric' });
                 const expectStr = order.expectedDate ? new Date(order.expectedDate).toLocaleDateString('th-TH', { day: '2-digit', month: '2-digit', year: 'numeric' }) : '-';
 
@@ -6785,7 +6981,6 @@
                     }
                 }
 
-                // Handle items display (support both old single-item and new multi-items)
                 let productsHTML = '';
                 if (order.items && order.items.length > 0) {
                     productsHTML = order.items.map(i => `
@@ -6796,7 +6991,6 @@
                         </div>
                     `).join('');
                 } else if (order.productName) {
-                    // Fallback for old data
                     productsHTML = `
                         <div class="flex items-center gap-1.5 mt-1">
                             <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
@@ -6807,46 +7001,48 @@
                     productsHTML = '<div class="text-xs text-slate-400 italic">No items</div>';
                 }
 
-                tr.innerHTML = `
-                    <td class="px-6 py-5 whitespace-nowrap">
-                        <div class="flex flex-col">
-                            <span class="text-xs font-bold text-slate-400 uppercase tracking-tighter mb-0.5">Order Date</span>
-                            <span class="text-sm font-bold text-slate-600">${dateStr}</span>
-                        </div>
-                    </td>
-                    <td class="px-6 py-5 whitespace-nowrap">
-                        <div class="flex flex-col">
-                            <span class="text-xs font-bold text-slate-400 uppercase tracking-tighter mb-0.5">Expected</span>
-                            <span class="text-sm font-bold text-slate-700 flex items-center gap-1.5">
-                                <ion-icon name="time-outline" class="text-slate-400"></ion-icon>
-                                ${expectStr}
-                            </span>
-                        </div>
-                    </td>
-                    <td class="px-6 py-5">
-                        <div class="text-base font-black text-slate-800 group-hover:text-yellow-600 transition-colors uppercase tracking-tight">${order.orderName}</div>
-                    </td>
-                    <td class="px-6 py-5">
-                        <div class="flex items-start gap-3">
-                            <div class="w-10 h-10 bg-slate-50 text-slate-400 rounded-xl flex items-center justify-center border border-slate-100 group-hover:border-yellow-200 group-hover:bg-white transition-all shrink-0">
-                                <ion-icon name="cube-outline" class="text-xl"></ion-icon>
-                            </div>
+                return `
+                    <tr class="group hover:bg-yellow-50/30 transition-all duration-300 border-b border-slate-50 last:border-0">
+                        <td class="px-6 py-5 whitespace-nowrap">
                             <div class="flex flex-col">
-                                ${productsHTML}
+                                <span class="text-xs font-bold text-slate-400 uppercase tracking-tighter mb-0.5">Order Date</span>
+                                <span class="text-sm font-bold text-slate-600">${dateStr}</span>
                             </div>
-                        </div>
-                    </td>
-                    <td class="px-6 py-5 text-center">
-                        <span class="inline-block px-3 py-1 bg-slate-100 text-slate-600 rounded-lg text-[10px] font-black uppercase tracking-widest border border-slate-200/50 group-hover:border-indigo-200 group-hover:bg-indigo-50 group-hover:text-indigo-600 transition-all">
-                            ${order.branch}
-                        </span>
-                    </td>
-                    <td class="px-6 py-5 text-center whitespace-nowrap">
-                        ${statusHTML}
-                    </td>
-                `;
-                tbody.appendChild(tr);
-            });
+                        </td>
+                        <td class="px-6 py-5 whitespace-nowrap">
+                            <div class="flex flex-col">
+                                <span class="text-xs font-bold text-slate-400 uppercase tracking-tighter mb-0.5">Expected</span>
+                                <span class="text-sm font-bold text-slate-700 flex items-center gap-1.5">
+                                    <ion-icon name="time-outline" class="text-slate-400"></ion-icon>
+                                    ${expectStr}
+                                </span>
+                            </div>
+                        </td>
+                        <td class="px-6 py-5">
+                            <div class="text-base font-black text-slate-800 group-hover:text-yellow-600 transition-colors uppercase tracking-tight">${order.orderName}</div>
+                        </td>
+                        <td class="px-6 py-5">
+                            <div class="flex items-start gap-3">
+                                <div class="w-10 h-10 bg-slate-50 text-slate-400 rounded-xl flex items-center justify-center border border-slate-100 group-hover:border-yellow-200 group-hover:bg-white transition-all shrink-0">
+                                    <ion-icon name="cube-outline" class="text-xl"></ion-icon>
+                                </div>
+                                <div class="flex flex-col">
+                                    ${productsHTML}
+                                </div>
+                            </div>
+                        </td>
+                        <td class="px-6 py-5 text-center">
+                            <span class="inline-block px-3 py-1 bg-slate-100 text-slate-600 rounded-lg text-[10px] font-black uppercase tracking-widest border border-slate-200/50 group-hover:border-indigo-200 group-hover:bg-indigo-50 group-hover:text-indigo-600 transition-all">
+                                ${order.branch}
+                            </span>
+                        </td>
+                        <td class="px-6 py-5 text-center whitespace-nowrap">
+                            ${statusHTML}
+                        </td>
+                    </tr>`;
+            }).join('');
+
+            tbody.innerHTML = rowsHTML;
         };
         window.updateBranchOrderStatus = async function (id, newStatus) {
             console.log(`[DEBUG] Updating Branch Order ${id} to status: ${newStatus}`);
@@ -6862,15 +7058,16 @@
 
                 if (res.ok) {
                     console.log(`[DEBUG] Update successful`);
+                    showToast('อัปเดตสถานะเรียบร้อยแล้ว!');
                     fetchBranchOrders();
                 } else {
                     const errBody = await res.json();
                     console.error(`[DEBUG] Update failed:`, errBody);
-                    alert('ไม่สามารถอัปเดตสถานะได้: ' + (errBody.message || 'Unknown error'));
+                    showToast('ไม่สามารถอัปเดตสถานะได้: ' + (errBody.message || 'Unknown error'), 'error');
                 }
             } catch (err) {
                 console.error(`[DEBUG] Update error:`, err);
-                alert('เกิดข้อผิดพลาด: ' + err.message);
+                showToast('เกิดข้อผิดพลาด: ' + err.message, 'error');
             }
         };
 
@@ -6898,13 +7095,12 @@
         window.renderBranchInventory = function (orders) {
             const tbody = document.getElementById('branch-inventory-table-body');
             if (!tbody) return;
-            tbody.innerHTML = '';
 
             if (orders.length === 0) {
                 tbody.innerHTML = `
                     <tr>
                         <td colspan="6" class="px-6 py-20 text-center">
-                            <div class="flex flex-col items-center justify-center space-y-4 animate-fade-in">
+                            <div class="flex flex-col items-center justify-center space-y-4">
                                 <div class="w-16 h-16 bg-slate-50 rounded-full flex items-center justify-center text-slate-300 shadow-inner">
                                     <ion-icon name="search-outline" class="text-4xl"></ion-icon>
                                 </div>
@@ -6918,11 +7114,7 @@
                 return;
             }
 
-            orders.forEach((order, index) => {
-                const tr = document.createElement('tr');
-                tr.className = "group hover:bg-emerald-50/20 transition-all duration-300 border-b border-slate-50 last:border-0 animate-fade-in";
-                tr.style.animationDelay = `${index * 50}ms`;
-
+            const rowsHTML = orders.map((order) => {
                 const dateStr = new Date(order.orderDate).toLocaleDateString('th-TH', { day: '2-digit', month: '2-digit', year: 'numeric' });
                 const expectStr = order.expectedDate ? new Date(order.expectedDate).toLocaleDateString('th-TH', { day: '2-digit', month: '2-digit', year: 'numeric' }) : '-';
 
@@ -6988,49 +7180,98 @@
                     productsHTML = '<div class="text-xs text-slate-400 italic mt-2">ไม่มีข้อมูลสินค้า</div>';
                 }
 
-                tr.innerHTML = `
-                    <td class="px-6 py-5 whitespace-nowrap">
-                        <div class="flex flex-col">
-                            <div class="flex items-center gap-1.5 mb-1">
-                                <ion-icon name="calendar-clear" class="text-slate-400 text-xs"></ion-icon>
-                                <span class="text-[10px] font-black text-slate-400 uppercase tracking-tighter">Order Date</span>
+                return `
+                    <tr class="group hover:bg-emerald-50/20 transition-all duration-300 border-b border-slate-50 last:border-0">
+                        <td class="px-6 py-5 whitespace-nowrap">
+                            <div class="flex flex-col">
+                                <span class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1.5">สั่งเมื่อ</span>
+                                <span class="text-sm font-black text-slate-700">${dateStr}</span>
                             </div>
-                            <span class="text-sm font-black text-slate-700">${dateStr}</span>
-                        </div>
-                    </td>
-                    <td class="px-6 py-5 whitespace-nowrap">
-                        <div class="flex flex-col">
-                            <div class="flex items-center gap-1.5 mb-1">
-                                <ion-icon name="calendar-clear" class="text-slate-400 text-xs"></ion-icon>
-                                <span class="text-[10px] font-black text-slate-400 uppercase tracking-tighter">Expected</span>
+                        </td>
+                        <td class="px-6 py-5 whitespace-nowrap">
+                            <div class="flex flex-col">
+                                <span class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1.5">คาดว่าจะถึง</span>
+                                <span class="text-sm font-black text-slate-700 flex items-center gap-1.5">
+                                    <ion-icon name="calendar-outline" class="text-emerald-500"></ion-icon>
+                                    ${expectStr}
+                                </span>
                             </div>
-                            <span class="text-sm font-black text-slate-700">${expectStr}</span>
-                        </div>
-                    </td>
-                    <td class="px-6 py-5">
-                        <div class="flex flex-col">
-                            <div class="flex items-center gap-2">
-                                <span class="text-base font-black text-slate-800 tracking-tight group-hover:text-emerald-600 transition-colors uppercase">${order.orderName}</span>
+                        </td>
+                        <td class="px-6 py-5">
+                            <div class="flex flex-col">
+                                <span class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1.5">หัวข้อรายการ</span>
+                                <div class="text-sm font-black text-slate-800 group-hover:text-emerald-600 transition-colors uppercase tracking-tight">${order.orderName}</div>
                             </div>
-                        </div>
-                    </td>
-                    <td class="px-6 py-5">
-                        <div class="flex flex-col">
-                            ${productsHTML}
-                        </div>
-                    </td>
-                    <td class="px-6 py-5 text-center">
-                        <div class="inline-flex items-center justify-center gap-2 bg-emerald-50 border border-emerald-100 px-4 py-2 rounded-2xl shadow-sm group-hover:bg-emerald-500 group-hover:text-white transition-all duration-300">
-                            <ion-icon name="business" class="text-lg text-emerald-500 group-hover:text-white transition-colors"></ion-icon>
-                            <span class="text-xs font-black uppercase tracking-widest">${order.branch}</span>
-                        </div>
-                    </td>
-                    <td class="px-6 py-5 text-center">
-                        ${statusHTML}
-                    </td>
-                `;
-                tbody.appendChild(tr);
-            });
+                        </td>
+                        <td class="px-6 py-5">
+                            <div class="flex flex-col">
+                                <span class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">รายการสินค้า</span>
+                                ${productsHTML}
+                            </div>
+                        </td>
+                        <td class="px-6 py-5 text-center">
+                            <span class="inline-block px-4 py-1.5 bg-slate-100 text-slate-600 rounded-full text-[10px] font-black uppercase tracking-widest border border-slate-200/50 shadow-sm group-hover:bg-emerald-500 group-hover:text-white group-hover:border-emerald-500 transition-all">
+                                ${order.branch}
+                            </span>
+                        </td>
+                        <td class="px-6 py-5 text-center whitespace-nowrap">
+                            ${statusHTML}
+                        </td>
+                    </tr>`;
+            }).join('');
+
+            tbody.innerHTML = rowsHTML;
+        };
+    </script>
+    <div id="toast-container" class="fixed top-6 right-6 z-[9999] flex flex-col gap-3 pointer-events-none"></div>
+
+    <script>
+        // Custom Toast Function
+        window.showToast = function (message, type = 'success') {
+            const container = document.getElementById('toast-container');
+            if (!container) return;
+
+            const toast = document.createElement('div');
+            toast.className = `glass-toast px-5 py-4 rounded-2xl shadow-2xl flex items-center gap-4 min-w-[320px] pointer-events-auto toast-animate-in border-l-4`;
+
+            let icon = '';
+            let iconColor = '';
+
+            if (type === 'success') {
+                toast.classList.add('border-emerald-500');
+                icon = 'checkmark-circle';
+                iconColor = 'text-emerald-500';
+            } else if (type === 'error') {
+                toast.classList.add('border-red-500');
+                icon = 'alert-circle';
+                iconColor = 'text-red-500';
+            } else {
+                toast.classList.add('border-amber-500');
+                icon = 'warning';
+                iconColor = 'text-amber-500';
+            }
+
+            toast.innerHTML = `
+                <div class="w-10 h-10 rounded-xl bg-white shadow-sm flex items-center justify-center shrink-0">
+                    <ion-icon name="${icon}" class="text-2xl ${iconColor}"></ion-icon>
+                </div>
+                <div class="flex-1">
+                    <p class="text-[13px] font-black text-slate-800 leading-tight">${message}</p>
+                </div>
+                <button class="text-slate-300 hover:text-slate-500 transition-colors" onclick="this.parentElement.classList.replace('toast-animate-in', 'toast-animate-out'); setTimeout(() => this.parentElement.remove(), 400)">
+                    <ion-icon name="close" class="text-xl"></ion-icon>
+                </button>
+            `;
+
+            container.appendChild(toast);
+
+            // Auto remove
+            setTimeout(() => {
+                if (toast.parentElement) {
+                    toast.classList.replace('toast-animate-in', 'toast-animate-out');
+                    setTimeout(() => toast.remove(), 400);
+                }
+            }, 4000);
         };
     </script>
 </body>

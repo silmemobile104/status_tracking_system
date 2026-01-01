@@ -4,76 +4,216 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SILMIN MOBILE</title>
+    <title>เข้าสู่ระบบ | SILMIN MOBILE</title>
     <link rel="icon" type="image/png" href="/image/icon_silme.png">
     <script src="https://cdn.tailwindcss.com"></script>
+    <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
+    <script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+Thai:wght@400;500;600;700&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Noto+Sans+Thai:wght@400;500;600;700;800&display=swap');
+
+        :root {
+            --primary: #f59e0b;
+            /* Amber 500 */
+            --primary-hover: #d97706;
+            /* Amber 600 */
+            --primary-light: #fef3c7;
+            /* Amber 100 */
+        }
 
         body {
             font-family: 'Inter', 'Noto Sans Thai', sans-serif;
-            background-color: #f3f4f6;
+            background-color: #ffffff;
+            overflow: hidden;
+        }
+
+        .bg-gradient-animate {
+            background: linear-gradient(-45deg, #ffffff, #fffbeb, #fef3c7, #ffffff);
+            background-size: 400% 400%;
+            animation: gradient 15s ease infinite;
+        }
+
+        @keyframes gradient {
+            0% {
+                background-position: 0% 50%;
+            }
+
+            50% {
+                background-position: 100% 50%;
+            }
+
+            100% {
+                background-position: 0% 50%;
+            }
+        }
+
+        .glass-card {
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.5);
+        }
+
+        .input-focus-effect:focus {
+            box-shadow: 0 0 0 4px rgba(245, 158, 11, 0.1);
+        }
+
+        .floating-icon {
+            animation: float 6s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0% {
+                transform: translateY(0px);
+            }
+
+            50% {
+                transform: translateY(-20px);
+            }
+
+            100% {
+                transform: translateY(0px);
+            }
+        }
+
+        .loader {
+            width: 20px;
+            height: 20px;
+            border: 3px solid #FFF;
+            border-bottom-color: transparent;
+            border-radius: 50%;
+            display: inline-block;
+            box-sizing: border-box;
+            animation: rotation 1s linear infinite;
+        }
+
+        @keyframes rotation {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
         }
     </style>
 </head>
 
-<body class="flex items-center justify-center min-h-screen">
+<body class="bg-gradient-animate flex items-center justify-center min-h-screen p-4">
 
-    <div class="w-full max-w-md p-8 space-y-8 bg-white rounded-xl shadow-lg">
-        <div class="text-center">
-            <h1 class="text-3xl font-bold text-gray-900">เข้าสู่ระบบ</h1>
-            <p class="mt-2 text-gray-600">ระบบติดตามสถานะงาน</p>
+    <!-- Background Elements -->
+    <div class="fixed top-[-10%] left-[-10%] w-[40%] h-[40%] bg-amber-100/50 rounded-full blur-[100px] z-0"></div>
+    <div class="fixed bottom-[-10%] right-[-10%] w-[50%] h-[50%] bg-yellow-50/50 rounded-full blur-[100px] z-0"></div>
+
+    <div class="w-full max-w-md z-10">
+        <!-- Logo Section -->
+        <div class="mb-10 text-center flex flex-col items-center">
+            <div class="relative mb-6">
+                <div
+                    class="w-24 h-24 bg-white rounded-[2.5rem] shadow-2xl flex items-center justify-center p-4 transform transition-transform hover:scale-110">
+                    <img src="/image/icon_silme.png" alt="SILME Icon" class="w-full h-full object-contain" />
+                </div>
+                <div
+                    class="absolute -top-2 -right-2 w-8 h-8 bg-amber-500 rounded-xl shadow-lg flex items-center justify-center text-white floating-icon">
+                    <ion-icon name="shield-checkmark" class="text-xl"></ion-icon>
+                </div>
+            </div>
+            <h1 class="text-4xl font-extrabold text-slate-900 tracking-tight">SILMIN MOBILE</h1>
+            <p class="mt-3 text-slate-500 font-medium">โปรดเข้าสู่ระบบเพื่อจัดการงานของคุณ</p>
         </div>
 
-        <form id="login-form" class="mt-8 space-y-6">
-            <div>
-                <label for="username" class="block text-sm font-medium text-gray-700 mb-2">รหัสพนักงาน
-                    (Username)</label>
-                <input id="username" name="username" type="text" required
-                    class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                    placeholder="กรอกรหัสพนักงาน">
-            </div>
-            <div>
-                <label for="password" class="block text-sm font-medium text-gray-700 mb-2">รหัสผ่าน</label>
-                <input id="password" name="password" type="password" required
-                    class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                    placeholder="••••••••">
+        <!-- Login Card -->
+        <div
+            class="glass-card p-10 rounded-[3rem] shadow-[0_32px_64px_-16px_rgba(245,158,11,0.15)] relative overflow-hidden group">
+            <div class="absolute top-0 left-0 w-full h-1.5 bg-gradient-to-r from-amber-400 via-yellow-300 to-amber-500">
             </div>
 
-            <div id="error-message" class="hidden p-3 text-sm text-red-600 bg-red-100 rounded-md"></div>
+            <form id="login-form" class="space-y-6">
+                <!-- Username -->
+                <div class="space-y-2">
+                    <label for="username" class="text-sm font-bold text-slate-700 ml-1">รหัสพนักงาน</label>
+                    <div class="relative group/input">
+                        <div
+                            class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-slate-400 group-focus-within/input:text-amber-500 transition-colors">
+                            <ion-icon name="person-outline" class="text-xl"></ion-icon>
+                        </div>
+                        <input id="username" name="username" type="text" required
+                            class="w-full pl-12 pr-4 py-4 bg-slate-50/50 border border-slate-200 rounded-2xl outline-none transition-all focus:bg-white focus:border-amber-400 input-focus-effect font-medium text-slate-800"
+                            placeholder="Employee ID">
+                    </div>
+                </div>
 
-            <button type="submit" id="submit-btn"
-                class="w-full px-4 py-2 text-white bg-indigo-600 rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 font-semibold transition-colors">
-                เข้าสู่ระบบ
-            </button>
-        </form>
+                <!-- Password -->
+                <div class="space-y-2">
+                    <label for="password" class="text-sm font-bold text-slate-700 ml-1">รหัสผ่าน</label>
+                    <div class="relative group/input">
+                        <div
+                            class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-slate-400 group-focus-within/input:text-amber-500 transition-colors">
+                            <ion-icon name="lock-closed-outline" class="text-xl"></ion-icon>
+                        </div>
+                        <input id="password" name="password" type="password" required
+                            class="w-full pl-12 pr-4 py-4 bg-slate-50/50 border border-slate-200 rounded-2xl outline-none transition-all focus:bg-white focus:border-amber-400 input-focus-effect font-medium text-slate-800"
+                            placeholder="••••••••">
+                    </div>
+                </div>
+
+                <!-- Error Message -->
+                <div id="error-message" class="hidden animate-shake">
+                    <div class="p-4 bg-red-50 text-red-600 rounded-2xl border border-red-100 flex items-center gap-3">
+                        <ion-icon name="alert-circle-outline" class="text-2xl shrink-0"></ion-icon>
+                        <span class="text-xs font-bold leading-tight"
+                            id="error-text">ชื่อผู้ใช้หรือรหัสผ่านไม่ถูกต้อง</span>
+                    </div>
+                </div>
+
+                <!-- Submit Button -->
+                <button type="submit" id="submit-btn"
+                    class="w-full py-4 px-6 bg-slate-900 text-white rounded-[1.5rem] font-extrabold shadow-xl shadow-slate-900/20 hover:bg-black transition-all hover:-translate-y-1 active:scale-[0.98] flex items-center justify-center gap-2 group/btn">
+                    <span id="btn-text">เข้าสู่ระบบ</span>
+                    <ion-icon name="arrow-forward-outline"
+                        class="text-xl transition-transform group-hover/btn:translate-x-1" id="btn-icon"></ion-icon>
+                    <span id="btn-loader" class="hidden loader"></span>
+                </button>
+            </form>
+
+            <!-- Footer Links -->
+            <div class="mt-10 pt-8 border-t border-slate-100 text-center">
+                <p class="text-slate-400 text-xs font-bold uppercase tracking-widest leading-loose">
+                    &copy; 2025 Silmin Mobile Co., Ltd.<br>
+                    <span class="text-slate-300">Status Tracking System</span>
+                </p>
+            </div>
+        </div>
     </div>
 
     <script>
         document.addEventListener('DOMContentLoaded', () => {
-            // เคลียร์ Token เก่าทิ้งทุกครั้งที่เข้าหน้า Login
             localStorage.clear();
 
             const loginForm = document.getElementById('login-form');
             const errorMessageDiv = document.getElementById('error-message');
+            const errorText = document.getElementById('error-text');
             const submitButton = document.getElementById('submit-btn');
+            const btnText = document.getElementById('btn-text');
+            const btnIcon = document.getElementById('btn-icon');
+            const btnLoader = document.getElementById('btn-loader');
 
             loginForm.addEventListener('submit', async (e) => {
                 e.preventDefault();
 
-                const username = document.getElementById('username').value;
+                const username = document.getElementById('username').value.trim();
                 const password = document.getElementById('password').value;
 
-                // ปิดปุ่มกันกดซ้ำ
+                // UI State: Loading
                 submitButton.disabled = true;
-                submitButton.textContent = 'กำลังตรวจสอบ...';
+                btnText.textContent = 'กำลังตรวจสอบ...';
+                btnIcon.classList.add('hidden');
+                btnLoader.classList.remove('hidden');
                 errorMessageDiv.classList.add('hidden');
 
                 try {
-                    // (*** จุดที่ต้องแก้ที่ 1: ใช้ Relative Path ***)
-                    // ใช้แค่ '/api/auth/login' ตัด http://localhost:5000 ออก
                     const response = await fetch('/api/auth/login', {
-                        method: 'POST', // ต้องเป็น POST เท่านั้น
+                        method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({ username, password })
                     });
@@ -81,12 +221,16 @@
                     const data = await response.json();
 
                     if (response.ok) {
-                        // บันทึก Token
                         localStorage.setItem('token', data.token);
                         localStorage.setItem('user', JSON.stringify(data.user));
 
-                        // (*** จุดที่ต้องแก้ที่ 2: Redirect ไป dashboard ***)
-                        window.location.href = '/dashboard';
+                        // Success Feedback
+                        btnText.textContent = 'สำเร็จ! กำลังเข้าสู่ระบบ...';
+                        submitButton.classList.replace('bg-slate-900', 'bg-emerald-500');
+
+                        setTimeout(() => {
+                            window.location.href = '/dashboard';
+                        }, 500);
 
                     } else {
                         throw new Error(data.message || 'เข้าสู่ระบบไม่สำเร็จ');
@@ -94,12 +238,14 @@
 
                 } catch (error) {
                     console.error('Login Error:', error);
-                    errorMessageDiv.textContent = error.message || 'ไม่สามารถเชื่อมต่อ Server ได้';
+                    errorText.textContent = error.message || 'ไม่สามารถเชื่อมต่อ Server ได้';
                     errorMessageDiv.classList.remove('hidden');
 
-                    // คืนค่าปุ่ม
+                    // UI State: Restore
                     submitButton.disabled = false;
-                    submitButton.textContent = 'เข้าสู่ระบบ';
+                    btnText.textContent = 'เข้าสู่ระบบ';
+                    btnIcon.classList.remove('hidden');
+                    btnLoader.classList.add('hidden');
                 }
             });
         });

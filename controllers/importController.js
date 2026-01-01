@@ -174,3 +174,71 @@ exports.deleteImport = async (req, res) => {
         res.status(500).json({ message: 'Server Error', error: error.message });
     }
 };
+// @desc    Update import request (Append files & update details)
+exports.updateImport = async (req, res) => {
+    try {
+        const importRequest = await ImportRequest.findById(req.params.id);
+
+        if (!importRequest) {
+            return res.status(404).json({ message: 'Request not found' });
+        }
+
+        const { type, details, supplier, description } = req.body;
+
+        // 1. Handle Files (Append) - Robustness Fix
+        console.log(`DEBUG: Updating import ${req.params.id}. Files before: ${importRequest.files ? importRequest.files.length : 0}`);
+
+        if (req.files && req.files.length > 0) {
+            const newFiles = req.files.map(file => file.path);
+            const existingFiles = importRequest.files || []; // Safety check
+            importRequest.files = [...existingFiles, ...newFiles];
+
+            console.log(`DEBUG: Appended ${newFiles.length} new files. Total: ${importRequest.files.length}`);
+        }
+
+        // 2. Handle Details
+        let parsedDetails = {};
+        if (details) {
+            try {
+                parsedDetails = JSON.parse(details);
+                // Ensure items are structured correctly if present
+                if (parsedDetails.items && Array.isArray(parsedDetails.items)) {
+                    parsedDetails.items = parsedDetails.items.map(item => ({
+                        productName: item.productName || item.name || 'Unknown Item',
+                        quantity: Number(item.quantity || item.qty || 1),
+                        note: item.note || item.desc || ''
+                    }));
+                }
+            } catch (e) {
+                console.error('DEBUG: Update Parse Error:', e);
+                parsedDetails = details;
+            }
+        } else {
+            // Accessory fallback or direct fields
+            parsedDetails = {
+                productName: req.body.name || importRequest.details.productName,
+                quantity: req.body.quantity || importRequest.details.quantity,
+                importDate: req.body.importDate || importRequest.details.importDate,
+                description: description || req.body.description || importRequest.details.description
+            };
+        }
+
+        // Phone specific updates
+        if (importRequest.type === 'phone' || type === 'phone') {
+            if (description) parsedDetails.description = description;
+            if (supplier) parsedDetails.supplier = supplier;
+        }
+
+        // Update the document
+        importRequest.details = { ...importRequest.details, ...parsedDetails };
+
+        // Mark details as modified for Mongoose if nested
+        importRequest.markModified('details');
+
+        await importRequest.save();
+        res.status(200).json(importRequest);
+    } catch (error) {
+        console.error('Update Import Error:', error);
+        res.status(500).json({ message: 'Server Error', error: error.message });
+    }
+};

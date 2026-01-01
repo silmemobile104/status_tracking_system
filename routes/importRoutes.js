@@ -27,7 +27,7 @@ const storage = new CloudinaryStorage({
             resource_type: 'auto',             // ให้ระบบตรวจชนิดไฟล์เอง (รูป/วิดีโอ/เอกสาร)
             format: fileFormat,                // บังคับใช้นามสกุลเดิม
             use_filename: true,                // ใช้ชื่อไฟล์เดิมจากเครื่อง user
-            unique_filename: false,            // ไม่ต้องเติมเลขสุ่มต่อท้ายชื่อไฟล์
+            unique_filename: true,             // (*** FIX: เติมเลขสุ่มต่อท้ายชื่อไฟล์เพื่อป้องกันการทับไฟล์เดิม ***)
         };
     },
 });
@@ -49,6 +49,9 @@ router.post('/', verifyToken, upload.array('files', 5), importController.createI
 
 // ดึงรายการแจ้งนำเข้า (สำคัญ: ต้องมี verifyToken เพื่อแก้ปัญหาโหลดข้อมูลไม่ได้)
 router.get('/', verifyToken, importController.getImports);
+
+// อัปเดตรายการ (แก้ไข/เพิ่มไฟล์)
+router.put('/:id', verifyToken, upload.array('files', 5), importController.updateImport);
 
 // อัปเดตสถานะ (เฉพาะ role ที่ระบุ)
 router.put('/:id/status', verifyToken, checkRole(['admin', 'manager', 'executive', 'staff']), importController.updateImportStatus);
