@@ -859,26 +859,54 @@
                                 </div>
                             </div>
 
-                            <!-- Status Filter -->
-                            <div id="branch-order-filter-status-container" class="min-w-[160px]">
-                                <div class="relative group">
-                                    <div
-                                        class="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-yellow-500 transition-colors">
-                                        <ion-icon name="filter-circle-outline" class="text-lg"></ion-icon>
-                                    </div>
-                                    <select id="branch-order-filter-status" onchange="fetchBranchOrders()"
-                                        class="w-full bg-slate-100/80 border border-slate-200/60 text-slate-700 text-sm font-bold rounded-2xl pl-10 pr-4 py-3.5 outline-none focus:ring-4 focus:ring-yellow-400/20 focus:border-yellow-400 transition-all appearance-none cursor-pointer">
-                                        <option value="all">ทุกสถานะ</option>
-                                        <option value="pending" selected>รอดำเนินการ</option>
-                                        <option value="shipped">รอของ</option>
-                                        <option value="arrived">ของถึงสาขาแล้ว</option>
-                                        <option value="canceled">ยกเลิก</option>
-                                    </select>
-                                    <div
-                                        class="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400">
-                                        <ion-icon name="chevron-down-outline"></ion-icon>
-                                    </div>
-                                </div>
+                            <!-- Status Filter (Icons) -->
+                            <div class="bg-slate-100 p-1.5 rounded-2xl flex flex-wrap items-center gap-1">
+                                <input type="hidden" id="branch-order-status-filter" value="">
+
+                                <button onclick="setBranchOrderStatusFilter('')" id="btn-bo-all"
+                                    class="relative px-3 h-10 rounded-xl flex items-center justify-center gap-2 text-slate-500 hover:bg-white hover:text-indigo-600 hover:shadow-sm transition-all bg-white shadow-sm ring-1 ring-black/5"
+                                    title="ทุกสถานะ">
+                                    <ion-icon name="grid-outline" class="text-lg"></ion-icon>
+                                    <span class="text-xs font-bold">ทั้งหมด</span>
+                                    <span id="count-bo-all"
+                                        class="absolute -top-1 -right-1 bg-indigo-500 text-white text-[9px] font-bold px-1 rounded-full min-w-[14px] h-[14px] flex items-center justify-center hidden">0</span>
+                                </button>
+
+                                <button onclick="setBranchOrderStatusFilter('pending')" id="btn-bo-pending"
+                                    class="relative px-3 h-10 rounded-xl flex items-center justify-center gap-2 text-slate-500 hover:bg-white hover:text-amber-600 hover:shadow-sm transition-all"
+                                    title="รอดำเนินการ">
+                                    <ion-icon name="time-outline" class="text-lg"></ion-icon>
+                                    <span class="text-xs font-bold">รออนุมัติ</span>
+                                    <span id="count-bo-pending"
+                                        class="absolute -top-1 -right-1 bg-amber-500 text-white text-[9px] font-bold px-1 rounded-full min-w-[14px] h-[14px] flex items-center justify-center hidden">0</span>
+                                </button>
+
+                                <button onclick="setBranchOrderStatusFilter('shipped')" id="btn-bo-shipped"
+                                    class="relative px-3 h-10 rounded-xl flex items-center justify-center gap-2 text-slate-500 hover:bg-white hover:text-blue-600 hover:shadow-sm transition-all"
+                                    title="รอของ">
+                                    <ion-icon name="bus-outline" class="text-lg"></ion-icon>
+                                    <span class="text-xs font-bold">รอของ</span>
+                                    <span id="count-bo-shipped"
+                                        class="absolute -top-1 -right-1 bg-blue-500 text-white text-[9px] font-bold px-1 rounded-full min-w-[14px] h-[14px] flex items-center justify-center hidden">0</span>
+                                </button>
+
+                                <button onclick="setBranchOrderStatusFilter('arrived')" id="btn-bo-arrived"
+                                    class="relative px-3 h-10 rounded-xl flex items-center justify-center gap-2 text-slate-500 hover:bg-white hover:text-emerald-600 hover:shadow-sm transition-all"
+                                    title="ได้รับแล้ว">
+                                    <ion-icon name="checkmark-circle-outline" class="text-lg"></ion-icon>
+                                    <span class="text-xs font-bold">ได้รับแล้ว</span>
+                                    <span id="count-bo-arrived"
+                                        class="absolute -top-1 -right-1 bg-emerald-500 text-white text-[9px] font-bold px-1 rounded-full min-w-[14px] h-[14px] flex items-center justify-center hidden">0</span>
+                                </button>
+
+                                <button onclick="setBranchOrderStatusFilter('canceled')" id="btn-bo-canceled"
+                                    class="relative px-3 h-10 rounded-xl flex items-center justify-center gap-2 text-slate-500 hover:bg-white hover:text-rose-600 hover:shadow-sm transition-all"
+                                    title="ยกเลิก">
+                                    <ion-icon name="close-circle-outline" class="text-lg"></ion-icon>
+                                    <span class="text-xs font-bold">ยกเลิก</span>
+                                    <span id="count-bo-canceled"
+                                        class="absolute -top-1 -right-1 bg-rose-500 text-white text-[9px] font-bold px-1 rounded-full min-w-[14px] h-[14px] flex items-center justify-center hidden">0</span>
+                                </button>
                             </div>
                             <button id="btn-add-branch-order" onclick="openBranchOrderModal()"
                                 class="bg-slate-900 hover:bg-black text-white font-black py-3.5 px-8 rounded-2xl shadow-xl shadow-slate-900/20 transition-all hover:-translate-y-1 active:translate-y-0.5 flex items-center gap-2">
@@ -1067,19 +1095,54 @@
                         </div>
                         <div class="flex flex-wrap items-center gap-3 w-full lg:w-auto">
                             <!-- Status Filter -->
-                            <div class="relative group flex-1 md:flex-none min-w-[160px]">
-                                <ion-icon name="funnel-outline"
-                                    class="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-hover:text-indigo-500 transition-colors z-10"></ion-icon>
-                                <select id="manage-request-status-filter" onchange="fetchManageStockRequests()"
-                                    class="pl-11 pr-10 py-3 rounded-2xl border border-slate-200 bg-white text-sm font-bold text-slate-700 focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 outline-none cursor-pointer hover:border-indigo-300 transition-all shadow-sm appearance-none w-full">
-                                    <option value="">ทุกสถานะ</option>
-                                    <option value="pending" selected>⏳ รอดำเนินการ</option>
-                                    <option value="processing">📦 กำลังเตรียมของ</option>
-                                    <option value="received">✅ สำเร็จ</option>
-                                    <option value="canceled">❌ ยกเลิก</option>
-                                </select>
-                                <ion-icon name="chevron-down-outline"
-                                    class="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none text-xs"></ion-icon>
+                            <!-- Status Filter (Icons) -->
+                            <div class="bg-slate-100 p-1.5 rounded-2xl flex flex-wrap items-center gap-1">
+                                <input type="hidden" id="manage-request-status-filter" value="">
+
+                                <button onclick="setManageStatusFilter('')" id="btn-status-all"
+                                    class="relative px-3 h-10 rounded-xl flex items-center justify-center gap-2 text-slate-500 hover:bg-white hover:text-indigo-600 hover:shadow-sm transition-all bg-white shadow-sm ring-1 ring-black/5"
+                                    title="ทุกสถานะ">
+                                    <ion-icon name="grid-outline" class="text-lg"></ion-icon>
+                                    <span class="text-xs font-bold">ทั้งหมด</span>
+                                    <span id="count-status-all"
+                                        class="absolute -top-1 -right-1 bg-indigo-500 text-white text-[9px] font-bold px-1 rounded-full min-w-[14px] h-[14px] flex items-center justify-center hidden">0</span>
+                                </button>
+
+                                <button onclick="setManageStatusFilter('pending')" id="btn-status-pending"
+                                    class="relative px-3 h-10 rounded-xl flex items-center justify-center gap-2 text-slate-500 hover:bg-white hover:text-amber-600 hover:shadow-sm transition-all"
+                                    title="รอดำเนินการ">
+                                    <ion-icon name="time-outline" class="text-lg"></ion-icon>
+                                    <span class="text-xs font-bold">รอดำเนินการ</span>
+                                    <span id="count-status-pending"
+                                        class="absolute -top-1 -right-1 bg-amber-500 text-white text-[9px] font-bold px-1 rounded-full min-w-[14px] h-[14px] flex items-center justify-center hidden">0</span>
+                                </button>
+
+                                <button onclick="setManageStatusFilter('processing')" id="btn-status-processing"
+                                    class="relative px-3 h-10 rounded-xl flex items-center justify-center gap-2 text-slate-500 hover:bg-white hover:text-blue-600 hover:shadow-sm transition-all"
+                                    title="กำลังเตรียมของ">
+                                    <ion-icon name="cube-outline" class="text-lg"></ion-icon>
+                                    <span class="text-xs font-bold">กำลังเตรียม</span>
+                                    <span id="count-status-processing"
+                                        class="absolute -top-1 -right-1 bg-blue-500 text-white text-[9px] font-bold px-1 rounded-full min-w-[14px] h-[14px] flex items-center justify-center hidden">0</span>
+                                </button>
+
+                                <button onclick="setManageStatusFilter('received')" id="btn-status-received"
+                                    class="relative px-3 h-10 rounded-xl flex items-center justify-center gap-2 text-slate-500 hover:bg-white hover:text-emerald-600 hover:shadow-sm transition-all"
+                                    title="สำเร็จ">
+                                    <ion-icon name="checkmark-circle-outline" class="text-lg"></ion-icon>
+                                    <span class="text-xs font-bold">สำเร็จ</span>
+                                    <span id="count-status-received"
+                                        class="absolute -top-1 -right-1 bg-emerald-500 text-white text-[9px] font-bold px-1 rounded-full min-w-[14px] h-[14px] flex items-center justify-center hidden">0</span>
+                                </button>
+
+                                <button onclick="setManageStatusFilter('canceled')" id="btn-status-canceled"
+                                    class="relative px-3 h-10 rounded-xl flex items-center justify-center gap-2 text-slate-500 hover:bg-white hover:text-rose-600 hover:shadow-sm transition-all"
+                                    title="ยกเลิก">
+                                    <ion-icon name="close-circle-outline" class="text-lg"></ion-icon>
+                                    <span class="text-xs font-bold">ยกเลิก</span>
+                                    <span id="count-status-canceled"
+                                        class="absolute -top-1 -right-1 bg-rose-500 text-white text-[9px] font-bold px-1 rounded-full min-w-[14px] h-[14px] flex items-center justify-center hidden">0</span>
+                                </button>
                             </div>
 
                             <!-- Branch Filter -->
@@ -1184,42 +1247,54 @@
                                     class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none text-xs"></ion-icon>
                             </div>
 
-                            <!-- Status Filter (Dropdown Style) -->
-                            <div class="relative group">
-                                <ion-icon name="filter"
-                                    class="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 group-hover:text-indigo-500 transition-colors"></ion-icon>
-                                <select id="stock-import-status-filter" onchange="filterStockImports(this.value)"
-                                    class="pl-9 pr-8 py-2.5 rounded-xl border border-slate-200 bg-white text-sm font-bold text-slate-700 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none cursor-pointer hover:border-indigo-300 transition-colors shadow-sm appearance-none">
-                                    <option value="all">สถานะทั้งหมด</option>
-                                    <option value="pending">🟡 รอนำเข้า</option>
-                                    <option value="importing">🔵 กำลังนำเข้า</option>
-                                    <option value="received">🟢 สำเร็จ</option>
-                                    <option value="rejected">🔴 ยกเลิก</option>
-                                </select>
-                                <ion-icon name="chevron-down"
-                                    class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none text-xs"></ion-icon>
-                            </div>
+                            <!-- Status Filter (Icons) -->
+                            <div class="bg-slate-100 p-1.5 rounded-2xl flex flex-wrap items-center gap-1">
+                                <input type="hidden" id="stock-import-status-filter" value="all">
 
-                            <!-- Date Range Filters -->
-                            <div class="h-8 w-px bg-slate-200 mx-1 hidden md:block"></div>
-                            <div class="flex items-center gap-2">
-                                <div class="relative group">
-                                    <ion-icon name="calendar-outline"
-                                        class="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"></ion-icon>
-                                    <input type="text" onfocus="(this.type='date')" onblur="(this.type='text')"
-                                        id="stock-filter-date-start" placeholder="วันเริ่มต้น"
-                                        class="pl-9 pr-2 py-2.5 rounded-xl border border-slate-200 bg-white text-sm font-bold text-slate-700 focus:ring-2 focus:ring-indigo-500 outline-none w-32 shadow-sm"
-                                        onchange="fetchStockImports()">
-                                </div>
-                                <span class="text-slate-300">-</span>
-                                <div class="relative group">
-                                    <ion-icon name="calendar-outline"
-                                        class="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"></ion-icon>
-                                    <input type="text" onfocus="(this.type='date')" onblur="(this.type='text')"
-                                        id="stock-filter-date-end" placeholder="วันสิ้นสุด"
-                                        class="pl-9 pr-2 py-2.5 rounded-xl border border-slate-200 bg-white text-sm font-bold text-slate-700 focus:ring-2 focus:ring-indigo-500 outline-none w-32 shadow-sm"
-                                        onchange="fetchStockImports()">
-                                </div>
+                                <button onclick="filterStockImports('all')" id="btn-stock-all"
+                                    class="relative px-3 h-10 rounded-xl flex items-center justify-center gap-2 text-slate-500 hover:bg-white hover:text-indigo-600 hover:shadow-sm transition-all bg-white shadow-sm ring-1 ring-black/5"
+                                    title="ทุกสถานะ">
+                                    <ion-icon name="grid-outline" class="text-lg"></ion-icon>
+                                    <span class="text-xs font-bold">ทั้งหมด</span>
+                                    <span id="count-stock-all"
+                                        class="absolute -top-1 -right-1 bg-indigo-500 text-white text-[9px] font-bold px-1 rounded-full min-w-[14px] h-[14px] flex items-center justify-center hidden">0</span>
+                                </button>
+
+                                <button onclick="filterStockImports('pending')" id="btn-stock-pending"
+                                    class="relative px-3 h-10 rounded-xl flex items-center justify-center gap-2 text-slate-500 hover:bg-white hover:text-amber-600 hover:shadow-sm transition-all"
+                                    title="รอนำเข้า">
+                                    <ion-icon name="time-outline" class="text-lg"></ion-icon>
+                                    <span class="text-xs font-bold">รอนำเข้า</span>
+                                    <span id="count-stock-pending"
+                                        class="absolute -top-1 -right-1 bg-amber-500 text-white text-[9px] font-bold px-1 rounded-full min-w-[14px] h-[14px] flex items-center justify-center hidden">0</span>
+                                </button>
+
+                                <button onclick="filterStockImports('importing')" id="btn-stock-importing"
+                                    class="relative px-3 h-10 rounded-xl flex items-center justify-center gap-2 text-slate-500 hover:bg-white hover:text-blue-600 hover:shadow-sm transition-all"
+                                    title="กำลังนำเข้า">
+                                    <ion-icon name="bus-outline" class="text-lg"></ion-icon>
+                                    <span class="text-xs font-bold">กำลังนำเข้า</span>
+                                    <span id="count-stock-importing"
+                                        class="absolute -top-1 -right-1 bg-blue-500 text-white text-[9px] font-bold px-1 rounded-full min-w-[14px] h-[14px] flex items-center justify-center hidden">0</span>
+                                </button>
+
+                                <button onclick="filterStockImports('received')" id="btn-stock-received"
+                                    class="relative px-3 h-10 rounded-xl flex items-center justify-center gap-2 text-slate-500 hover:bg-white hover:text-emerald-600 hover:shadow-sm transition-all"
+                                    title="สำเร็จ">
+                                    <ion-icon name="checkmark-circle-outline" class="text-lg"></ion-icon>
+                                    <span class="text-xs font-bold">สำเร็จ</span>
+                                    <span id="count-stock-received"
+                                        class="absolute -top-1 -right-1 bg-emerald-500 text-white text-[9px] font-bold px-1 rounded-full min-w-[14px] h-[14px] flex items-center justify-center hidden">0</span>
+                                </button>
+
+                                <button onclick="filterStockImports('rejected')" id="btn-stock-rejected"
+                                    class="relative px-3 h-10 rounded-xl flex items-center justify-center gap-2 text-slate-500 hover:bg-white hover:text-rose-600 hover:shadow-sm transition-all"
+                                    title="ยกเลิก">
+                                    <ion-icon name="close-circle-outline" class="text-lg"></ion-icon>
+                                    <span class="text-xs font-bold">ยกเลิก</span>
+                                    <span id="count-stock-rejected"
+                                        class="absolute -top-1 -right-1 bg-rose-500 text-white text-[9px] font-bold px-1 rounded-full min-w-[14px] h-[14px] flex items-center justify-center hidden">0</span>
+                                </button>
                             </div>
                         </div>
                     </div>
@@ -5031,27 +5106,23 @@
 
             async function fetchStockImports() {
                 try {
+                    // Fetch ALL items for the current type/branch to calculate counts
+                    // Remove page/limit restrictions (effectively) and status filter from URL
                     let url = `${SERVER_URL}/imports?t=${Date.now()}`;
-
-                    // Pagination
-                    url += `&page=${currentStockPage}&limit=${currentStockLimit}`;
+                    url += `&page=1&limit=9999`;
 
                     if (currentStockImportType && currentStockImportType !== 'all') {
                         url += `&type=${currentStockImportType}`;
                     }
 
-                    if (currentStockFilter !== 'all') {
-                        url += `&status=${currentStockFilter}`;
-                    }
+                    // Branch filter still applies Server-Side? 
+                    // Yes, we only want counts for the selected branch.
                     if (currentStockBranch !== 'all') {
                         url += `&branch=${encodeURIComponent(currentStockBranch)}`;
                     }
 
-                    // Date Filters
-                    const startEl = document.getElementById('stock-filter-date-start');
-                    const endEl = document.getElementById('stock-filter-date-end');
-                    if (startEl && startEl.value) url += `&startDate=${startEl.value}`;
-                    if (endEl && endEl.value) url += `&endDate=${endEl.value}`;
+                    // Verify Date Filters are REMOVED from logic
+                    // (Old logic removed)
 
                     if (document.getElementById('stock-loading')) document.getElementById('stock-loading').classList.remove('hidden');
 
@@ -5061,50 +5132,91 @@
                     if (!res.ok) throw new Error('Failed to fetch');
 
                     const responseData = await res.json();
+                    // Since we requested limit=9999, 'data' should be all items (or fallback to array)
+                    const allItems = Array.isArray(responseData) ? responseData : (responseData.data || []);
 
-                    // Support both old array format (fallback) and new paginated object
-                    const data = Array.isArray(responseData) ? responseData : (responseData.data || []);
-                    const total = responseData.total || data.length;
-                    const totalPages = responseData.totalPages || 1;
+                    // 1. Calculate Counts
+                    const counts = {
+                        all: allItems.length,
+                        pending: 0,
+                        importing: 0,
+                        received: 0,
+                        rejected: 0
+                    };
 
-                    // Update State
-                    currentStockTotalPages = totalPages;
-                    updatePaginationUI({ page: currentStockPage, total, totalPages });
+                    allItems.forEach(item => {
+                        const s = item.status || 'pending';
+                        if (counts[s] !== undefined) {
+                            counts[s]++;
+                        } else {
+                            // Map unknown or 'canceled' to rejected if needed?
+                            // Assuming 'rejected' is the key in DB if dropdown had it.
+                            if (s === 'canceled') counts.rejected++; // Fallback
+                        }
+                    });
 
-                    renderStockImportTable(data);
+                    // 2. Update Badges
+                    Object.keys(counts).forEach(key => {
+                        const badge = document.getElementById(`count-stock-${key}`);
+                        if (badge) {
+                            badge.textContent = counts[key];
+                            badge.classList.remove('hidden');
+                            if (counts[key] === 0) badge.classList.add('hidden');
+                        }
+                    });
 
-                    const countEl = document.getElementById('stock-import-count');
-                    // if (countEl) countEl.textContent = `${total}`;
+                    // 3. Client-Side Filtering
+                    const effectiveFilter = currentStockFilter || 'all';
+                    const filteredData = effectiveFilter === 'all'
+                        ? allItems
+                        : allItems.filter(item => item.status === effectiveFilter);
+
+                    // 4. Update UI
+                    // Hide pagination as we are showing all
+                    const paginationEl = document.getElementById('stock-pagination');
+                    if (paginationEl) paginationEl.classList.add('hidden');
+
+                    renderStockImportTable(filteredData);
 
                 } catch (err) {
-                    console.error(err);
+                    console.error('Fetch Stock Import Error:', err);
+                } finally {
+                    if (document.getElementById('stock-loading')) document.getElementById('stock-loading').classList.add('hidden');
                 }
             }
 
             function filterStockImports(status, doFetch = true) {
                 currentStockFilter = status;
-                currentStockPage = 1; // Reset page
-                // Update UI buttons
-                ['pending', 'importing', 'received', 'all'].forEach(s => {
-                    const btn = document.getElementById(`filter-stock-${s}`);
-                    if (btn) {
-                        let base = "px-4 py-2 rounded-lg text-xs font-bold transition-all flex items-center gap-2";
-                        if (s === status) {
-                            btn.className = base + " text-white bg-indigo-600 shadow-md ring-1 ring-slate-200";
-                            // Fix inner dots colors if needed
-                            const dot = btn.querySelector('div');
-                            if (dot && s !== 'all') dot.className = "w-2 h-2 rounded-full border border-white/30 " + (s === 'pending' ? 'bg-yellow-400' : (s === 'importing' ? 'bg-blue-400' : 'bg-green-400'));
+
+                // Update Hidden Input
+                const hiddenInput = document.getElementById('stock-import-status-filter');
+                if (hiddenInput) hiddenInput.value = status;
+
+                // Update Visuals
+                const buttons = [
+                    { id: 'btn-stock-all', val: 'all' },
+                    { id: 'btn-stock-pending', val: 'pending', color: 'text-amber-600' },
+                    { id: 'btn-stock-importing', val: 'importing', color: 'text-blue-600' },
+                    { id: 'btn-stock-received', val: 'received', color: 'text-emerald-600' },
+                    { id: 'btn-stock-rejected', val: 'rejected', color: 'text-rose-600' }
+                ];
+
+                buttons.forEach(btn => {
+                    const el = document.getElementById(btn.id);
+                    if (el) {
+                        if (btn.val === status) {
+                            // Active Style
+                            el.classList.add('bg-white', 'shadow-sm', 'ring-1', 'ring-black/5');
+                            el.classList.remove('text-slate-500');
+                            if (btn.color) el.classList.add(btn.color);
+                            else el.classList.add('text-indigo-600');
                         } else {
-                            btn.className = base + " text-slate-500 hover:text-slate-700 hover:bg-white/50";
-                            const dot = btn.querySelector('div');
-                            if (dot && s !== 'all') dot.className = "w-2 h-2 rounded-full " + (s === 'pending' ? 'bg-yellow-400' : (s === 'importing' ? 'bg-blue-500' : 'bg-green-500'));
+                            // Inactive Style
+                            el.classList.remove('bg-white', 'shadow-sm', 'ring-1', 'ring-black/5', 'text-indigo-600', 'text-amber-600', 'text-blue-600', 'text-emerald-600', 'text-rose-600');
+                            el.classList.add('text-slate-500');
                         }
                     }
                 });
-
-                // Sync Dropdown
-                const statusSelect = document.getElementById('stock-import-status-filter');
-                if (statusSelect) statusSelect.value = status;
 
                 if (doFetch) fetchStockImports();
             }
@@ -5916,20 +6028,86 @@
                 } catch (err) { console.error(err); }
             };
 
+            window.setManageStatusFilter = function (status) {
+                // 1. Update Hidden Input
+                document.getElementById('manage-request-status-filter').value = status;
+
+                // 2. Update Visuals
+                const buttons = [
+                    { id: 'btn-status-all', val: '' },
+                    { id: 'btn-status-pending', val: 'pending', color: 'text-amber-600' },
+                    { id: 'btn-status-processing', val: 'processing', color: 'text-blue-600' },
+                    { id: 'btn-status-received', val: 'received', color: 'text-emerald-600' },
+                    { id: 'btn-status-canceled', val: 'canceled', color: 'text-rose-600' }
+                ];
+
+                buttons.forEach(btn => {
+                    const el = document.getElementById(btn.id);
+                    if (el) {
+                        if (btn.val === status) {
+                            // Active Style
+                            el.classList.add('bg-white', 'shadow-sm', 'ring-1', 'ring-black/5');
+                            el.classList.remove('text-slate-500');
+                            if (btn.color) el.classList.add(btn.color);
+                            else el.classList.add('text-indigo-600');
+                        } else {
+                            // Inactive Style
+                            el.classList.remove('bg-white', 'shadow-sm', 'ring-1', 'ring-black/5', 'text-indigo-600', 'text-amber-600', 'text-blue-600', 'text-emerald-600', 'text-rose-600');
+                            el.classList.add('text-slate-500');
+                        }
+                    }
+                });
+
+                // 3. Fetch Data
+                fetchManageStockRequests();
+            };
+
             window.fetchManageStockRequests = async function () {
                 try {
-                    const status = document.getElementById('manage-request-status-filter')?.value || '';
+                    const statusFilter = document.getElementById('manage-request-status-filter')?.value || '';
                     const branch = document.getElementById('manage-request-branch-filter')?.value || '';
+
+                    // Fetch ALL to calculate counts (Client-side filtering strategy)
                     const url = new URL(`${window.location.origin}${SERVER_URL}/stock-requests/manage`);
-                    if (status) url.searchParams.append('status', status);
                     if (branch) url.searchParams.append('branch', branch);
 
                     const res = await fetch(url.toString(), {
                         headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
                     });
                     if (res.ok) {
-                        const requests = await res.json();
-                        renderManageStockRequestList(requests);
+                        const allRequests = await res.json();
+
+                        // 1. Calculate Counts
+                        const counts = {
+                            all: allRequests.length,
+                            pending: 0,
+                            processing: 0,
+                            received: 0,
+                            canceled: 0
+                        };
+
+                        allRequests.forEach(req => {
+                            if (counts[req.status] !== undefined) {
+                                counts[req.status]++;
+                            }
+                        });
+
+                        // 2. Update Badges
+                        Object.keys(counts).forEach(key => {
+                            const badge = document.getElementById(`count-status-${key}`);
+                            if (badge) {
+                                badge.textContent = counts[key];
+                                badge.classList.remove('hidden');
+                                if (counts[key] === 0) badge.classList.add('hidden'); // Hide if 0
+                            }
+                        });
+
+                        // 3. Filter & Render
+                        const filtered = statusFilter
+                            ? allRequests.filter(req => req.status === statusFilter)
+                            : allRequests;
+
+                        renderManageStockRequestList(filtered);
                     }
                 } catch (err) { console.error('Fetch manage requests error:', err); }
             };
@@ -6882,13 +7060,50 @@
             }
         };
 
+        window.setBranchOrderStatusFilter = function (status) {
+            // 1. Update Hidden Input
+            document.getElementById('branch-order-status-filter').value = status;
+
+            // 2. Update Visuals
+            const buttons = [
+                { id: 'btn-bo-all', val: '' },
+                { id: 'btn-bo-pending', val: 'pending', color: 'text-amber-600' },
+                { id: 'btn-bo-shipped', val: 'shipped', color: 'text-blue-600' },
+                { id: 'btn-bo-arrived', val: 'arrived', color: 'text-emerald-600' },
+                { id: 'btn-bo-canceled', val: 'canceled', color: 'text-rose-600' }
+            ];
+
+            buttons.forEach(btn => {
+                const el = document.getElementById(btn.id);
+                if (el) {
+                    if (btn.val === status) {
+                        // Active Style
+                        el.classList.add('bg-white', 'shadow-sm', 'ring-1', 'ring-black/5');
+                        el.classList.remove('text-slate-500');
+                        if (btn.color) el.classList.add(btn.color);
+                        else el.classList.add('text-indigo-600');
+                    } else {
+                        // Inactive Style
+                        el.classList.remove('bg-white', 'shadow-sm', 'ring-1', 'ring-black/5', 'text-indigo-600', 'text-amber-600', 'text-blue-600', 'text-emerald-600', 'text-rose-600');
+                        el.classList.add('text-slate-500');
+                    }
+                }
+            });
+
+            // 3. Fetch (or Re-render)
+            // Since we plan to client-side filter, we can just call fetch which will use the cached data logic?
+            // Or better, just call fetchBranchOrders() which handles the fetch-all-and-filter logic.
+            // If we wanted to be super efficient we could cache the last response, but calling fetch again is safer to ensure fresh data.
+            fetchBranchOrders();
+        };
+
         window.fetchBranchOrders = async function () {
             const branchFilter = document.getElementById('branch-order-filter-branch').value;
-            const statusFilter = document.getElementById('branch-order-filter-status').value;
+            const statusFilter = document.getElementById('branch-order-status-filter')?.value || '';
 
+            // Fetch ALL orders for the branch (remove status filter from URL to get counts)
             let url = `${SERVER_URL}/branch-stock-orders?`;
             if (branchFilter && branchFilter !== 'all') url += `&branch=${branchFilter}`;
-            if (statusFilter && statusFilter !== 'all') url += `&status=${statusFilter}`;
 
             // Add Loading State
             const tbody = document.getElementById('branch-order-table-body');
@@ -6899,8 +7114,44 @@
                     headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
                 });
                 if (res.ok) {
-                    const data = await res.json();
-                    renderBranchOrders(data);
+                    const allOrders = await res.json();
+
+                    // 1. Calculate Counts
+                    const counts = {
+                        all: allOrders.length,
+                        pending: 0,
+                        shipped: 0,
+                        arrived: 0,
+                        canceled: 0
+                    };
+
+                    allOrders.forEach(order => {
+                        const s = order.status || 'pending';
+                        if (counts[s] !== undefined) {
+                            counts[s]++;
+                        } else {
+                            // Fallback for unknown status, treat as pending logic or ignore?
+                            // Default logic usually maps empty to pending.
+                            if (!order.status) counts.pending++;
+                        }
+                    });
+
+                    // 2. Update Badges
+                    Object.keys(counts).forEach(key => {
+                        const badge = document.getElementById(`count-bo-${key}`);
+                        if (badge) {
+                            badge.textContent = counts[key];
+                            badge.classList.remove('hidden');
+                            if (counts[key] === 0) badge.classList.add('hidden');
+                        }
+                    });
+
+                    // 3. Filter Data Client-Side
+                    const filteredOrders = statusFilter
+                        ? allOrders.filter(order => (order.status || 'pending') === statusFilter)
+                        : allOrders;
+
+                    renderBranchOrders(filteredOrders);
                 }
             } catch (err) { console.error(err); }
         };
