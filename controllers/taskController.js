@@ -30,18 +30,18 @@ exports.createTask = async (req, res) => {
             priority,
             companyId: companyId || req.user.companyId,
             createdBy, // (แก้ไข: ใส่ comma ให้ถูกต้อง)
-            
+
             // (สำคัญ) บันทึกสาขาลงไปใน Task ด้วย เพื่อให้ฝ่ายขายเห็นร่วมกัน
-            branch: assigneeUser.branch || null 
+            branch: assigneeUser.branch || null
         });
 
         const savedTask = await newTask.save();
         console.log(`[Task] User ${req.user.username} สั่งงานใหม่ (ID: ${savedTask._id})`);
-        
+
         // 2. สร้างการแจ้งเตือน "งานใหม่"
         const message = `คุณได้รับมอบหมายงานใหม่: "${savedTask.title}"`;
         await createNotification([savedTask.assignedTo], message, savedTask._id, req.user.id);
-        
+
         res.status(201).json(savedTask);
 
     } catch (error) {
@@ -60,7 +60,7 @@ exports.getTasksForDashboard = async (req, res) => {
         const userId = req.user.id;
 
         // ดึงข้อมูลแผนกและสาขาของคน Login
-        const userDept = req.user.department; 
+        const userDept = req.user.department;
         const userBranch = req.user.branch;
 
         // Helper: ตรวจสอบว่าเป็นฝ่ายขายที่มีสังกัดสาขาหรือไม่
@@ -72,9 +72,9 @@ exports.getTasksForDashboard = async (req, res) => {
             // --- VIEW: งานของฉัน ---
             if (isSalesTeam) {
                 // (ฝ่ายขาย) เห็นงานทั้งหมดของ "สาขาตัวเอง"
-                query = { 
+                query = {
                     branch: userBranch,
-                    companyId: req.user.companyId 
+                    companyId: req.user.companyId
                 };
                 console.log(`[Task] User ${req.user.username} (Sales-${userBranch}) ดูงานรวมของสาขา`);
             } else {
@@ -86,25 +86,25 @@ exports.getTasksForDashboard = async (req, res) => {
             // --- VIEW: DASHBOARD (ภาพรวม) ---
             let filterCompanyId;
             if (userRole === 'staff') {
-                filterCompanyId = req.user.companyId; 
+                filterCompanyId = req.user.companyId;
             } else {
-                filterCompanyId = companyId || req.user.companyId; 
+                filterCompanyId = companyId || req.user.companyId;
             }
 
             if (userRole === 'staff') {
                 if (isSalesTeam) {
-                     // Staff ฝ่ายขาย -> เห็นงานในสาขา
-                     query = { branch: userBranch, companyId: filterCompanyId };
+                    // Staff ฝ่ายขาย -> เห็นงานในสาขา
+                    query = { branch: userBranch, companyId: filterCompanyId };
                 } else {
-                     // Staff ทั่วไป -> เห็นงานตัวเอง
-                     query = { assignedTo: userId, companyId: filterCompanyId };
+                    // Staff ทั่วไป -> เห็นงานตัวเอง
+                    query = { assignedTo: userId, companyId: filterCompanyId };
                 }
             } else {
                 // Manager/Exec/HR -> เห็นงานทั้งหมดในบริษัทที่เลือก
                 query = { companyId: filterCompanyId };
             }
         }
-        
+
         const tasks = await Task.find(query)
             .populate('assignedTo', 'name username branch')
             .populate('createdBy', 'name')
@@ -124,8 +124,8 @@ exports.getTasksForDashboard = async (req, res) => {
 exports.getTaskById = async (req, res) => {
     try {
         const task = await Task.findById(req.params.id)
-            .populate('createdBy', 'name') 
-            .populate('assignedTo', 'name'); 
+            .populate('createdBy', 'name')
+            .populate('assignedTo', 'name');
 
         if (!task) {
             return res.status(404).json({ message: 'ไม่พบงานนี้' });
@@ -135,7 +135,7 @@ exports.getTaskById = async (req, res) => {
         const isSalesTeam = (req.user.department && (req.user.department.includes('ขาย') || req.user.department.toLowerCase().includes('sales')));
         const isSameBranch = (task.branch && task.branch === req.user.branch);
 
-        const isAllowed = 
+        const isAllowed =
             task.createdBy._id.toString() === req.user.id ||
             task.assignedTo._id.toString() === req.user.id ||
             (isSalesTeam && isSameBranch) || // (อนุญาตถ้าเป็นฝ่ายขายสาขาเดียวกัน)
@@ -170,21 +170,21 @@ exports.updateTask = async (req, res) => {
         const isSameBranch = (task.branch && task.branch === req.user.branch);
 
         // 1. สิทธิ์การแก้ไขเนื้อหา (Content) -> Admin หรือ ผู้สร้าง
-        const canEditContent = 
+        const canEditContent =
             task.createdBy.toString() === userId ||
             ['executive', 'manager', 'hr'].includes(req.user.role);
 
         // 2. สิทธิ์การแก้ไขสถานะ (Status Only) -> ผู้รับผิดชอบ หรือ ฝ่ายขายสาขาเดียวกัน
-        const canOnlyUpdateStatus = 
+        const canOnlyUpdateStatus =
             req.user.role === 'staff' && (
-                task.assignedTo.toString() === userId || 
+                task.assignedTo.toString() === userId ||
                 (isSalesTeam && isSameBranch)
             );
 
         if (!canEditContent && !canOnlyUpdateStatus) {
             return res.status(403).json({ message: 'คุณไม่มีสิทธิ์แก้ไขงานนี้' });
         }
-        
+
         // --- เริ่มการอัปเดต ---
         const statusChanged = req.body.status && task.status !== req.body.status;
         const commentAdded = req.body.commentText && req.body.commentText.trim() !== '';
@@ -202,13 +202,13 @@ exports.updateTask = async (req, res) => {
         if (commentAdded) {
             task.comments.push({
                 userId: req.user.id,
-                name: req.user.name, 
+                name: req.user.name,
                 text: commentText
             });
         }
 
         const updatedTask = await task.save();
-        
+
         // --- Notification Logic ---
         const executives = await User.find({ companyId: task.companyId, role: 'executive' }).select('_id');
         const executiveIds = executives.map(e => e._id);
@@ -230,14 +230,14 @@ exports.updateTask = async (req, res) => {
                 req.user.id
             );
         }
-        
+
         console.log(`[Task] User ${req.user.username} อัปเดตงาน (ID: ${taskId})`);
         res.status(200).json(updatedTask);
 
     } catch (error) {
         console.error('Update Task Error:', error.message);
         if (error.name === 'ValidationError') {
-             return res.status(400).json({ message: error.message });
+            return res.status(400).json({ message: error.message });
         }
         res.status(500).json({ message: 'Server Error' });
     }
@@ -254,15 +254,18 @@ exports.deleteTask = async (req, res) => {
         const task = await Task.findById(taskId);
         if (!task) return res.status(404).json({ message: 'ไม่พบงานนี้' });
 
-        const canDelete = 
+        // Normalize role to lowercase to ensure case-insensitive comparison
+        const userRole = (req.user.role || '').toLowerCase();
+
+        const canDelete =
             task.createdBy.toString() === userId ||
-            ['executive', 'manager', 'hr'].includes(req.user.role);
+            ['executive', 'manager', 'hr'].includes(userRole);
 
         if (!canDelete) {
             return res.status(403).json({ message: 'คุณไม่มีสิทธิ์ลบงานนี้' });
         }
 
-        await task.deleteOne(); 
+        await task.deleteOne();
         console.log(`[Task] User ${req.user.username} ลบงาน (ID: ${taskId})`);
         res.status(200).json({ message: 'ลบงานสำเร็จ' });
 
@@ -282,9 +285,9 @@ exports.getTaskStats = async (req, res) => {
 
         let filterCompanyId;
         if (userRole === 'staff') {
-            filterCompanyId = req.user.companyId; 
+            filterCompanyId = req.user.companyId;
         } else {
-            filterCompanyId = companyId || req.user.companyId; 
+            filterCompanyId = companyId || req.user.companyId;
         }
 
         const stats = await Task.aggregate([
