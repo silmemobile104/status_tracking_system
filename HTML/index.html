@@ -309,6 +309,18 @@
                             class="w-5 h-5 mr-3 text-slate-400 group-hover:text-yellow-500 transition-colors"></ion-icon>
                         <span class="font-medium">รายการของลงสาขา</span>
                     </a>
+                    <a href="#" onclick="updateNavActiveState('claim')" id="nav-claim"
+                        class="flex items-center px-4 py-3 text-slate-600 hover:bg-slate-50 hover:text-slate-900 rounded-xl transition-all group hidden">
+                        <ion-icon name="hammer-outline"
+                            class="w-5 h-5 mr-3 text-slate-400 group-hover:text-orange-500 transition-colors"></ion-icon>
+                        <span class="font-medium">แจ้งเคลมอุปกรณ์เสริม</span>
+                    </a>
+                    <a href="#" onclick="updateNavActiveState('stock-claim')" id="nav-stock-claim"
+                        class="flex items-center px-4 py-3 text-slate-600 hover:bg-slate-50 hover:text-slate-900 rounded-xl transition-all group hidden">
+                        <ion-icon name="hammer-outline"
+                            class="w-5 h-5 mr-3 text-slate-400 group-hover:text-purple-500 transition-colors"></ion-icon>
+                        <span class="font-medium">รายการแจ้งเคลมอุปกรณ์เสริม</span>
+                    </a>
                     <a href="#" onclick="updateNavActiveState('admin')" id="nav-admin"
                         class="flex items-center px-4 py-3 text-slate-600 hover:bg-slate-50 hover:text-slate-900 rounded-xl transition-all group">
                         <ion-icon name="people-outline"
@@ -1046,6 +1058,264 @@
                     </div>
                 </div>
 
+                <!-- Claim View -->
+                <div id="claim-view-content" class="hidden space-y-8 mt-6">
+                    <!-- Premium Header -->
+                    <div
+                        class="relative overflow-hidden bg-white rounded-3xl p-8 shadow-sm border border-slate-100 flex flex-col md:flex-row justify-between items-center gap-6">
+                        <!-- Decorative bg -->
+                        <div
+                            class="absolute top-0 right-0 w-64 h-64 bg-orange-400 opacity-10 rounded-full blur-3xl -mr-20 -mt-20">
+                        </div>
+                        <div
+                            class="absolute bottom-0 left-0 w-32 h-32 bg-red-400 opacity-5 rounded-full blur-2xl -ml-10 -mb-10">
+                        </div>
+
+                        <div class="flex items-center gap-6 relative z-10">
+                            <div
+                                class="w-16 h-16 bg-gradient-to-br from-orange-500 to-red-600 text-white rounded-2xl flex items-center justify-center shadow-lg shadow-orange-500/20 transform -rotate-3 hover:rotate-0 transition-transform duration-300">
+                                <ion-icon name="hammer" class="text-3xl"></ion-icon>
+                            </div>
+                            <div>
+                                <h3 class="text-2xl font-black text-slate-800 tracking-tight">รายการแจ้งเคลม</h3>
+                                <div class="flex items-center gap-2 mt-1">
+                                    <span class="w-2 h-2 bg-orange-500 rounded-full animate-pulse"></span>
+                                    <p class="text-sm font-bold text-slate-500 uppercase tracking-widest">Accessory
+                                        Claims Management</p>
+                                </div>
+                            </div>
+                        </div>
+                        <button onclick="openClaimModal()"
+                            class="relative group bg-slate-900 hover:bg-black text-white px-8 py-4 rounded-2xl font-bold shadow-xl shadow-slate-900/10 hover:shadow-2xl hover:shadow-orange-500/20 transition-all duration-300 flex items-center gap-3 overflow-hidden">
+                            <div
+                                class="absolute inset-0 bg-gradient-to-r from-orange-500 to-red-500 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                            </div>
+                            <ion-icon name="add-circle" class="text-2xl relative z-10"></ion-icon>
+                            <span class="relative z-10">แจ้งเคลมใหม่</span>
+                        </button>
+                    </div>
+
+                    <!-- Standardized Filters (For Sales View) -->
+                    <div id="claim-filter-standard"
+                        class="hidden bg-white rounded-2xl p-6 shadow-sm border border-slate-100 flex flex-col md:flex-row justify-between items-center gap-4">
+                        <div class="flex flex-wrap items-center gap-3 w-full md:w-auto">
+                            <!-- Date Filter -->
+                            <div class="relative group hidden md:block">
+                                <ion-icon name="calendar-outline"
+                                    class="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-hover:text-orange-500 transition-colors z-10"></ion-icon>
+                                <input type="date" id="claim-date-standard" onchange="fetchClaims()"
+                                    class="pl-11 pr-4 py-2.5 rounded-xl border border-slate-200 bg-white text-sm font-bold text-slate-700 focus:ring-4 focus:ring-orange-500/10 focus:border-orange-500 outline-none transition-all shadow-sm">
+                            </div>
+
+                            <!-- Search Filter -->
+                            <div class="relative group flex-1 md:flex-none">
+                                <ion-icon name="search-outline"
+                                    class="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-hover:text-orange-500 transition-colors z-10"></ion-icon>
+                                <input type="text" id="claim-search-standard" onkeyup="fetchClaims()"
+                                    placeholder="ค้นหา เลขที่โอน, สินค้า..."
+                                    class="pl-11 pr-4 py-2.5 rounded-xl border border-slate-200 bg-white text-sm font-bold text-slate-700 focus:ring-4 focus:ring-orange-500/10 focus:border-orange-500 outline-none transition-all shadow-sm w-full md:w-64">
+                            </div>
+
+                            <!-- Branch Filter -->
+                            <div id="claim-branch-standard-container"
+                                class="relative group flex-1 md:flex-none min-w-[180px]">
+                                <ion-icon name="storefront-outline"
+                                    class="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-hover:text-orange-500 transition-colors z-10"></ion-icon>
+                                <select id="claim-branch-standard" onchange="fetchClaims()"
+                                    class="pl-11 pr-10 py-2.5 rounded-xl border border-slate-200 bg-white text-sm font-bold text-slate-700 focus:ring-4 focus:ring-orange-500/10 focus:border-orange-500 outline-none cursor-pointer hover:border-orange-300 transition-all shadow-sm appearance-none w-full">
+                                    <option value="all">ทุกสาขา</option>
+                                    <option value="ยะลา">ยะลา</option>
+                                    <option value="นราธิวาส">นราธิวาส</option>
+                                    <option value="หาดใหญ่">หาดใหญ่</option>
+                                    <option value="หาดใหญ่2">หาดใหญ่2</option>
+                                    <option value="ปัตตานี">ปัตตานี</option>
+                                    <option value="โคลีเซียม">โคลีเซียม</option>
+                                    <option value="สุราษฎร์ธานี">สุราษฎร์ธานี</option>
+                                    <option value="ปากแมว">ปากแมว</option>
+                                    <option value="ภูเก็ต">ภูเก็ต</option>
+                                    <option value="นครศรีธรรมราช">นครศรีธรรมราช</option>
+                                    <option value="กระบี่">กระบี่</option>
+                                    <option value="กะทู้">กะทู้</option>
+                                    <option value="ตรัง">ตรัง</option>
+                                    <option value="คุรุ">คุรุ</option>
+                                    <option value="ชุมพร">ชุมพร</option>
+                                    <option value="สตูล">สตูล</option>
+                                    <option value="พัทลุง">พัทลุง</option>
+                                    <option value="สงขลา">สงขลา</option>
+                                </select>
+                                <ion-icon name="chevron-down-outline"
+                                    class="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none text-xs"></ion-icon>
+                            </div>
+
+                            <!-- Status Filter -->
+                            <div class="relative group flex-1 md:flex-none min-w-[160px]">
+                                <ion-icon name="funnel-outline"
+                                    class="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-hover:text-orange-500 transition-colors z-10"></ion-icon>
+                                <select id="claim-status-standard" onchange="fetchClaims()"
+                                    class="pl-11 pr-10 py-2.5 rounded-xl border border-slate-200 bg-white text-sm font-bold text-slate-700 focus:ring-4 focus:ring-orange-500/10 focus:border-orange-500 outline-none cursor-pointer hover:border-orange-300 transition-all shadow-sm appearance-none w-full">
+                                    <option value="all">ทุกสถานะ</option>
+                                    <option value="pending">⏳ รอดำเนินการ</option>
+                                    <option value="approved">✅ รับสินค้าแล้ว</option>
+                                    <option value="completed">🔵 เสร็จสิ้น</option>
+                                </select>
+                                <ion-icon name="chevron-down-outline"
+                                    class="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none text-xs"></ion-icon>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Modern Glassmorphism Filters (For Stock View) -->
+                    <div id="claim-filter-modern"
+                        class="bg-white/70 backdrop-blur-2xl p-4 rounded-3xl shadow-xl border border-white/50 flex flex-col xl:flex-row gap-6 items-center">
+
+                        <!-- Left Group: Search & Date -->
+                        <div class="flex flex-col md:flex-row gap-4 flex-1 w-full">
+                            <!-- Search Box -->
+                            <div class="relative group flex-1">
+                                <ion-icon name="search"
+                                    class="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-orange-500 transition-colors text-lg"></ion-icon>
+                                <input type="text" id="claim-search-filter" oninput="fetchClaims()"
+                                    placeholder="ค้นหา เลขที่โอน, สินค้า..."
+                                    class="w-full pl-12 pr-4 py-3.5 rounded-2xl border border-slate-200/60 bg-white/50 focus:bg-white focus:ring-4 focus:ring-orange-500/10 focus:border-orange-500 outline-none transition-all duration-300 font-bold text-slate-700 placeholder:text-slate-400">
+                            </div>
+
+                            <!-- Date Filter -->
+                            <div class="relative group min-w-[200px]">
+                                <ion-icon name="calendar"
+                                    class="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-hover:text-orange-500 transition-colors text-lg"></ion-icon>
+                                <input type="date" id="claim-date-filter" onchange="fetchClaims()"
+                                    class="w-full pl-12 pr-4 py-3.5 rounded-2xl border border-slate-200/60 bg-white/50 focus:bg-white focus:ring-4 focus:ring-orange-500/10 focus:border-orange-500 outline-none cursor-pointer transition-all duration-300 font-bold text-slate-700">
+                            </div>
+                        </div>
+
+                        <!-- Right Group: Branch & Status -->
+                        <div class="flex flex-col md:flex-row gap-4 items-center w-full xl:w-auto">
+                            <!-- Branch Select -->
+                            <div id="claim-branch-filter-container" class="relative group w-full md:w-56">
+                                <ion-icon name="storefront"
+                                    class="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-hover:text-orange-500 transition-colors text-lg"></ion-icon>
+                                <select id="claim-branch-filter" onchange="fetchClaims()"
+                                    class="w-full pl-12 pr-10 py-3.5 rounded-2xl border border-slate-200/60 bg-white/50 focus:bg-white focus:ring-4 focus:ring-orange-500/10 focus:border-orange-500 outline-none cursor-pointer transition-all duration-300 font-bold text-slate-700 appearance-none">
+                                    <option value="all">ทุกสาขา</option>
+                                    <option value="ยะลา">ยะลา</option>
+                                    <option value="นราธิวาส">นราธิวาส</option>
+                                    <option value="หาดใหญ่">หาดใหญ่</option>
+                                    <option value="หาดใหญ่2">หาดใหญ่2</option>
+                                    <option value="ปัตตานี">ปัตตานี</option>
+                                    <option value="โคลีเซียม">โคลีเซียม</option>
+                                    <option value="สุราษฎร์ธานี">สุราษฎร์ธานี</option>
+                                    <option value="ปากแมว">ปากแมว</option>
+                                    <option value="ภูเก็ต">ภูเก็ต</option>
+                                    <option value="นครศรีธรรมราช">นครศรีธรรมราช</option>
+                                    <option value="กระบี่">กระบี่</option>
+                                    <option value="กะทู้">กะทู้</option>
+                                    <option value="ตรัง">ตรัง</option>
+                                    <option value="คุรุ">คุรุ</option>
+                                    <option value="ชุมพร">ชุมพร</option>
+                                    <option value="สตูล">สตูล</option>
+                                    <option value="พัทลุง">พัทลุง</option>
+                                    <option value="สงขลา">สงขลา</option>
+                                </select>
+                                <ion-icon name="chevron-down"
+                                    class="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none text-xs"></ion-icon>
+                            </div>
+
+                            <!-- Status Filter Bar -->
+                            <div
+                                class="bg-slate-100/80 p-1.5 rounded-[22px] flex items-center gap-1 w-full md:w-auto overflow-x-auto no-scrollbar">
+                                <input type="hidden" id="claim-status-filter" value="all">
+
+                                <button onclick="setClaimStatusFilter('all')" id="btn-claim-all"
+                                    class="relative px-5 h-11 rounded-[18px] flex items-center justify-center gap-2.5 text-slate-500 hover:text-orange-600 transition-all duration-300 bg-white shadow-sm ring-1 ring-black/5 whitespace-nowrap"
+                                    title="ทุกสถานะ">
+                                    <ion-icon name="grid-outline"
+                                        class="text-xl transition-transform group-hover:scale-110"></ion-icon>
+                                    <span class="text-xs font-black uppercase tracking-wider">ทั้งหมด</span>
+                                    <span id="count-claim-all"
+                                        class="min-w-[20px] h-5 bg-orange-500 text-white text-[10px] font-black rounded-full flex items-center justify-center px-1 hidden shadow-lg shadow-orange-500/20">0</span>
+                                </button>
+
+                                <button onclick="setClaimStatusFilter('pending')" id="btn-claim-pending"
+                                    class="relative px-5 h-11 rounded-[18px] flex items-center justify-center gap-2.5 text-slate-500 hover:bg-white hover:text-amber-600 hover:shadow-md transition-all duration-300 group whitespace-nowrap"
+                                    title="รอดำเนินการ">
+                                    <ion-icon name="time-outline" class="text-xl"></ion-icon>
+                                    <span class="text-xs font-black uppercase tracking-wider">รอดำเนินการ</span>
+                                    <span id="count-claim-pending"
+                                        class="min-w-[20px] h-5 bg-amber-500 text-white text-[10px] font-black rounded-full flex items-center justify-center px-1 hidden shadow-lg shadow-amber-500/20">0</span>
+                                </button>
+
+                                <button onclick="setClaimStatusFilter('approved')" id="btn-claim-approved"
+                                    class="relative px-5 h-11 rounded-[18px] flex items-center justify-center gap-2.5 text-slate-500 hover:bg-white hover:text-emerald-600 hover:shadow-md transition-all duration-300 group whitespace-nowrap"
+                                    title="รับสินค้าแล้ว">
+                                    <ion-icon name="checkmark-circle-outline" class="text-xl"></ion-icon>
+                                    <span class="text-xs font-black uppercase tracking-wider">รับสินค้าแล้ว</span>
+                                    <span id="count-claim-approved"
+                                        class="min-w-[20px] h-5 bg-emerald-500 text-white text-[10px] font-black rounded-full flex items-center justify-center px-1 hidden shadow-lg shadow-emerald-500/20">0</span>
+                                </button>
+
+                                <button onclick="setClaimStatusFilter('completed')" id="btn-claim-completed"
+                                    class="relative px-5 h-11 rounded-[18px] flex items-center justify-center gap-2.5 text-slate-500 hover:bg-white hover:text-blue-600 hover:shadow-md transition-all duration-300 group whitespace-nowrap"
+                                    title="เสร็จสิ้น">
+                                    <ion-icon name="checkbox-outline" class="text-xl"></ion-icon>
+                                    <span class="text-xs font-black uppercase tracking-wider">เสร็จสิ้น</span>
+                                    <span id="count-claim-completed"
+                                        class="min-w-[20px] h-5 bg-blue-500 text-white text-[10px] font-black rounded-full flex items-center justify-center px-1 hidden shadow-lg shadow-blue-500/20">0</span>
+                                </button>
+
+                                <button onclick="setClaimStatusFilter('rejected')" id="btn-claim-rejected"
+                                    class="relative px-5 h-11 rounded-[18px] flex items-center justify-center gap-2.5 text-slate-500 hover:bg-white hover:text-rose-600 hover:shadow-md transition-all duration-300 group whitespace-nowrap"
+                                    title="ปฏิเสธ">
+                                    <ion-icon name="close-circle-outline" class="text-xl"></ion-icon>
+                                    <span class="text-xs font-black uppercase tracking-wider">ปฏิเสธ</span>
+                                    <span id="count-claim-rejected"
+                                        class="min-w-[20px] h-5 bg-rose-500 text-white text-[10px] font-black rounded-full flex items-center justify-center px-1 hidden shadow-lg shadow-rose-500/20">0</span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
+                        <div class="overflow-x-auto">
+                            <table class="w-full">
+                                <thead class="bg-slate-50/80 border-b border-slate-100">
+                                    <tr>
+                                        <th
+                                            class="px-6 py-5 text-left text-[10px] font-black text-slate-400 uppercase tracking-widest">
+                                            วันที่/เวลา</th>
+                                        <th
+                                            class="px-6 py-5 text-left text-[10px] font-black text-slate-400 uppercase tracking-widest">
+                                            เลขที่โอน</th>
+                                        <th
+                                            class="px-6 py-5 text-left text-[10px] font-black text-slate-400 uppercase tracking-widest">
+                                            สาขา</th>
+                                        <th
+                                            class="px-6 py-5 text-left text-[10px] font-black text-slate-400 uppercase tracking-widest">
+                                            ผู้แจ้ง</th>
+                                        <th
+                                            class="px-6 py-5 text-left text-[10px] font-black text-slate-400 uppercase tracking-widest">
+                                            สินค้า (รหัส)</th>
+                                        <th
+                                            class="px-6 py-5 text-center text-[10px] font-black text-slate-400 uppercase tracking-widest">
+                                            จำนวน</th>
+                                        <th
+                                            class="px-6 py-5 text-left text-[10px] font-black text-slate-400 uppercase tracking-widest">
+                                            ปัญหา</th>
+                                        <th
+                                            class="px-6 py-5 text-center text-[10px] font-black text-slate-400 uppercase tracking-widest">
+                                            สถานะ</th>
+                                        <th
+                                            class="px-6 py-5 text-right text-[10px] font-black text-slate-400 uppercase tracking-widest">
+                                            จัดการ</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="claim-table-body" class="divide-y divide-slate-50">
+                                    <!-- Dynamic Rows -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
                 <div id="admin-view-content"
                     class="hidden bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
                     <div id="loading-users" class="text-center p-12 hidden">
@@ -1111,7 +1381,8 @@
                                 <ion-icon name="clipboard-outline" class="text-2xl text-white"></ion-icon>
                             </div>
                             <div>
-                                <h3 class="text-xl font-black text-slate-800 tracking-tight">จัดการรายการแจ้งเบิก</h3>
+                                <h3 class="text-xl font-black text-slate-800 tracking-tight">จัดการรายการแจ้งเบิก
+                                </h3>
                                 <p class="text-sm font-medium text-slate-500">
                                     คัดกรองและบริหารจัดการคำขอเบิกสินค้าจากทุกสาขา
                                 </p>
@@ -1212,7 +1483,8 @@
                                 <tbody id="stock-request-manage-table-body" class="divide-y divide-slate-100">
                                     <!-- JS Injected Rows -->
                                     <tr>
-                                        <td colspan="6" class="px-6 py-10 text-center text-slate-400">กำลังโหลดข้อมูล...
+                                        <td colspan="6" class="px-6 py-10 text-center text-slate-400">
+                                            กำลังโหลดข้อมูล...
                                         </td>
                                     </tr>
                                 </tbody>
@@ -1389,7 +1661,8 @@
                     <div id="stock-pagination"
                         class="hidden border-t border-slate-100 bg-slate-50 p-4 flex flex-col md:flex-row justify-between items-center gap-4 relative z-20">
                         <div class="text-xs font-bold text-slate-500">
-                            แสดง <span id="pagination-info-start">0</span> - <span id="pagination-info-end">0</span> จาก
+                            แสดง <span id="pagination-info-start">0</span> - <span id="pagination-info-end">0</span>
+                            จาก
                             <span id="pagination-info-total">0</span> รายการ
                         </div>
                         <div class="flex items-center gap-2">
@@ -1519,7 +1792,8 @@
                                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                                             <!-- Excel File Input -->
                                             <div>
-                                                <label class="block text-sm font-bold text-slate-700 mb-2">1. ไฟล์ Excel
+                                                <label class="block text-sm font-bold text-slate-700 mb-2">1. ไฟล์
+                                                    Excel
                                                     (.xlsx, .xls)</label>
                                                 <div
                                                     class="border-2 border-dashed border-slate-200 rounded-2xl p-4 text-center hover:bg-slate-50 hover:border-yellow-400 transition-all cursor-pointer relative group bg-slate-50/30 h-32 flex flex-col items-center justify-center">
@@ -1692,7 +1966,8 @@
                                 <div class="p-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 flex-grow overflow-y-auto max-h-[600px] custom-scrollbar"
                                     id="accessory-import-list">
                                     <!-- Accessor Cards Injected Here -->
-                                    <div class="col-span-full py-12 text-center text-slate-400">กำลังโหลดข้อมูล...</div>
+                                    <div class="col-span-full py-12 text-center text-slate-400">กำลังโหลดข้อมูล...
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -2405,7 +2680,7 @@
                         <span id="detail-current-status" class="px-3 py-1 rounded-full text-xs font-bold">...</span>
                     </div>
 
-                    <div class="grid grid-cols-2 gap-3">
+                    <div id="detail-actions-container" class="grid grid-cols-2 gap-3">
                         <button id="btn-action-importing" onclick="updateStockStatusFromModal('importing')"
                             class="col-span-1 py-3 rounded-xl bg-blue-100 text-blue-700 font-bold hover:bg-blue-200 transition-colors flex items-center justify-center gap-2">
                             <ion-icon name="timer-outline"></ion-icon> กำลังนำเข้า
@@ -2423,9 +2698,6 @@
             </div>
         </div>
     </div>
-
-    <!-- =============================================== -->
-    <!-- View: Admin (User Management) -->
     <!-- =============================================== -->
     <div id="admin-view-content" class="hidden animate-fade-in">
         <div class="modal-content relative w-full max-w-md bg-white rounded-2xl shadow-2xl p-6 text-center">
@@ -3000,6 +3272,35 @@
                 } else {
                     branchOrderInvNav.style.display = 'none';
                     branchOrderInvNav.classList.add('hidden');
+                }
+            }
+
+            // =======================================================
+            // 2.5 [ใหม่] ควบคุมเมนู "แจ้งเคลมอุปกรณ์เสริม"
+            // =======================================================
+            const claimNav = document.getElementById('nav-claim');
+            if (claimNav) {
+                const isSales = userDept.includes('ขาย') || userDept.includes('sales');
+                // Allow: Sales Dept (any role including staff) OR Admin/Exec/Manager
+                if (isSales || ['admin', 'executive', 'manager'].includes(currentUser.role)) {
+                    claimNav.style.display = 'flex';
+                    claimNav.classList.remove('hidden');
+                } else {
+                    claimNav.style.display = 'none';
+                    claimNav.classList.add('hidden');
+                }
+            }
+
+            const stockClaimNav = document.getElementById('nav-stock-claim');
+            if (stockClaimNav) {
+                const stockKeywords = ['stock', 'store', 'สต๊อก', 'คลัง', 'warehouse', 'supply'];
+                const isStockTeam = stockKeywords.some(keyword => userDept.includes(keyword));
+
+                if (isStockTeam || ['admin', 'executive', 'manager'].includes(currentUser.role)) {
+                    stockClaimNav.style.display = 'flex';
+                    stockClaimNav.classList.remove('hidden');
+                } else {
+                    stockClaimNav.classList.add('hidden');
                 }
             }
 
@@ -4825,10 +5126,14 @@
             const branchOrderView = document.getElementById('branch-order-view'); // [Order Management View]
             const branchInventoryView = document.getElementById('branch-inventory-view'); // [Inventory View]
 
+            const navClaim = document.getElementById('nav-claim'); // [Claim]
+            const navStockClaim = document.getElementById('nav-stock-claim'); // [Stock Claim]
+            const claimView = document.getElementById('claim-view-content'); // [Claim View]
+
             // Only toggle visibility if changing views (prevents flicker on refresh)
             if (activeView !== currentView) {
                 // Reset Nav Styles
-                [navDashboard, navMyTasks, navAdmin, navDeposit, navPurchasing, navImport, navStockImport, navStockRequest, navStockRequestManage, navBranchOrder, navBranchOrderInventory].forEach(el => {
+                [navDashboard, navMyTasks, navAdmin, navDeposit, navPurchasing, navImport, navStockImport, navStockRequest, navStockRequestManage, navBranchOrder, navBranchOrderInventory, navClaim, navStockClaim].forEach(el => {
                     if (el) {
                         el.classList.remove('bg-amber-500', 'text-white');
                         el.classList.add('text-slate-600', 'hover:bg-slate-50');
@@ -4847,6 +5152,7 @@
                 safeHide(stockRequestManageView);
                 safeHide(branchOrderView);
                 safeHide(branchInventoryView);
+                safeHide(claimView);
             }
 
             // Update state
@@ -4970,6 +5276,50 @@
                 }
                 if (companySelectDiv) companySelectDiv.style.display = 'none';
             }
+            else if (activeView === 'claim' || activeView === 'stock-claim') {
+                safeShow(claimView);
+                mainHeader.textContent = activeView === 'claim' ? "แจ้งเคลมอุปกรณ์เสริม" : "รายการแจ้งเคลมอุปกรณ์เสริม";
+
+                const navEl = activeView === 'claim' ? navClaim : navStockClaim;
+                if (navEl) {
+                    navEl.classList.add('bg-amber-500', 'text-white');
+                    navEl.classList.remove('text-slate-600', 'hover:bg-slate-50');
+                }
+                if (companySelectDiv) companySelectDiv.style.display = 'none';
+
+                // Handle Branch Filter Visibility for Sales Staff (Both Standard and Modern)
+                const branchContainers = [
+                    document.getElementById('claim-branch-filter-container'),
+                    document.getElementById('claim-branch-standard-container')
+                ];
+
+                const userDept = (currentUser.department || '').toLowerCase();
+                const isSalesTeam = userDept.includes('ขาย') || userDept.includes('sales');
+                const isStaff = currentUser.role === 'staff';
+
+                branchContainers.forEach(container => {
+                    if (container) {
+                        if (isSalesTeam && isStaff) safeHide(container);
+                        else safeShow(container);
+                    }
+                });
+
+                // Toggle Filter UI Style (Sales vs Stock)
+                const filterModern = document.getElementById('claim-filter-modern');
+                const filterStandard = document.getElementById('claim-filter-standard');
+                if (filterModern && filterStandard) {
+                    if (activeView === 'claim') {
+                        safeHide(filterModern);
+                        safeShow(filterStandard);
+                    } else {
+                        safeShow(filterModern);
+                        safeHide(filterStandard);
+                    }
+                }
+
+                if (typeof setClaimStatusFilter === 'function') setClaimStatusFilter('pending');
+                else if (typeof fetchClaims === 'function') fetchClaims();
+            }
 
             if (currentUser && currentUser.role === 'staff') {
                 if (document.getElementById('company-select')) document.getElementById('company-select').disabled = true;
@@ -5033,6 +5383,10 @@
                 const emptyState = document.getElementById('stock-empty-state');
                 const loading = document.getElementById('stock-loading');
 
+                // Permissions logic
+                const isStaff = currentUser?.role === 'staff';
+                const canUpdate = !isStaff;
+
                 if (loading) loading.classList.add('hidden');
 
                 // Clear both
@@ -5055,6 +5409,9 @@
                         const createdBy = item.createdBy ? item.createdBy.name : '-';
                         const supplier = item.details?.supplier || '-';
                         const desc = item.details?.description || '-';
+
+                        // Check Delete Permission (Own branch OR not staff)
+                        const canDelete = !isStaff || (currentUser?.branch === item.branch);
 
                         // File
                         const fileCount = item.files ? item.files.length : 0;
@@ -5080,8 +5437,24 @@
                             fileLink = `<span class="text-slate-400 text-xs">-</span>`;
                         }
 
-                        // Status
+                        // Status Badge Logic
                         const statusBadge = getStockStatusBadge(item.status);
+                        let statusHtml = '';
+                        if (canUpdate) {
+                            statusHtml = `<button onclick="openStatusModal('${item._id}', '${item.status}')" class="hover:scale-105 active:scale-95 transition-transform">${statusBadge}</button>`;
+                        } else {
+                            statusHtml = `<div class="cursor-default opacity-90">${statusBadge}</div>`;
+                        }
+
+                        // Delete Button Logic
+                        let deleteHtml = '';
+                        if (canDelete) {
+                            deleteHtml = `<button onclick="deleteImportRequest('${item._id}')" class="p-2 text-slate-300 hover:text-red-500 hover:bg-red-50 rounded-full transition-all" title="ลบรายการ">
+                                    <ion-icon name="trash-outline" class="text-lg"></ion-icon>
+                                </button>`;
+                        } else {
+                            deleteHtml = `<span class="w-8 h-8 block"></span>`;
+                        }
 
                         const tr = document.createElement('tr');
                         tr.className = "hover:bg-slate-50/80 transition-colors border-b border-slate-50 last:border-0 group";
@@ -5105,14 +5478,10 @@
                             </td>
                             <td class="px-6 py-4 text-sm">${fileLink}</td>
                             <td class="px-6 py-4 text-center">
-                                <button onclick="openStatusModal('${item._id}', '${item.status}')" class="hover:scale-105 active:scale-95 transition-transform">
-                                    ${statusBadge}
-                                </button>
+                                ${statusHtml}
                             </td>
                              <td class="px-6 py-4 text-right">
-                                <button onclick="deleteImportRequest('${item._id}')" class="p-2 text-slate-300 hover:text-red-500 hover:bg-red-50 rounded-full transition-all" title="ลบรายการ">
-                                    <ion-icon name="trash-outline" class="text-lg"></ion-icon>
-                                </button>
+                                ${deleteHtml}
                             </td>
                         `;
                         phoneTbody.appendChild(tr);
@@ -5415,6 +5784,7 @@
 
             // Status Modal Selection
             function openStatusModal(id, currentStatus) {
+                if (currentUser?.role === 'staff') return;
                 targetImportId = id;
                 openModal('statusUpdateModal');
             }
@@ -5424,6 +5794,16 @@
             function openImportDetailModal(item) {
                 currentDetailItem = item;
                 targetImportId = item._id;
+
+                // ACTIONS VISIBILITY
+                const actionsContainer = document.getElementById('detail-actions-container');
+                if (actionsContainer) {
+                    if (currentUser?.role === 'staff') {
+                        actionsContainer.classList.add('hidden');
+                    } else {
+                        actionsContainer.classList.remove('hidden');
+                    }
+                }
 
                 const d = item.details || {};
                 const supplier = d.supplier || '-';
@@ -7881,6 +8261,591 @@
             }, 4000);
         };
     </script>
+
+    <!-- Modal: Claim Status Update -->
+    <div id="claimStatusModal" class="modal fixed inset-0 z-[60] items-center justify-center p-4 hidden">
+        <div
+            class="modal-content relative w-full max-w-sm bg-white rounded-2xl shadow-blue-500/20 shadow-2xl overflow-hidden animate-fade-in-up">
+            <div class="bg-slate-50 border-b border-slate-100 px-6 py-4 flex justify-between items-center">
+                <h3 class="text-lg font-bold text-slate-800">อัปเดตสถานะเคลม</h3>
+                <button onclick="closeModal('claimStatusModal')"
+                    class="hover:bg-slate-200 p-1 rounded-full transition-colors text-slate-400 hover:text-slate-600">
+                    <ion-icon name="close" class="text-xl"></ion-icon>
+                </button>
+            </div>
+            <div class="p-6">
+                <input type="hidden" id="claim-update-id">
+                <label class="block text-sm font-bold text-slate-700 mb-2">สถานะใหม่</label>
+                <div class="relative">
+                    <select id="claim-update-status" class="form-input-theme w-full appearance-none">
+                        <option value="pending">รอดำเนินการ</option>
+                        <option value="approved">รับสินค้าแล้ว</option>
+                        <option value="completed">เสร็จสิ้น</option>
+                    </select>
+                    <div class="absolute inset-y-0 right-0 flex items-center px-3 pointer-events-none text-slate-500">
+                        <ion-icon name="chevron-down-outline"></ion-icon>
+                    </div>
+                </div>
+
+                <div class="mt-6 flex gap-3">
+                    <button onclick="closeModal('claimStatusModal')"
+                        class="flex-1 py-2.5 rounded-xl border border-slate-200 text-slate-600 font-bold hover:bg-slate-50 transition-colors">ยกเลิก</button>
+                    <button onclick="submitClaimStatus()"
+                        class="flex-1 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold shadow-lg shadow-blue-500/30 transition-all">บันทึก</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal: Claim (Create) -->
+    <div id="claimModal" class="modal fixed inset-0 z-50 items-center justify-center p-4 hidden">
+        <div class="modal-content relative w-full max-w-lg bg-white rounded-2xl shadow-2xl overflow-hidden">
+            <!-- Header -->
+            <div
+                class="bg-gradient-to-r from-orange-500 to-red-500 px-6 py-4 flex justify-between items-center text-white">
+                <h3 class="text-xl font-bold flex items-center gap-2">
+                    <ion-icon name="hammer"></ion-icon> แจ้งเคลมอุปกรณ์เสริม
+                </h3>
+                <button onclick="closeModal('claimModal')"
+                    class="hover:bg-white/20 p-1.5 rounded-full transition-colors">
+                    <ion-icon name="close" class="text-2xl"></ion-icon>
+                </button>
+            </div>
+
+            <form onsubmit="submitClaim(event)" class="p-6 space-y-4">
+                <!-- Row 1 -->
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-bold text-slate-700 mb-1">เลขที่โอนย้าย</label>
+                        <input type="text" id="claim-transfer-no" class="form-input-theme w-full"
+                            placeholder="ระบุเลขที่..." required>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-bold text-slate-700 mb-1">สาขา</label>
+                        <input type="text" id="claim-branch-display"
+                            class="form-input-theme w-full bg-slate-100 text-slate-500" readonly>
+                    </div>
+                </div>
+
+                <!-- Row 2 -->
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-bold text-slate-700 mb-1">ชื่อสินค้า</label>
+                        <div class="relative group">
+                            <select id="claim-product-name" onchange="syncClaimProduct('name')"
+                                class="form-input-theme w-full appearance-none pr-10" required>
+                                <option value="" disabled selected>เลือกสินค้า...</option>
+                            </select>
+                            <div
+                                class="absolute inset-y-0 right-0 flex items-center px-3 pointer-events-none text-slate-400">
+                                <ion-icon name="chevron-down-outline"></ion-icon>
+                            </div>
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-bold text-slate-700 mb-1">รหัสสินค้า</label>
+                        <div class="relative group">
+                            <select id="claim-product-code" onchange="syncClaimProduct('code')"
+                                class="form-input-theme w-full appearance-none pr-10" required>
+                                <option value="" disabled selected>รหัส...</option>
+                            </select>
+                            <div
+                                class="absolute inset-y-0 right-0 flex items-center px-3 pointer-events-none text-slate-400">
+                                <ion-icon name="chevron-down-outline"></ion-icon>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Row 3 -->
+                <div>
+                    <label class="block text-sm font-bold text-slate-700 mb-1">จำนวน (ชิ้น)</label>
+                    <input type="number" id="claim-quantity" class="form-input-theme w-full" value="1" min="1" required>
+                </div>
+
+                <!-- Row 4 -->
+                <div>
+                    <label class="block text-sm font-bold text-slate-700 mb-1">ปัญหา / ตำหนิ</label>
+                    <textarea id="claim-problem" rows="3" class="form-input-theme w-full"
+                        placeholder="ระบุอาการเสีย หรือตำหนิ..." required></textarea>
+                </div>
+
+                <div class="pt-4 flex justify-end gap-3 border-t border-slate-100">
+                    <button type="button" onclick="closeModal('claimModal')"
+                        class="px-5 py-2.5 rounded-xl text-slate-600 hover:bg-slate-50 font-bold transition-colors">ยกเลิก</button>
+                    <button type="submit"
+                        class="px-5 py-2.5 rounded-xl bg-gradient-to-r from-orange-500 to-red-600 hover:from-orange-600 hover:to-red-700 text-white font-bold shadow-lg shadow-orange-500/30 transition-all">บันทึกแจ้งเคลม</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Claim Logic -->
+    <script>
+        const CLAIM_PRODUCT_PRESETS = [
+            { code: 'K16PLUS', name: 'เคส 16plus' },
+            { code: 'KG9', name: 'เคส Gen9' },
+            { code: 'KA4', name: 'เคส Ipad Air4' },
+            { code: 'KA6', name: 'เคส Ipad Air5/6/7' },
+            { code: 'KX', name: 'เคส X XS' },
+            { code: 'K11', name: 'เคส11' },
+            { code: 'K11PM', name: 'เคส11PM' },
+            { code: 'K11P', name: 'เคส11Pro' },
+            { code: 'K12', name: 'เคส12/12p' },
+            { code: 'K12PM', name: 'เคส12pm' },
+            { code: 'K13', name: 'เคส13/14' },
+            { code: 'K13PM', name: 'เคส13pm' },
+            { code: 'K13P', name: 'เคส13pro' },
+            { code: 'K14PLUS', name: 'เคส14plus' },
+            { code: 'K14PM', name: 'เคส14pm' },
+            { code: 'K14P', name: 'เคส14pro' },
+            { code: 'K15', name: 'เคส15' },
+            { code: 'K15P', name: 'เคส15p' },
+            { code: 'K15PLUS', name: 'เคส15plus' },
+            { code: 'K15PM', name: 'เคส15pm' },
+            { code: 'K16', name: 'เคส16' },
+            { code: 'K16PM', name: 'เคส16pm' },
+            { code: 'K16P', name: 'เคส16pro' },
+            { code: 'K17', name: 'เคส17' },
+            { code: 'K17A', name: 'เคส17Air' },
+            { code: 'K17PM', name: 'เคส17pm' },
+            { code: 'K17P', name: 'เคส17pro' },
+            { code: 'K7', name: 'เคส7 8' },
+            { code: 'K7P8P', name: 'เคส7+8+' },
+            { code: 'KAP3', name: 'เคสAirpods3' },
+            { code: 'KG10', name: 'เคสGen10 /Gen11' },
+            { code: 'KXR', name: 'เคสXR' },
+            { code: 'KXSM', name: 'เคสXs max' },
+            { code: 'KSA17', name: 'เคสซัมซุงA17' },
+            { code: 'KSA56', name: 'เคสซัมซุงA56' },
+            { code: '29', name: 'ชุดชาร์จ Android' },
+            { code: '10', name: 'ชุดชาร์จ Iphone11-14' },
+            { code: '1100', name: 'ชุดชาร์จ Iphone15-16' },
+            { code: 'S001', name: 'ซิม' },
+            { code: 'SUMK', name: 'เซทเคสโรสโตร์' },
+            { code: 'P00003', name: 'ปากกา Ipad' },
+            { code: 'POWER', name: 'เพาเวอร์แบงค์10000M' },
+            { code: 'F11P', name: 'ฟิล์ม 11pro/x/xs' },
+            { code: 'F13', name: 'ฟิล์ม 13/13pro/14/16e' },
+            { code: 'F13PM', name: 'ฟิล์ม 13pm/14plus' },
+            { code: 'F14PM', name: 'ฟิล์ม 14pm' },
+            { code: 'F14P', name: 'ฟิล์ม 14pro' },
+            { code: '5', name: 'ฟิล์ม 15 โฟกัส' },
+            { code: 'F15', name: 'ฟิล์ม 15/16' },
+            { code: 'F15P', name: 'ฟิล์ม 15p' },
+            { code: '6', name: 'ฟิล์ม 15P โฟกัส' },
+            { code: 'F15PM', name: 'ฟิล์ม 15pm' },
+            { code: '7', name: 'ฟิล์ม 15pm โฟกัส' },
+            { code: 'F16PLUS', name: 'ฟิล์ม 16plus/15plus' },
+            { code: 'F16PM', name: 'ฟิล์ม 16pm' },
+            { code: 'F16P', name: 'ฟิล์ม 16pro' },
+            { code: 'F7P8P', name: 'ฟิล์ม 7+8+' },
+            { code: 'FA2', name: 'ฟิล์ม Air2' },
+            { code: 'FA4', name: 'ฟิล์ม Air4 Air5' },
+            { code: 'FA6', name: 'ฟิล์ม Air6/Air7' },
+            { code: 'FG9', name: 'ฟิล์ม Gen9 8 7' },
+            { code: 'FG10', name: 'ฟิล์ม ipad gen10/11' },
+            { code: 'FXR', name: 'ฟิล์ม XR / 11' },
+            { code: 'F11PM', name: 'ฟิล์ม11pm/XS Max' },
+            { code: 'F12P', name: 'ฟิล์ม12/12pro' },
+            { code: 'F12PM', name: 'ฟิล์ม12pm' },
+            { code: 'F17', name: 'ฟิล์ม17' },
+            { code: 'F17A', name: 'ฟิล์ม17air' },
+            { code: 'F17PM', name: 'ฟิล์ม17pm' },
+            { code: 'F17P', name: 'ฟิล์ม17pro' },
+            { code: 'FSA17', name: 'ฟิล์มซัมซุงA17' },
+            { code: 'FSA56', name: 'ฟิล์ม์ซัมซุงA56' },
+            { code: 'L13', name: 'เลนส์กล้อง 13' },
+            { code: 'L15', name: 'เลนส์กล้อง 15/15plus' },
+            { code: 'L15P', name: 'เลนส์กล้อง 15p/15pm' },
+            { code: 'L16', name: 'เลนส์กล้อง 16/16plus' },
+            { code: 'L16P', name: 'เลนส์กล้อง 16p/16pm' },
+            { code: 'L12', name: 'เลนส์กล้อง12' },
+            { code: '201', name: 'สายชาร์จ (เทียบ)' },
+            { code: '41', name: 'สายชาร์จ C-TO-C (แท้)' },
+            { code: '20', name: 'สายชาร์จ Lighning (แท้)' },
+            { code: '60', name: 'หัวชาร์จ 20W (เทียบ)' },
+            { code: '61', name: 'หัวชาร์จ 20W (แท้)' },
+            { code: '28', name: 'หัวชาร์จ Android' },
+            { code: '30', name: 'หูฟัง' },
+            { code: '83', name: 'หูฟัง Airpods' }
+        ];
+
+        function initializeClaimProductPresets() {
+            const nameSelect = document.getElementById('claim-product-name');
+            const codeSelect = document.getElementById('claim-product-code');
+
+            if (nameSelect.options.length > 1) return; // Already initialized
+
+            CLAIM_PRODUCT_PRESETS.forEach(item => {
+                nameSelect.add(new Option(item.name, item.name));
+                codeSelect.add(new Option(item.code, item.code));
+            });
+        }
+
+        function syncClaimProduct(type) {
+            const nameSelect = document.getElementById('claim-product-name');
+            const codeSelect = document.getElementById('claim-product-code');
+
+            if (type === 'name') {
+                const selectedName = nameSelect.value;
+                const preset = CLAIM_PRODUCT_PRESETS.find(p => p.name === selectedName);
+                if (preset) codeSelect.value = preset.code;
+            } else {
+                const selectedCode = codeSelect.value;
+                const preset = CLAIM_PRODUCT_PRESETS.find(p => p.code === selectedCode);
+                if (preset) nameSelect.value = preset.name;
+            }
+        }
+
+        // Open Modal
+        function openClaimModal() {
+            // Set Branch
+            const branch = (currentUser.role === 'staff') ? currentUser.branch : (currentUser.department || 'สำนักงานใหญ่');
+            document.getElementById('claim-branch-display').value = branch;
+
+            // Initialize Presets
+            initializeClaimProductPresets();
+
+            // Clear other fields
+            document.getElementById('claim-transfer-no').value = '';
+            document.getElementById('claim-product-name').value = '';
+            document.getElementById('claim-product-code').value = '';
+            document.getElementById('claim-quantity').value = '1';
+            document.getElementById('claim-problem').value = '';
+
+            openModal('claimModal');
+        }
+
+        // --- Filter Logic ---
+        function setClaimStatusFilter(status) {
+            const statusInput = document.getElementById('claim-status-filter');
+            if (statusInput) statusInput.value = status;
+
+            const statusSelect = document.getElementById('claim-status-standard');
+            if (statusSelect) statusSelect.value = status;
+
+            // Update UI Active State (Modern)
+            const statusButtons = ['all', 'pending', 'approved', 'rejected', 'completed'];
+            statusButtons.forEach(s => {
+                const btn = document.getElementById(`btn-claim-${s}`);
+                if (!btn) return;
+
+                if (s === status) {
+                    btn.classList.add('bg-white', 'shadow-sm', 'ring-1', 'ring-black/5');
+                    btn.classList.remove('text-slate-500');
+                    if (s === 'all') btn.classList.add('text-orange-600');
+                    if (s === 'pending') btn.classList.add('text-amber-600');
+                    if (s === 'approved') btn.classList.add('text-emerald-600');
+                    if (s === 'rejected') btn.classList.add('text-rose-600');
+                    if (s === 'completed') btn.classList.add('text-blue-600');
+                } else {
+                    btn.classList.remove('bg-white', 'shadow-sm', 'ring-1', 'ring-black/5', 'text-orange-600', 'text-amber-600', 'text-emerald-600', 'text-rose-600', 'text-blue-600');
+                    btn.classList.add('text-slate-500');
+                }
+            });
+
+            fetchClaims();
+        }
+
+        // Fetch Claims
+        async function fetchClaims() {
+            try {
+                const token = localStorage.getItem('token');
+
+                const filterStandard = document.getElementById('claim-filter-standard');
+                const isStandard = filterStandard && !filterStandard.classList.contains('hidden');
+
+                let branch, activeStatus, search, date;
+
+                if (isStandard) {
+                    branch = document.getElementById('claim-branch-standard').value;
+                    activeStatus = document.getElementById('claim-status-standard').value;
+                    search = document.getElementById('claim-search-standard').value;
+                    date = document.getElementById('claim-date-standard').value;
+                } else {
+                    branch = document.getElementById('claim-branch-filter').value;
+                    activeStatus = document.getElementById('claim-status-filter').value;
+                    search = document.getElementById('claim-search-filter').value;
+                    date = document.getElementById('claim-date-filter').value;
+                }
+
+                let url = `${SERVER_URL}/claims?branch=${branch}&status=all&search=${encodeURIComponent(search)}&date=${date}`;
+
+                const response = await fetch(url, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+
+                if (!response.ok) throw new Error('Failed to fetch claims');
+                const result = await response.json();
+
+                // Update Status Counts using the full result set (fetched status=all)
+                updateClaimStatusCounts(result.data);
+
+                // Filter by activeStatus clientside before rendering table
+                const filteredData = (activeStatus === 'all')
+                    ? result.data
+                    : result.data.filter(item => item.status === activeStatus);
+
+                renderClaimsTable(filteredData);
+            } catch (error) {
+                console.error('Error fetching claims:', error);
+                showToast('ไม่สามารถดึงข้อมูลเคลมได้', 'error');
+            }
+        }
+
+        function updateClaimStatusCounts(data) {
+            if (!data) return;
+
+            // Note: This only counts items in the current filtered result. 
+            // In a real production app, you might want a separate API for counts or 
+            // fetch all items without filter once. 
+            // However, the user asked for the same behavior as the "Stock Import" which might do it differently.
+            // Let's see how Stock Import does it. Usually it fetches "all" and then filters clientside OR it has a count API.
+
+            const counts = {
+                all: data.length,
+                pending: data.filter(i => i.status === 'pending').length,
+                approved: data.filter(i => i.status === 'approved').length,
+                rejected: data.filter(i => i.status === 'rejected').length,
+                completed: data.filter(i => i.status === 'completed').length
+            };
+
+            ['all', 'pending', 'approved', 'rejected', 'completed'].forEach(s => {
+                // Update Modern Badges
+                const badge = document.getElementById(`count-claim-${s}`);
+                if (badge) {
+                    badge.innerText = counts[s];
+                    badge.classList.toggle('hidden', counts[s] === 0);
+                }
+
+                // Update Standard Dropdown Options
+                const select = document.getElementById('claim-status-standard');
+                if (select) {
+                    const option = Array.from(select.options).find(o => o.value === s);
+                    if (option) {
+                        const baseLabels = {
+                            all: 'ทุกสถานะ',
+                            pending: '⏳ รอดำเนินการ',
+                            approved: '✅ รับสินค้าแล้ว',
+                            completed: '🔵 เสร็จสิ้น',
+                        };
+                        option.textContent = `${baseLabels[s] || s} (${counts[s]})`;
+                    }
+                }
+            });
+        }
+
+        // Render Table (Updated)
+        function renderClaimsTable(data) {
+            const tbody = document.getElementById('claim-table-body');
+            tbody.innerHTML = '';
+
+            // Check Permissions: Admin/Manager/Executive OR Stock Team can update
+            const userDept = (currentUser.department || '').toLowerCase();
+            const stockKeywords = ['stock', 'store', 'สต๊อก', 'คลัง', 'warehouse', 'supply'];
+            const isStockTeam = stockKeywords.some(keyword => userDept.includes(keyword));
+
+            const canUpdate = ['admin', 'manager', 'executive'].includes(currentUser.role) || isStockTeam;
+
+            // Toggle "Create" button visibility based on view/role?
+            // Actually, keep it simple: Stock sees the same view, but maybe we hide the "Create" button via CSS if needed?
+            // For now, let's just focus on the Table Actions.
+
+            const createBtn = document.querySelector('#claim-view-content button[onclick="openClaimModal()"]');
+            if (createBtn) {
+                if (isStockTeam && currentUser.role === 'staff') {
+                    createBtn.style.display = 'none'; // Stock Staff usually don't create claims here
+                } else {
+                    createBtn.style.display = 'inline-flex';
+                }
+            }
+
+            if (!data || data.length === 0) {
+                // Enhanced Empty State
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="9" class="py-20 text-center">
+                            <div class="flex flex-col items-center justify-center animate-fade-in">
+                                <div class="w-24 h-24 bg-slate-50 rounded-full flex items-center justify-center mb-6 shadow-inner">
+                                    <ion-icon name="file-tray-outline" class="text-5xl text-slate-300"></ion-icon>
+                                </div>
+                                <h4 class="text-xl font-black text-slate-700">ไม่พบรายการแจ้งเคลม</h4>
+                                <p class="text-slate-400 mt-2 font-medium">ลองเปลี่ยนตัวกรอง หรือค้นหาใหม่อีกครั้ง</p>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+
+            data.forEach((item, index) => {
+                const dateObj = new Date(item.createdAt);
+                const dateStr = dateObj.toLocaleDateString('th-TH', { day: '2-digit', month: '2-digit', year: 'numeric' });
+                const timeStr = dateObj.toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit' });
+
+                const statusBadge = getClaimStatusBadge(item.status);
+
+                let actionHtml = statusBadge;
+                if (canUpdate) {
+                    actionHtml = `
+                    <button onclick="openClaimStatusModal('${item._id}', '${item.status}')" 
+                        class="group relative inline-flex items-center justify-center transition-all active:scale-90 hover:-translate-y-0.5">
+                        ${statusBadge}
+                        <div class="absolute -right-5 top-1/2 -translate-y-1/2 text-slate-300 group-hover:text-orange-500 transition-all opacity-0 group-hover:opacity-100 scale-75 group-hover:scale-100">
+                             <ion-icon name="create-outline" class="text-lg"></ion-icon>
+                        </div>
+                    </button>`;
+                }
+
+                const tr = document.createElement('tr');
+                tr.className = `group hover:bg-orange-50/40 transition-all duration-300 border-b border-slate-50 last:border-0 animate-fade-in`;
+                tr.style.animationDelay = `${index * 50}ms`;
+
+                tr.innerHTML = `
+                    <td class="px-6 py-5">
+                        <div class="flex flex-col">
+                            <span class="text-sm font-black text-slate-700">${dateStr}</span>
+                            <span class="text-[10px] font-bold text-slate-400 uppercase tracking-tighter">${timeStr}</span>
+                        </div>
+                    </td>
+                    <td class="px-6 py-5">
+                        <span class="px-2.5 py-1 bg-slate-100 text-slate-700 rounded-lg text-xs font-black border border-slate-200">${item.transferNumber}</span>
+                    </td>
+                    <td class="px-6 py-5">
+                        <div class="flex items-center gap-2">
+                            <div class="w-2 h-2 rounded-full bg-slate-300 group-hover:bg-orange-400 transition-colors"></div>
+                            <span class="text-sm font-bold text-slate-600">${item.branch}</span>
+                        </div>
+                    </td>
+                    <td class="px-6 py-5">
+                        <div class="flex items-center gap-2">
+                             <div class="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center text-[10px] font-black text-slate-500 uppercase">
+                                ${(item.createdBy?.name || '?').substring(0, 2)}
+                             </div>
+                             <span class="text-sm font-bold text-slate-500">${item.createdBy?.name || '-'}</span>
+                        </div>
+                    </td>
+                    <td class="px-6 py-5">
+                        <div class="flex flex-col">
+                            <span class="text-sm font-black text-slate-800 leading-tight">${item.productName}</span>
+                            <span class="text-[10px] font-bold text-slate-400 font-mono tracking-tight mt-0.5">${item.productCode}</span>
+                        </div>
+                    </td>
+                    <td class="px-6 py-5 text-center">
+                        <span class="inline-flex items-center justify-center w-8 h-8 rounded-xl bg-slate-900/5 text-slate-700 text-xs font-black">${item.quantity}</span>
+                    </td>
+                    <td class="px-6 py-5">
+                        <p class="text-sm font-medium text-slate-500 max-w-xs truncate" title="${item.problem}">${item.problem}</p>
+                    </td>
+                    <td class="px-6 py-5 text-center select-none">${actionHtml}</td>
+                    <td class="px-6 py-5 text-right">
+                        <button onclick="downloadClaimPDF('${item._id}')" 
+                            class="w-10 h-10 flex items-center justify-center text-slate-400 hover:text-white hover:bg-orange-500 rounded-xl transition-all duration-300 shadow-sm hover:shadow-orange-500/30 group/btn"
+                            title="ดาวน์โหลด PDF">
+                            <ion-icon name="print-outline" class="text-xl transition-transform group-hover/btn:scale-110"></ion-icon>
+                        </button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+            // Store data globally for PDF generation
+            window.currentClaimsData = data;
+        }
+
+        function getClaimStatusBadge(status) {
+            const baseClass = "px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-wider shadow-sm flex items-center justify-center gap-1.5 min-w-[100px]";
+            if (status === 'pending') return `<span class="${baseClass} bg-amber-50 text-amber-700 ring-1 ring-amber-200/50"><span class="w-1.5 h-1.5 bg-amber-500 rounded-full animate-pulse"></span>รอดำเนินการ</span>`;
+            if (status === 'approved') return `<span class="${baseClass} bg-emerald-50 text-emerald-700 ring-1 ring-emerald-200/50"><ion-icon name="checkmark-done" class="text-xs"></ion-icon>รับสินค้าแล้ว</span>`;
+            if (status === 'completed') return `<span class="${baseClass} bg-blue-50 text-blue-700 ring-1 ring-blue-200/50"><ion-icon name="checkbox" class="text-xs"></ion-icon>เสร็จสิ้น</span>`;
+            return `<span class="${baseClass} bg-slate-100 text-slate-600">${status}</span>`;
+        }
+
+        // Submit Claim
+        async function submitClaim(e) {
+            e.preventDefault();
+            const btn = e.target.querySelector('button[type="submit"]');
+            const originalText = btn.innerHTML;
+            btn.innerHTML = '<ion-icon name="sync" class="animate-spin"></ion-icon> กำลังบันทึก...';
+            btn.disabled = true;
+
+            const payload = {
+                transferNumber: document.getElementById('claim-transfer-no').value,
+                productName: document.getElementById('claim-product-name').value,
+                productCode: document.getElementById('claim-product-code').value,
+                quantity: document.getElementById('claim-quantity').value,
+                problem: document.getElementById('claim-problem').value
+            };
+
+            try {
+                const token = localStorage.getItem('token');
+                const response = await fetch(`${SERVER_URL}/claims`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify(payload)
+                });
+
+                if (!response.ok) throw new Error('Create failed');
+
+                showToast('บันทึกการแจ้งเคลมสำเร็จ!', 'success');
+                closeModal('claimModal');
+                fetchClaims(); // Refresh list
+            } catch (error) {
+                console.error('Submit Claim Error:', error);
+                showToast('เกิดข้อผิดพลาดในการบันทึก', 'error');
+            } finally {
+                btn.innerHTML = originalText;
+                btn.disabled = false;
+            }
+        }
+
+        // --- Status Update Logic ---
+        function openClaimStatusModal(id, currentStatus) {
+            document.getElementById('claim-update-id').value = id;
+            document.getElementById('claim-update-status').value = currentStatus;
+            openModal('claimStatusModal');
+        }
+
+        async function submitClaimStatus() {
+            const id = document.getElementById('claim-update-id').value;
+            const newStatus = document.getElementById('claim-update-status').value;
+
+            try {
+                const token = localStorage.getItem('token');
+                const response = await fetch(`${SERVER_URL}/claims/${id}/status`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify({ status: newStatus })
+                });
+
+                if (!response.ok) throw new Error('Update failed');
+
+                showToast('อัปเดตสถานะเรียบร้อย', 'success');
+                closeModal('claimStatusModal');
+                fetchClaims();
+            } catch (error) {
+                console.error('Update Status Error:', error);
+                showToast('เกิดข้อผิดพลาดในการอัปเดต', 'error');
+            }
+        }
+
+        // --- Print/PDF Export Logic ---
+        function downloadClaimPDF(itemId) {
+            // Open document.html in a new tab with the ID
+            window.open(`document.html?id=${itemId}`, '_blank');
+        }
+    </script>
+
+    <!-- Hidden PDF Template -->
+    <div id="claim-pdf-template"
+        style="position: fixed; top: 0; left: 0; width: 794px; background: white; z-index: -100; visibility: hidden;">
+    </div>
 </body>
 
 </html>

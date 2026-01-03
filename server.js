@@ -37,6 +37,7 @@ app.use('/api/deposits', depositRoutes);
 app.use('/api/imports', require('./routes/importRoutes'));
 app.use('/api/stock-requests', require('./routes/stockRequestRoutes'));
 app.use('/api/branch-stock-orders', require('./routes/branchStockOrderRoutes'));
+app.use('/api/claims', require('./routes/claimRoutes'));
 
 // Serve Uploads
 app.use('/uploads', express.static(path.join(process.cwd(), 'uploads')));

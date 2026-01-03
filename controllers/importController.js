@@ -156,17 +156,21 @@ exports.updateImportStatus = async (req, res) => {
 // @desc    Delete import request
 exports.deleteImport = async (req, res) => {
     try {
-        console.log(`DEBUG: Attempting to delete import: ${req.params.id} by user: ${req.user.username} (${req.user.role})`);
+        // console.log(`DEBUG: Attempting to delete import: ${req.params.id} by user: ${req.user.username} (${req.user.role})`);
         const importRequest = await ImportRequest.findById(req.params.id);
 
         if (!importRequest) {
             return res.status(404).json({ message: 'Request not found' });
         }
 
-        // Optional: Check permissions (e.g., only Admin or Creator)
-        // For now, assuming middleware handles role check
+        // Check permissions: Staff can only delete their own branch's requests
+        if (req.user.role === 'staff') {
+            if (importRequest.branch !== req.user.branch) {
+                return res.status(403).json({ message: 'คุณไม่มีสิทธิ์ลบรายการของสาขาอื่น' });
+            }
+        }
 
-        await importRequest.deleteOne(); // Use deleteOne() for Mongoose v6+
+        await importRequest.deleteOne();
 
         res.status(200).json({ message: 'Import request removed' });
     } catch (error) {
