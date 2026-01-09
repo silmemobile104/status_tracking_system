@@ -54,7 +54,7 @@ router.get('/', verifyToken, importController.getImports);
 router.put('/:id', verifyToken, checkRole(['admin', 'manager', 'executive']), upload.array('files', 5), importController.updateImport);
 
 // อัปเดตสถานะ (เฉพาะ role ที่ระบุ)
-router.put('/:id/status', verifyToken, checkRole(['admin', 'manager', 'executive']), importController.updateImportStatus);
+router.put('/:id/status', verifyToken, checkRole(['admin', 'manager', 'executive', 'staff']), importController.updateImportStatus);
 
 // ลบรายการ (เฉพาะ admin/manager/executive)
 router.delete('/:id', verifyToken, checkRole(['admin', 'manager', 'executive', 'staff']), importController.deleteImport);
