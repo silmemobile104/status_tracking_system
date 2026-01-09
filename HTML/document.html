@@ -182,7 +182,8 @@
 
     <div class="page" id="print-content" style="display: none;">
         <div class="header">
-            <img src="../image/logo_silminmobile.png" alt="Silmeen Mobile Logo" style="height: 150px; margin-bottom: 5px;">
+            <img src="../image/logo_silminmobile.png" alt="Silmeen Mobile Logo"
+                style="height: 150px; margin-bottom: 5px;">
             <h2>ใบแจ้งเคลมอุปกรณ์เสริม</h2>
         </div>
 
@@ -204,9 +205,10 @@
         <table>
             <thead>
                 <tr>
-                    <th style="width: 35%;">ชื่อสินค้า</th>
-                    <th style="width: 20%;">รหัสสินค้า</th>
-                    <th style="width: 15%;">จำนวน(ชิ้น)</th>
+                    <th style="width: 25%;">ชื่อสินค้า</th>
+                    <th style="width: 15%;">รหัสสินค้า</th>
+                    <th style="width: 20%;">Supplier</th>
+                    <th style="width: 10%;">จำนวน</th>
                     <th style="width: 30%;">ปัญหา/ตำหนิ</th>
                 </tr>
             </thead>
@@ -312,11 +314,13 @@
                     <tr>
                         <td style="height: 50px; vertical-align: middle;">${item.productName || '-'}</td>
                         <td style="text-align: center; vertical-align: middle;">${item.productCode || '-'}</td>
+                        <td style="text-align: center; vertical-align: middle;">${item.supplier || '-'}</td>
                         <td style="text-align: center; vertical-align: middle;">${item.quantity || '0'}</td>
                         <td style="vertical-align: middle;">${item.problem || '-'}</td>
                     </tr>
                     <tr>
-                        <td style="height: 50px;"></td>
+                        <td></td>
+                        <td></td>
                         <td></td>
                         <td></td>
                         <td></td>

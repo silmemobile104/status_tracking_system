@@ -38,6 +38,10 @@ const ClaimSchema = new mongoose.Schema({
         type: String,
         required: true
     },
+    supplier: {
+        type: String,
+        trim: true
+    },
     status: {
         type: String,
         enum: ['pending', 'approved', 'rejected', 'completed'],

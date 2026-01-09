@@ -60,7 +60,8 @@ exports.getClaims = async (req, res) => {
             query.$or = [
                 { transferNumber: searchRegex },
                 { productName: searchRegex },
-                { productCode: searchRegex }
+                { productCode: searchRegex },
+                { supplier: searchRegex }
             ];
         }
 
@@ -104,7 +105,7 @@ exports.getClaims = async (req, res) => {
 // @access  Private (Admin/Manager/Stock)
 exports.updateClaimStatus = async (req, res) => {
     try {
-        const { status } = req.body;
+        const { status, supplier } = req.body;
 
         // Check Permissions: Admin/Manager OR Stock Team
         const userDept = (req.user.department || '').toLowerCase();
@@ -128,7 +129,8 @@ exports.updateClaimStatus = async (req, res) => {
             return res.status(404).json({ message: 'Claim not found' });
         }
 
-        claim.status = status;
+        if (status) claim.status = status;
+        if (supplier !== undefined) claim.supplier = supplier;
         await claim.save();
 
         res.status(200).json(claim);

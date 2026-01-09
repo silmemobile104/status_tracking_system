@@ -1060,41 +1060,6 @@
 
                 <!-- Claim View -->
                 <div id="claim-view-content" class="hidden space-y-8 mt-6">
-                    <!-- Premium Header -->
-                    <div
-                        class="relative overflow-hidden bg-white rounded-3xl p-8 shadow-sm border border-slate-100 flex flex-col md:flex-row justify-between items-center gap-6">
-                        <!-- Decorative bg -->
-                        <div
-                            class="absolute top-0 right-0 w-64 h-64 bg-orange-400 opacity-10 rounded-full blur-3xl -mr-20 -mt-20">
-                        </div>
-                        <div
-                            class="absolute bottom-0 left-0 w-32 h-32 bg-red-400 opacity-5 rounded-full blur-2xl -ml-10 -mb-10">
-                        </div>
-
-                        <div class="flex items-center gap-6 relative z-10">
-                            <div
-                                class="w-16 h-16 bg-gradient-to-br from-orange-500 to-red-600 text-white rounded-2xl flex items-center justify-center shadow-lg shadow-orange-500/20 transform -rotate-3 hover:rotate-0 transition-transform duration-300">
-                                <ion-icon name="hammer" class="text-3xl"></ion-icon>
-                            </div>
-                            <div>
-                                <h3 class="text-2xl font-black text-slate-800 tracking-tight">รายการแจ้งเคลม</h3>
-                                <div class="flex items-center gap-2 mt-1">
-                                    <span class="w-2 h-2 bg-orange-500 rounded-full animate-pulse"></span>
-                                    <p class="text-sm font-bold text-slate-500 uppercase tracking-widest">Accessory
-                                        Claims Management</p>
-                                </div>
-                            </div>
-                        </div>
-                        <button onclick="openClaimModal()"
-                            class="relative group bg-slate-900 hover:bg-black text-white px-8 py-4 rounded-2xl font-bold shadow-xl shadow-slate-900/10 hover:shadow-2xl hover:shadow-orange-500/20 transition-all duration-300 flex items-center gap-3 overflow-hidden">
-                            <div
-                                class="absolute inset-0 bg-gradient-to-r from-orange-500 to-red-500 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                            </div>
-                            <ion-icon name="add-circle" class="text-2xl relative z-10"></ion-icon>
-                            <span class="relative z-10">แจ้งเคลมใหม่</span>
-                        </button>
-                    </div>
-
                     <!-- Standardized Filters (For Sales View) -->
                     <div id="claim-filter-standard"
                         class="hidden bg-white rounded-2xl p-6 shadow-sm border border-slate-100 flex flex-col md:flex-row justify-between items-center gap-4">
@@ -1161,6 +1126,14 @@
                                 <ion-icon name="chevron-down-outline"
                                     class="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none text-xs"></ion-icon>
                             </div>
+                            <button onclick="openClaimModal()"
+                                class="relative group bg-slate-900 hover:bg-black text-white px-8 py-4 rounded-2xl font-bold shadow-xl shadow-slate-900/10 hover:shadow-2xl hover:shadow-orange-500/20 transition-all duration-300 flex items-center gap-3 overflow-hidden">
+                                <div
+                                    class="absolute inset-0 bg-gradient-to-r from-orange-500 to-red-500 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                                </div>
+                                <ion-icon name="add-circle" class="text-2xl relative z-10"></ion-icon>
+                                <span class="relative z-10">แจ้งเคลมใหม่</span>
+                            </button>
                         </div>
                     </div>
 
@@ -1282,6 +1255,9 @@
                                         <th
                                             class="px-6 py-5 text-left text-[10px] font-black text-slate-400 uppercase tracking-widest">
                                             ผู้แจ้ง</th>
+                                        <th
+                                            class="px-6 py-5 text-left text-[10px] font-black text-slate-400 uppercase tracking-widest">
+                                            Supplier</th>
                                         <th
                                             class="px-6 py-5 text-left text-[10px] font-black text-slate-400 uppercase tracking-widest">
                                             สินค้า (รหัส)</th>
@@ -8326,6 +8302,12 @@
                     </div>
                 </div>
 
+                <div class="mt-4">
+                    <label class="block text-sm font-bold text-slate-700 mb-2">ชื่อ Supplier</label>
+                    <input type="text" id="claim-update-supplier" class="form-input-theme w-full"
+                        placeholder="ระบุชื่อ Supplier...">
+                </div>
+
                 <div class="mt-6 flex gap-3">
                     <button onclick="closeModal('claimStatusModal')"
                         class="flex-1 py-2.5 rounded-xl border border-slate-200 text-slate-600 font-bold hover:bg-slate-50 transition-colors">ยกเลิก</button>
@@ -8728,7 +8710,7 @@
                 let actionHtml = statusBadge;
                 if (canUpdate) {
                     actionHtml = `
-                    <button onclick="openClaimStatusModal('${item._id}', '${item.status}')" 
+                    <button onclick="openClaimStatusModal('${item._id}', '${item.status}', '${(item.supplier || '').replace(/'/g, "\\'")}')" 
                         class="group relative inline-flex items-center justify-center transition-all active:scale-90 hover:-translate-y-0.5">
                         ${statusBadge}
                         <div class="absolute -right-5 top-1/2 -translate-y-1/2 text-slate-300 group-hover:text-orange-500 transition-all opacity-0 group-hover:opacity-100 scale-75 group-hover:scale-100">
@@ -8764,6 +8746,11 @@
                              </div>
                              <span class="text-sm font-bold text-slate-500">${item.createdBy?.name || '-'}</span>
                         </div>
+                    </td>
+                    <td class="px-6 py-5">
+                        <span class="text-sm font-bold ${item.supplier ? 'text-slate-600' : 'text-red-500 italic animate-pulse'}">
+                            ${item.supplier || 'รอระบุ Supplier'}
+                        </span>
                     </td>
                     <td class="px-6 py-5">
                         <div class="flex flex-col">
@@ -8842,15 +8829,17 @@
         }
 
         // --- Status Update Logic ---
-        function openClaimStatusModal(id, currentStatus) {
+        function openClaimStatusModal(id, currentStatus, currentSupplier) {
             document.getElementById('claim-update-id').value = id;
             document.getElementById('claim-update-status').value = currentStatus;
+            document.getElementById('claim-update-supplier').value = currentSupplier || '';
             openModal('claimStatusModal');
         }
 
         async function submitClaimStatus() {
             const id = document.getElementById('claim-update-id').value;
             const newStatus = document.getElementById('claim-update-status').value;
+            const newSupplier = document.getElementById('claim-update-supplier').value;
 
             try {
                 const token = localStorage.getItem('token');
@@ -8860,7 +8849,10 @@
                         'Content-Type': 'application/json',
                         'Authorization': `Bearer ${token}`
                     },
-                    body: JSON.stringify({ status: newStatus })
+                    body: JSON.stringify({
+                        status: newStatus,
+                        supplier: newSupplier
+                    })
                 });
 
                 if (!response.ok) throw new Error('Update failed');
