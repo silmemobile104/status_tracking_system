@@ -47,7 +47,7 @@ exports.getClaims = async (req, res) => {
         const canViewAll = ['admin', 'manager', 'executive'].includes(req.user.role) || isStockTeam;
 
         // --- Filters from Query ---
-        const { branch, status, search, date } = req.query;
+        const { branch, status, search } = req.query;
 
         // Status Filter
         if (status && status !== 'all') {
@@ -65,13 +65,27 @@ exports.getClaims = async (req, res) => {
             ];
         }
 
-        // Date Filter
-        if (date) {
-            const startDate = new Date(date);
-            startDate.setHours(0, 0, 0, 0);
-            const endDate = new Date(date);
-            endDate.setHours(23, 59, 59, 999);
-            query.createdAt = { $gte: startDate, $lte: endDate };
+        // Date Filter (Support Range and Single Date)
+        const { date, startDate: qStartDate, endDate: qEndDate } = req.query;
+
+        if (qStartDate || qEndDate) {
+            query.createdAt = {};
+            if (qStartDate) {
+                const sDate = new Date(qStartDate);
+                sDate.setHours(0, 0, 0, 0);
+                query.createdAt.$gte = sDate;
+            }
+            if (qEndDate) {
+                const eDate = new Date(qEndDate);
+                eDate.setHours(23, 59, 59, 999);
+                query.createdAt.$lte = eDate;
+            }
+        } else if (date) {
+            const sDate = new Date(date);
+            sDate.setHours(0, 0, 0, 0);
+            const eDate = new Date(date);
+            eDate.setHours(23, 59, 59, 999);
+            query.createdAt = { $gte: sDate, $lte: eDate };
         }
 
         // Branch Filter & Permission Logic

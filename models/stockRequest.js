@@ -15,10 +15,16 @@ const StockRequestSchema = new Schema({
     note: { type: String, default: '' },
     status: {
         type: String,
-        enum: ['pending', 'processing', 'received'],
+        enum: ['pending', 'processing', 'ordering', 'sent_to_tech', 'shipped', 'received', 'canceled'],
         default: 'pending'
     },
+    fulfillmentMethod: {
+        type: String,
+        enum: ['purchase', 'stock', null],
+        default: null
+    },
     expectedArrivalDate: { type: Date },
+    trackingNumbers: [{ type: String }],
     requestedDate: { type: Date, default: Date.now },
     createdAt: { type: Date, default: Date.now }
 });

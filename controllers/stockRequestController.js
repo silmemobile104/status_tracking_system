@@ -1,4 +1,5 @@
 const StockRequest = require('../models/stockRequest');
+const notificationController = require('./notificationController');
 
 // @desc    Create new stock request
 // @route   POST /api/stock-requests
@@ -99,7 +100,7 @@ exports.getManageStockRequests = async (req, res) => {
 // @route   PUT /api/stock-requests/:id
 exports.updateStockRequest = async (req, res) => {
     try {
-        const { status, expectedArrival } = req.body;
+        const { status, expectedArrival, trackingNumbers, fulfillmentMethod } = req.body;
         const request = await StockRequest.findById(req.params.id);
 
         if (!request) {
@@ -107,9 +108,23 @@ exports.updateStockRequest = async (req, res) => {
         }
 
         if (status) request.status = status;
-        if (expectedArrival) request.expectedArrivalDate = expectedArrival;
+        if (expectedArrival !== undefined) request.expectedArrivalDate = expectedArrival;
+        if (Array.isArray(trackingNumbers)) request.trackingNumbers = trackingNumbers;
+        if (fulfillmentMethod) request.fulfillmentMethod = fulfillmentMethod;
 
         await request.save();
+
+        // Send Notification if status changed to 'shipped'
+        if (status === 'shipped' && request.createdBy) {
+            const message = `รายการแจ้งเบิก "${request.title}" ของคุณถูกจัดส่งแล้ว (เลขพัสดุ: ${request.trackingNumbers.join(', ') || '-'})`;
+            await notificationController.createNotification(
+                [request.createdBy],
+                message,
+                null, // No task ID
+                req.user.id
+            );
+        }
+
         res.status(200).json(request);
     } catch (error) {
         console.error('Update Stock Request Error:', error);

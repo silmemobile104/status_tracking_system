@@ -241,6 +241,21 @@
     </div>
 
     <script>
+        // --- Fetch Interceptor (Auto Logout on 401) ---
+        (function () {
+            const originalFetch = window.fetch;
+            window.fetch = async (...args) => {
+                const response = await originalFetch(...args);
+                if (response.status === 401) {
+                    console.warn('Unauthorized (401) detected. Redirecting to login...');
+                    localStorage.removeItem('token');
+                    localStorage.removeItem('user');
+                    window.location.href = 'login.html?expired=true';
+                }
+                return response;
+            };
+        })();
+
         const API_URL = '/api';
 
         async function loadClaimData() {
