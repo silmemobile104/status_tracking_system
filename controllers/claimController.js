@@ -10,7 +10,8 @@ exports.createClaim = async (req, res) => {
             productName,
             productCode,
             quantity,
-            problem
+            problem,
+            supplier
         } = req.body;
 
         const newClaim = new Claim({
@@ -21,7 +22,8 @@ exports.createClaim = async (req, res) => {
             productName,
             productCode,
             quantity,
-            problem
+            problem,
+            supplier
         });
 
         await newClaim.save();
