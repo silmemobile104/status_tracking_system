@@ -855,7 +855,6 @@
                                     <option value="">ทุกสถานะ</option>
                                     <option value="pending" selected>⏳ รอเช็ค</option>
                                     <option value="ordering">📦 กำลังสั่ง</option>
-                                    <option value="stock_out">📦 จัดส่งแล้ว</option>
                                     <option value="received">✅ ได้รับแล้ว</option>
                                     <option value="canceled">❌ ยกเลิก</option>
                                 </select>
@@ -919,8 +918,6 @@
                         </div>
 
                         <div class="flex flex-wrap items-center gap-4 w-full lg:w-auto">
-
-
                             <!-- Modern Branch Filter -->
                             <div id="branch-order-filter-branch-container" class="min-w-[180px]">
                                 <div class="relative group">
@@ -1841,20 +1838,14 @@
 
                     <!-- Filters Group -->
                     <div class="flex flex-wrap items-center gap-3 w-full md:w-auto">
-                        <!-- Branch Filter -->
-                        <div class="relative group w-full sm:w-56">
-                            <ion-icon name="chevron-down-outline"
-                                class="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none text-xs"></ion-icon>
-                        </div>
-
                         <!-- Status Filter -->
                         <div class="relative group w-full sm:w-48">
                             <ion-icon name="funnel-outline"
                                 class="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-hover:text-blue-500 transition-colors z-10"></ion-icon>
                             <select id="import-status-filter" onchange="fetchImportRequests()"
                                 class="pl-11 pr-10 py-3 rounded-2xl border border-slate-200 bg-white text-sm font-bold text-slate-700 focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 outline-none cursor-pointer hover:border-indigo-300 transition-all shadow-sm appearance-none w-full">
-                                <option value="all">ทุกสถานะ</option>
-                                <option value="pending" selected>รอนำเข้า</option>
+                                <option value="all" selected>ทุกสถานะ</option>
+                                <option value="pending">รอนำเข้า</option>
                                 <option value="importing">กำลังนำเข้า</option>
                                 <option value="received">สำเร็จ</option>
                             </select>
@@ -3235,39 +3226,19 @@
             }
 
             // =======================================================
-            // 2.1 [ใหม่] ควบคุมเมนู "แจ้งนำเข้า" (Import Notification)
+            // 2.1 ควบคุมเมนู "แจ้งนำเข้า" (Import Notification)
             // =======================================================
             const importNav = document.getElementById('nav-import');
             if (importNav) {
-                // แสดงเมนูนี้ถ้าเป็น: Staff (Sales/Branch), Admin, Executive, Manager
-                if (['staff', 'admin', 'executive', 'manager'].includes(currentUser.role)) {
-                    importNav.classList.remove('hidden');
-                    importNav.style.display = 'flex';
-                } else {
-                    // แต่ถ้าอยากให้ทีม Stock เห็นด้วย ก็เพิ่มเงื่อนไขได้ (แต่ในที่นี้ Staff ครอบคลุม Sales แล้ว)
-                    const userDept = (currentUser.department || '').trim();
-                    const isStock = userDept.includes('Store') || userDept.includes('Stock') || userDept.includes('สต๊อก');
+                const isSales = userDept.includes('ขาย') || userDept.includes('Sales');
+                const isAdminOrMgr = ['admin', 'executive', 'manager'].includes(currentUser.role);
 
-                    if (isStock) {
-                        // Stock Team usually uses "Stock Import" menu, but if they need to see this:
-                        // importNav.classList.remove('hidden');
-                        // importNav.style.display = 'flex';
-
-                        // For now, let's stick to the request: Sales Staff (Role: Staff)
-                        importNav.classList.add('hidden');
-                        importNav.style.display = 'none';
-                    } else {
-                        importNav.classList.add('hidden');
-                        importNav.style.display = 'none';
-                    }
-                }
-
-                // Simplify: Just check role for now based on user request "Sales Staff"
-                if (['staff', 'admin', 'executive', 'manager'].includes(currentUser.role)) {
+                // แสดงเมนูนี้ถ้าเป็น: ทีมขาย (Sales) หรือ ผู้บริหาร/ผู้จัดการ/Admin
+                if (isSales || isAdminOrMgr) {
                     importNav.classList.remove('hidden');
                     importNav.style.display = 'flex';
 
-                    // (*** Fix: Explicitly Show Action Buttons ***)
+                    // แสดงปุ่มดำเนินการ (ถ้ามี)
                     const actionBtns = document.getElementById('import-action-buttons');
                     if (actionBtns) {
                         actionBtns.classList.remove('hidden');
@@ -6367,11 +6338,11 @@
                 fetchAllUsersForTable();
             });
 
-            // (*** เพิ่ม: Listener สำหรับเมนู Import ***)
+            // (*** เพิ่ม: Listener สำหรับเมนู Import - เรียกใช้ switchImportTab เพื่อให้โหลดข้อมูลทันที ***)
             document.getElementById('nav-import').addEventListener('click', (e) => {
                 e.preventDefault();
                 updateNavActiveState('import');
-                fetchImportRequests(); // เรียกฟังก์ชันดึงข้อมูล (ที่เราเพิ่งสร้าง)
+                switchImportTab('phone');
             });
 
             // (*** เพิ่ม Listener สำหรับเมนู Deposit ***)
@@ -7427,33 +7398,41 @@
             const loading = document.getElementById('import-loading');
             const list = document.getElementById('import-list');
             if (loading) loading.classList.remove('hidden');
-            if (list) list.classList.add('hidden');
 
             try {
                 const token = localStorage.getItem('token');
                 const branch = document.getElementById('import-branch-filter')?.value || '';
-                const status = document.getElementById('import-status-filter')?.value || 'all';
+                const selectedStatus = document.getElementById('import-status-filter')?.value || 'all';
 
-                let url = `${SERVER_URL}/imports?type=${currentImportType}&branch=${branch}&status=${status}&limit=100`;
+                // Fetch with status=all to get counts for all statuses correctly
+                let url = `${SERVER_URL}/imports?type=${currentImportType}&branch=${branch}&status=all&limit=200`;
 
                 const res = await fetch(url, {
                     headers: { 'Authorization': `Bearer ${token}` }
                 });
 
                 if (res.ok) {
-                    const data = await res.json();
-                    allImportsData = Array.isArray(data) ? data : (data.data || []);
+                    const responseData = await res.json();
+                    allImportsData = Array.isArray(responseData) ? responseData : (responseData.data || []);
+
+                    // Update counts based on ALL data for this type/branch
+                    updateImportStatusCounts();
+
+                    // Filter display data based on UI selection
+                    let displayData = allImportsData;
+                    if (selectedStatus !== 'all') {
+                        displayData = allImportsData.filter(i => (i.status || 'pending') === selectedStatus);
+                    }
 
                     if (currentImportType === 'phone') {
-                        renderPhoneImportList();
+                        renderPhoneImportList(displayData);
                     } else {
-                        renderAccessoryImportList();
+                        renderAccessoryImportList(displayData);
                     }
-                    updateImportStatusCounts();
                 }
             } catch (err) {
                 console.error(err);
-                showToast('ไม่สามารถโหลดข้อมูลได้', 'error');
+                if (typeof showToast === 'function') showToast('ไม่สามารถโหลดข้อมูลได้', 'error');
             } finally {
                 if (loading) loading.classList.add('hidden');
                 if (list) list.classList.remove('hidden');
@@ -7486,12 +7465,12 @@
         }
 
         // 1. Render Phone List
-        function renderPhoneImportList() {
+        function renderPhoneImportList(data = allImportsData) {
             const list = document.getElementById('import-list');
             if (!list) return;
             list.innerHTML = '';
 
-            if (allImportsData.length === 0) {
+            if (data.length === 0) {
                 list.innerHTML = `<div class="col-span-full py-20 text-center">
                     <div class="flex flex-col items-center justify-center">
                         <div class="w-16 h-16 bg-slate-50 rounded-full flex items-center justify-center text-slate-300 mb-4">
@@ -7503,7 +7482,7 @@
                 return;
             }
 
-            allImportsData.forEach(item => {
+            data.forEach(item => {
                 const dateStr = new Date(item.createdAt).toLocaleDateString('th-TH');
                 const details = item.details || {};
                 const supplier = details.supplier || '-';
@@ -7618,12 +7597,12 @@
         }
 
         // 2. Render Accessory List
-        function renderAccessoryImportList() {
+        function renderAccessoryImportList(data = allImportsData) {
             const list = document.getElementById('import-list');
             if (!list) return;
             list.innerHTML = '';
 
-            if (allImportsData.length === 0) {
+            if (data.length === 0) {
                 list.innerHTML = `<div class="col-span-full py-20 text-center">
                     <div class="flex flex-col items-center justify-center">
                         <div class="w-16 h-16 bg-slate-50 rounded-full flex items-center justify-center text-slate-300 mb-4">
@@ -7635,7 +7614,7 @@
                 return;
             }
 
-            allImportsData.forEach(item => {
+            data.forEach(item => {
                 const details = item.details || {};
                 let imgUrl = null;
                 if (item.files && item.files.length > 0) {
@@ -7969,7 +7948,7 @@
             const container = document.getElementById('phone-items-container');
             const emptyState = document.getElementById('phone-items-empty');
             if (emptyState) emptyState.classList.add('hidden');
-
+                
             const rowId = `phone-row-${Date.now()}`;
             const div = document.createElement('div');
             div.className = "grid grid-cols-12 gap-3 p-3 bg-white rounded-xl border border-slate-100 shadow-sm animate-fade-in relative group items-end";
@@ -7983,15 +7962,18 @@
                     <label class="block text-[10px] font-bold text-slate-400 mb-1">สี (Color)</label>
                     <input type="text" class="phone-item-color form-input-theme w-full text-xs" placeholder="ระบุสี">
                 </div>
-                <div class="col-span-3">
+                
+                <div class="col-span-2">
                     <label class="block text-[10px] font-bold text-slate-400 mb-1">ความจุ</label>
                     <input type="text" class="phone-item-capacity form-input-theme w-full text-xs" placeholder="เช่น 128GB">
                 </div>
-                <div class="col-span-2">
+            
+                <div class="col-span-3">
                     <label class="block text-[10px] font-bold text-slate-400 mb-1">จำนวน</label>
                     <div class="flex items-center gap-1">
-                         <input type="number" class="phone-item-qty form-input-theme w-full text-center font-bold text-blue-600 text-xs px-1" value="1" min="1" required>
-                         <button type="button" onclick="document.getElementById('${rowId}').remove()" class="text-slate-300 hover:text-red-500 transition-colors p-1">
+                         <input type="number" class="phone-item-qty form-input-theme w-full text-center font-bold text-blue-600 text-sm px-3 py-1" value="1" min="1" required>
+                         
+                         <button type="button" onclick="document.getElementById('${rowId}').remove()" class="text-slate-300 hover:text-red-500 transition-colors p-1 shrink-0">
                             <ion-icon name="trash" class="text-lg"></ion-icon>
                         </button>
                     </div>
@@ -8194,11 +8176,14 @@
             div.className = "flex gap-2 items-start animate-fade-in";
             div.id = rowId;
             div.innerHTML = `
-                <div class="flex-1">
+                <div class="flex-[2]">
                     <input type="text" name="bo-product-name" placeholder="ชื่อสินค้า" class="form-input-theme text-sm" required>
                 </div>
-                <div class="w-24">
-                    <input type="number" name="bo-quantity" value="1" min="1" class="form-input-theme text-sm text-center" placeholder="จำนวน" required>
+                <div class="w-16">
+                    <input type="number" name="bo-quantity" value="1" min="1" class="form-input-theme text-sm text-center px-1" placeholder="จำนวน" required>
+                </div>
+                <div class="flex-1">
+                    <input type="text" name="bo-tracking" placeholder="เลขพัสดุ" class="form-input-theme text-sm">
                 </div>
                 <button type="button" onclick="removeBranchOrderItemRow('${rowId}')" class="p-2 text-slate-300 hover:text-red-500 transition-colors">
                     <ion-icon name="trash"></ion-icon>
@@ -8238,8 +8223,9 @@
             itemRows.forEach(row => {
                 const name = row.querySelector('input[name="bo-product-name"]').value;
                 const qty = row.querySelector('input[name="bo-quantity"]').value;
+                const tracking = row.querySelector('input[name="bo-tracking"]').value;
                 if (!name || !qty) isValid = false;
-                items.push({ productName: name, quantity: Number(qty) });
+                items.push({ productName: name, quantity: Number(qty), trackingNumber: tracking });
             });
 
             if (!orderName || !orderDate || items.length === 0 || !isValid) {
@@ -8446,10 +8432,15 @@
                 let productsHTML = '';
                 if (order.items && order.items.length > 0) {
                     productsHTML = order.items.map(i => `
-                        <div class="flex items-center gap-1.5 mt-1">
+                        <div class="flex items-center gap-1.5 mt-1 flex-wrap">
                             <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
                             <span class="text-xs font-bold text-slate-700">${i.productName}</span>
                             <span class="text-[10px] bg-slate-100 px-1.5 py-0.5 rounded text-slate-500 ml-1 font-bold">x${i.quantity}</span>
+                            ${i.trackingNumber ? `
+                                <span class="text-[9px] bg-indigo-50 text-indigo-600 px-1.5 py-0.5 rounded border border-indigo-100 ml-1 font-black flex items-center gap-1">
+                                    <ion-icon name="bus-outline"></ion-icon> ${i.trackingNumber}
+                                </span>
+                            ` : ''}
                         </div>
                     `).join('');
                 } else if (order.productName) {

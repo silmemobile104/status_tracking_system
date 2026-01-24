@@ -24,6 +24,10 @@ const BranchStockOrderSchema = new Schema({
             type: Number,
             required: true,
             min: 1
+        },
+        trackingNumber: {
+            type: String,
+            default: ''
         }
     }],
     branch: {
