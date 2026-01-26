@@ -320,7 +320,7 @@
                         class="flex items-center px-4 py-3 text-slate-600 hover:bg-slate-50 hover:text-slate-900 rounded-xl transition-all group">
                         <ion-icon name="wallet-outline"
                             class="w-5 h-5 mr-3 text-slate-400 group-hover:text-yellow-500 transition-colors"></ion-icon>
-                        <span class="font-medium">เงินค่ามัดจำหน้าร้าน</span>
+                        <span class="font-medium">การมัดจำสินค้า</span>
                     </a>
                     <a href="#" onclick="updateNavActiveState('purchasing')" id="nav-purchasing"
                         class="flex items-center px-4 py-3 text-slate-600 hover:bg-slate-50 hover:text-slate-900 rounded-xl transition-all group">
@@ -585,7 +585,7 @@
                         <h3 class="text-xl font-bold text-slate-800 flex items-center">
                             <div class="p-2 bg-yellow-100 text-yellow-600 rounded-lg mr-3"><ion-icon
                                     name="wallet"></ion-icon></div>
-                            <span id="deposit-header-title">เงินค่ามัดจำหน้าร้าน</span>
+                            <span id="deposit-header-title">การมัดจำสินค้า</span>
                         </h3>
 
                         <div class="flex items-center gap-3">
@@ -5128,7 +5128,7 @@
             }
             else if (activeView === 'deposit') { // (*** ใหม่ ***)
                 safeShow(depositView);
-                mainHeader.textContent = "เงินค่ามัดจำหน้าร้าน";
+                mainHeader.textContent = "การมัดจำสินค้า";
                 navDeposit.classList.add('bg-amber-500', 'text-white');
                 navDeposit.classList.remove('text-gray-600', 'hover:bg-gray-100');
                 // ปกติหน้าร้านก็ควรเลือกบริษัทได้
